@@ -109,7 +109,7 @@ class ProxyCreator
         ];
 
         $nodes = $this->getNodes($class);
-        $output = $this->traverser->traverseClonedNodes($nodes, $visitors);
+        $output = $this->traverser->traverseClonedNodes($nodes, ...$visitors);
 
         return $this->printer->printFormatPreserving($output, $nodes, $this->lexer->getTokens());
     }

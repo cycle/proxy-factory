@@ -20,7 +20,7 @@ class Traverser
 
     public function traverseFilename(string $filename, NodeVisitor ...$visitors)
     {
-        return $this->makeTraverser($visitors)->traverse($this->parseNodes($filename));
+        return $this->makeTraverser(...$visitors)->traverse($this->parseNodes($filename));
     }
 
     private function parseNodes(string $filename)
@@ -30,7 +30,7 @@ class Traverser
 
     public function traverseClonedNodes(array $nodes, NodeVisitor ...$visitors)
     {
-        return $this->makeTraverser($visitors)->traverse($this->cloneNodes($nodes));
+        return $this->makeTraverser(...$visitors)->traverse($this->cloneNodes($nodes));
     }
 
     private function cloneNodes(array $nodes)
