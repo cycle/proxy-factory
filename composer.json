@@ -1,0 +1,24 @@
+{
+  "name": "spiral/cycle-proxy-factory",
+  "type": "library",
+  "description": "Proxy Factory Interface implementation for cycle ORM",
+  "autoload": {
+    "psr-4": {
+      "Spiral\\Cycle\\Promise\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Spiral\\Cycle\\Promise\\Tests\\": "tests/Promise/"
+    }
+  },
+  "require": {
+    "nikic/php-parser": "^4.2"
+  },
+  "require-dev": {
+    "spiral/dumper": "^1.1",
+    "phpunit/phpunit": "^8.0",
+    "spiral/core": "^1.1",
+    "spiral/debug": "^1.3"
+  }
+}
