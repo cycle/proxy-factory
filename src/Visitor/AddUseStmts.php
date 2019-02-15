@@ -14,6 +14,14 @@ use Spiral\Cycle\Promise\Utils;
  */
 class AddUseStmts extends NodeVisitorAbstract
 {
+    /** @var array */
+    private $dependencies = [];
+
+    public function __construct(array $dependencies)
+    {
+        $this->dependencies = $dependencies;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -92,7 +100,7 @@ class AddUseStmts extends NodeVisitorAbstract
     private function buildUseStmts(): array
     {
         $stmts = [];
-        foreach (ProxyCreator::PROXY_DEPENDENCIES as $dependency) {
+        foreach ($this->dependencies as $dependency) {
             $stmts[] = $this->buildUse($dependency);
         }
 

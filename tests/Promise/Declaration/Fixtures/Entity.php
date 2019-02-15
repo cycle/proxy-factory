@@ -12,13 +12,17 @@ abstract class Entity
     public $public;
     public static $publicStatic;
     protected $protected;
+//    protected $__resolver;
     private $private = null;
 
     public function public()
     {
     }
 
-    protected function protected()
+    /**
+     * @return array
+     */
+    protected function protected(): array
     {
     }
 

@@ -12,7 +12,6 @@ use PhpParser\PrettyPrinterAbstract;
 use Spiral\Cycle\ORMInterface;
 use Spiral\Cycle\Promise\Declaration\Declaration;
 use Spiral\Cycle\Select\SourceFactoryInterface;
-use Spiral\Cycle\Tests\Fixtures\PromiseResolver;
 
 class ProxyCreator
 {
@@ -24,6 +23,14 @@ class ProxyCreator
         SourceFactoryInterface::class,
         PromiseInterface::class,
         ResolverTrait::class,
+        PromiseResolver::class,
+    ];
+
+    const PROXY_CONSTRUCTOR_PARAMS = [
+        'orm'    => ORMInterface::class,
+        'source' => SourceFactoryInterface::class,
+        'target' => 'string',
+        'scope'  => 'array'
     ];
 
     /** @var ConflictResolver */
@@ -44,21 +51,20 @@ class ProxyCreator
     /** @var Traverser */
     private $cloner;
 
-    public function __construct(ConflictResolver $resolver, Traverser $traverser, Lexer $lexer = null, PrettyPrinterAbstract $printer = null)
+    public function __construct(ConflictResolver $resolver, Traverser $traverser)
     {
+        $this->resolver = $resolver;
         $this->traverser = $traverser;
 
-        if (empty($lexer)) {
-            $lexer = new Lexer\Emulative([
-                'usedAttributes' => [
-                    'comments',
-                    'startLine',
-                    'endLine',
-                    'startTokenPos',
-                    'endTokenPos',
-                ],
-            ]);
-        }
+        $lexer = new Lexer\Emulative([
+            'usedAttributes' => [
+                'comments',
+                'startLine',
+                'endLine',
+                'startTokenPos',
+                'endTokenPos',
+            ],
+        ]);
 
         $this->lexer = $lexer;
         $this->parser = new Parser\Php7($this->lexer);
@@ -66,8 +72,7 @@ class ProxyCreator
         $this->cloner = new NodeTraverser();
         $this->cloner->addVisitor(new CloningVisitor());
 
-        $this->printer = $printer ?? new Standard();
-        $this->resolver = $resolver;
+        $this->printer = new Standard();
     }
 
     /**
@@ -100,12 +105,15 @@ class ProxyCreator
     {
         $propertyName = $this->propertyName($declaration);
         $visitors = [
-            new Visitor\AddUseStmts(),      //1
-            new Visitor\RemoveUseStmts(),   //2
-            new Visitor\DeclareClass(),     //3
-            new Visitor\AddTrait(),         //4
-            new Visitor\AddProperty($propertyName, $this->propertyType()),      //5
-            new Visitor\ModifyProxyMethod(),//7
+            new Visitor\AddUseStmts(self::PROXY_DEPENDENCIES),
+            new Visitor\RemoveUseStmts(),
+            new Visitor\DeclareClass(),
+            new Visitor\RemoveProperties(),
+            new Visitor\AddTrait(),
+            new Visitor\AddResolverProperty($propertyName, $this->propertyType()),
+            new Visitor\AddConstructor($propertyName, $this->propertyType(), self::PROXY_CONSTRUCTOR_PARAMS),
+            new Visitor\ModifyProxyMethod(),
+            new Visitor\AddResolverGetter($propertyName, $this->methodName($declaration), $this->propertyType()),
         ];
 
         $nodes = $this->getNodes($class);
@@ -122,6 +130,11 @@ class ProxyCreator
     private function propertyType(): string
     {
         return Utils::shortName(PromiseResolver::class);
+    }
+
+    private function methodName(Declaration $declaration): string
+    {
+        return $this->resolver->resolve($declaration->methods, self::PROXY_RESOLVER_CALL);
     }
 
     private function getNodes(string $class)

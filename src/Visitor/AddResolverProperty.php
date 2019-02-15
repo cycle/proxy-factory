@@ -12,7 +12,7 @@ use Spiral\Cycle\Promise\Utils;
 /**
  * Add resolver property
  */
-class AddProperty extends NodeVisitorAbstract
+class AddResolverProperty extends NodeVisitorAbstract
 {
     /** @var string */
     private $name;
@@ -43,7 +43,7 @@ class AddProperty extends NodeVisitorAbstract
     private function definePlacementID(Node\Stmt\Class_ $node): int
     {
         foreach ($node->stmts as $index => $child) {
-            if ($child instanceof Node\Stmt\ClassMethod || $child instanceof Node\Stmt\Property) {
+            if ($child instanceof Node\Stmt\ClassMethod || $child instanceof Node\Stmt\Property || $child instanceof Node\Stmt\Trait_) {
                 return $index;
             }
         }

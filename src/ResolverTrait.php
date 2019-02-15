@@ -3,8 +3,6 @@ declare(strict_types=1);
 
 namespace Spiral\Cycle\Promise;
 
-use Spiral\Cycle\Tests\Fixtures\PromiseResolver;
-
 trait ResolverTrait
 {
     abstract protected function __resolver(): PromiseResolver;

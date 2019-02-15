@@ -22,10 +22,19 @@ class DeclareClass extends NodeVisitorAbstract
             return null;
         }
 
-        $node->extends = new Node\Stmt\Class_($node->name->name);
-        $node->implements = [new Node\Stmt\Interface_(Utils::shortName(PromiseInterface::class))];
+        if ($node->isAbstract()) {
+            $this->removeAbstract($node);
+        }
+
+        $node->extends = new Node\Name($node->name->name);
+        $node->implements = [new Node\Name(Utils::shortName(PromiseInterface::class))];
         $node->name->name .= 'Proxy';
 
         return $node;
+    }
+
+    private function removeAbstract(Node\Stmt\Class_ $node)
+    {
+        $node->flags = $node->flags ^ Node\Stmt\Class_::MODIFIER_ABSTRACT;
     }
 }

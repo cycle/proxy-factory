@@ -1,10 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Tests\Fixtures;
+namespace Spiral\Cycle\Promise;
 
 use Spiral\Cycle\ORMInterface;
-use Spiral\Cycle\Promise\PromiseInterface;
 use Spiral\Cycle\Select;
 
 class PromiseResolver implements PromiseInterface
