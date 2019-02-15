@@ -13,6 +13,14 @@ use Spiral\Cycle\Promise\ProxyCreator;
  */
 class RemoveUseStmts extends NodeVisitorAbstract
 {
+    /** @var array */
+    private $dependencies;
+
+    public function __construct(array $dependencies)
+    {
+        $this->dependencies = $dependencies;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -37,6 +45,6 @@ class RemoveUseStmts extends NodeVisitorAbstract
 
     private function isReserved(Node\Stmt\UseUse $use): bool
     {
-        return in_array($use->name->toString(), ProxyCreator::PROXY_DEPENDENCIES);
+        return in_array($use->name->toString(), $this->dependencies);
     }
 }

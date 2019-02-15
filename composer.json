@@ -15,7 +15,10 @@
   },
   "require": {
     "php": "^7.1|^8.0",
-    "nikic/php-parser": "^4.2"
+    "nikic/php-parser": "^4.2",
+    "spiral/tokenizer": "^2.1",
+    "spiral/config": "^1.1",
+    "ext-mbstring": "^7.3"
   },
   "require-dev": {
     "spiral/dumper": "^1.1",

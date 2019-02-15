@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Spiral\Cycle\Promise\Tests\Fixtures;
 
-abstract class Entity
+class EntityWithTrait
 {
     use EntityTrait;
     const MY_CONST = 'value';

@@ -13,6 +13,14 @@ use Spiral\Cycle\Promise\Utils;
  */
 class DeclareClass extends NodeVisitorAbstract
 {
+    /** @var string */
+    private $name;
+
+    public function __construct(string $name)
+    {
+        $this->name = $name;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +36,7 @@ class DeclareClass extends NodeVisitorAbstract
 
         $node->extends = new Node\Name($node->name->name);
         $node->implements = [new Node\Name(Utils::shortName(PromiseInterface::class))];
-        $node->name->name .= 'Proxy';
+        $node->name->name = $this->name;
 
         return $node;
     }

@@ -4,9 +4,7 @@ declare(strict_types=1);
 namespace Spiral\Cycle\Promise;
 
 use PhpParser\Lexer;
-use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\Parser;
-use PhpParser\NodeTraverser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Spiral\Cycle\ORMInterface;
@@ -15,10 +13,10 @@ use Spiral\Cycle\Select\SourceFactoryInterface;
 
 class ProxyCreator
 {
-    const PROXY_RESOLVER_PROPERTY = '__resolver';
-    const PROXY_RESOLVER_CALL     = '__resolver';
+    private const PROXY_RESOLVER_PROPERTY = '__resolver';
+    private const PROXY_RESOLVER_CALL     = '__resolver';
 
-    const PROXY_DEPENDENCIES = [
+    private const PROXY_DEPENDENCIES = [
         ORMInterface::class,
         SourceFactoryInterface::class,
         PromiseInterface::class,
@@ -26,7 +24,7 @@ class ProxyCreator
         PromiseResolver::class,
     ];
 
-    const PROXY_CONSTRUCTOR_PARAMS = [
+    private const PROXY_CONSTRUCTOR_PARAMS = [
         'orm'    => ORMInterface::class,
         'source' => SourceFactoryInterface::class,
         'target' => 'string',
@@ -39,17 +37,14 @@ class ProxyCreator
     /** @var Traverser */
     private $traverser;
 
-    /** @var Parser */
-    private $parser;
-
     /** @var Lexer */
     private $lexer;
 
+    /** @var Parser */
+    private $parser;
+
     /** @var PrettyPrinterAbstract */
     private $printer;
-
-    /** @var Traverser */
-    private $cloner;
 
     public function __construct(ConflictResolver $resolver, Traverser $traverser)
     {
@@ -68,9 +63,6 @@ class ProxyCreator
 
         $this->lexer = $lexer;
         $this->parser = new Parser\Php7($this->lexer);
-
-        $this->cloner = new NodeTraverser();
-        $this->cloner->addVisitor(new CloningVisitor());
 
         $this->printer = new Standard();
     }
@@ -97,23 +89,26 @@ class ProxyCreator
      * 8 add "__resolver()" method with PHPDoc (with name conflict resolving)
      *
      * @param string      $class
+     * @param string      $as
      * @param Declaration $declaration
      *
      * @return string
      */
-    public function make(string $class, Declaration $declaration): string
+    public function make(string $class, string $as, Declaration $declaration): string
     {
         $propertyName = $this->propertyName($declaration);
+        $methodName = $this->methodName($declaration);
+
         $visitors = [
             new Visitor\AddUseStmts(self::PROXY_DEPENDENCIES),
-            new Visitor\RemoveUseStmts(),
-            new Visitor\DeclareClass(),
+            new Visitor\RemoveUseStmts(self::PROXY_DEPENDENCIES),
+            new Visitor\DeclareClass($as),
             new Visitor\RemoveProperties(),
             new Visitor\AddTrait(),
             new Visitor\AddResolverProperty($propertyName, $this->propertyType()),
             new Visitor\AddConstructor($declaration->hasConstructor, $propertyName, $this->propertyType(), self::PROXY_CONSTRUCTOR_PARAMS),
-            new Visitor\ModifyProxyMethod(),
-            new Visitor\AddResolverGetter($propertyName, $this->methodName($declaration), $this->propertyType()),
+            new Visitor\ModifyProxyMethod($methodName),
+            new Visitor\AddResolverGetter($propertyName, $methodName, $this->propertyType()),
         ];
 
         $nodes = $this->getNodes($class);

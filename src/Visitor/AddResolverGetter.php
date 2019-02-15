@@ -17,15 +17,15 @@ class AddResolverGetter extends NodeVisitorAbstract
     private $property;
 
     /** @var string */
-    private $name;
+    private $method;
 
     /** @var string */
     private $returnType;
 
-    public function __construct(string $property, string $name, string $returnType)
+    public function __construct(string $property, string $method, string $returnType)
     {
         $this->property = $property;
-        $this->name = $name;
+        $this->method = $method;
         $this->returnType = $returnType;
     }
 
@@ -45,7 +45,7 @@ class AddResolverGetter extends NodeVisitorAbstract
 
     private function buildMethod(Doc $doc): Node\Stmt\ClassMethod
     {
-        $method = new Method($this->name);
+        $method = new Method($this->method);
         $method->makeProtected();
         $method->setReturnType($this->returnType);
         $method->setDocComment($doc);
