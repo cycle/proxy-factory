@@ -13,11 +13,12 @@
     }
   },
   "require": {
+    "php": "^7.1|^8.0",
     "nikic/php-parser": "^4.2"
   },
   "require-dev": {
     "spiral/dumper": "^1.1",
-    "phpunit/phpunit": "^8.0",
+    "phpunit/phpunit": "~7.0",
     "spiral/core": "^1.1",
     "spiral/debug": "^1.3"
   }
