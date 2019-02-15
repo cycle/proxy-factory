@@ -115,8 +115,19 @@ class ProxyCreatorTest extends TestCase
     /**
      * @depends testDeclaration
      */
+    public function testConstants()
+    {
+        $this->assertStringNotContainsString(' const ', $this->make(Fixtures\EntityWithoutConstants::class, "EntityProxy" . __LINE__));
+        $this->assertStringNotContainsString(' const ', $this->make(Fixtures\EntityWithConstants::class, "EntityProxy" . __LINE__));
+    }
+
+    /**
+     * @depends testDeclaration
+     */
     public function testProperties()
     {
+        //test all properties are removed
+        //test resolver property inserted with name resolved
     }
 
     /**
@@ -183,6 +194,8 @@ class ProxyCreatorTest extends TestCase
      */
     public function testMethods()
     {
+        //test all methods (except public/protected and not final/abstract/static) are removed
+        //test other methods are changed
     }
 
     private function fetchUseStatements(string $code): array
