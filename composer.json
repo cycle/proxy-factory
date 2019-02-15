@@ -4,7 +4,8 @@
   "description": "Proxy Factory Interface implementation for cycle ORM",
   "autoload": {
     "psr-4": {
-      "Spiral\\Cycle\\Promise\\": "src/"
+      "Spiral\\Cycle\\Promise\\": "src/",
+      "Spiral\\Cycle\\": "cycle/"
     }
   },
   "autoload-dev": {

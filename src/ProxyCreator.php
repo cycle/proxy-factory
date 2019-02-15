@@ -111,7 +111,7 @@ class ProxyCreator
             new Visitor\RemoveProperties(),
             new Visitor\AddTrait(),
             new Visitor\AddResolverProperty($propertyName, $this->propertyType()),
-            new Visitor\AddConstructor($propertyName, $this->propertyType(), self::PROXY_CONSTRUCTOR_PARAMS),
+            new Visitor\AddConstructor($declaration->hasConstructor, $propertyName, $this->propertyType(), self::PROXY_CONSTRUCTOR_PARAMS),
             new Visitor\ModifyProxyMethod(),
             new Visitor\AddResolverGetter($propertyName, $this->methodName($declaration), $this->propertyType()),
         ];

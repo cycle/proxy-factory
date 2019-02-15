@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Spiral\Cycle\Promise\Tests\Declaration\Fixtures;
 
-class Entity
+class EntityWithConstructor
 {
     public $public;
     public static $publicStatic;
@@ -36,5 +36,9 @@ class Entity
     public function __toString()
     {
         return '';
+    }
+
+    public function __construct()
+    {
     }
 }

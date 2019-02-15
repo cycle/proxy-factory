@@ -11,6 +11,9 @@ class LocateMethods extends NodeVisitorAbstract
     /** @var string[] */
     private $methods = [];
 
+    /** @var bool */
+    private $hasConstructor = false;
+
     /**
      * {@inheritdoc}
      */
@@ -18,6 +21,10 @@ class LocateMethods extends NodeVisitorAbstract
     {
         if (!$node instanceof Node\Stmt\ClassMethod) {
             return null;
+        }
+
+        if ($node->name->name == '__construct') {
+            $this->hasConstructor = true;
         }
 
         if ($node->isPrivate() || $node->isStatic() || $node->isFinal() || $node->isAbstract() || $node->isMagic()) {
@@ -32,5 +39,10 @@ class LocateMethods extends NodeVisitorAbstract
     public function getMethods(): array
     {
         return $this->methods;
+    }
+
+    public function hasConstructor(): bool
+    {
+        return $this->hasConstructor;
     }
 }

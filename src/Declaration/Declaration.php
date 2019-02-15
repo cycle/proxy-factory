@@ -11,11 +11,15 @@ class Declaration
     /** @var string[] */
     public $methods = [];
 
-    public static function create(array $properties, array $methods): Declaration
+    /** @var bool */
+    public $hasConstructor;
+
+    public static function create(array $properties, array $methods, bool $hasConstructor): Declaration
     {
         $self = new self();
         $self->properties = $properties;
         $self->methods = $methods;
+        $self->hasConstructor = $hasConstructor;
 
         return $self;
     }

@@ -15,7 +15,8 @@ use Spiral\Cycle\Promise\Utils;
  */
 class AddConstructor extends NodeVisitorAbstract
 {
-    private const CONSTRUCTOR_METHOD_NAME = '__construct';
+    /** @var bool */
+    private $hasConstructor;
 
     /** @var string */
     private $property;
@@ -26,8 +27,9 @@ class AddConstructor extends NodeVisitorAbstract
     /** @var array */
     private $dependencies = [];
 
-    public function __construct(string $property, string $propertyType, array $dependencies)
+    public function __construct(bool $hasConstructor, string $property, string $propertyType, array $dependencies)
     {
+        $this->hasConstructor = $hasConstructor;
         $this->property = $property;
         $this->propertyType = $propertyType;
         $this->dependencies = $dependencies;
@@ -60,15 +62,15 @@ class AddConstructor extends NodeVisitorAbstract
 
     private function buildMethod(): Node\Stmt\ClassMethod
     {
-        $constructor = new Method(self::CONSTRUCTOR_METHOD_NAME);
+        $constructor = new Method('__construct');
         $constructor->makePublic();
         $constructor->setDocComment($this->makePHPDoc());
         $constructor->addParams($this->makeParams());
 
-        $constructor->addStmts([
-            $this->makeResolverAssignment(),
-            $this->makeParentConstructorCall()
-        ]);
+        $constructor->addStmt($this->makeResolverAssignment());
+        if ($this->hasConstructor) {
+            $constructor->addStmt($this->makeParentConstructorCall());
+        }
 
         return $constructor->getNode();
     }
@@ -128,6 +130,6 @@ class AddConstructor extends NodeVisitorAbstract
 
     private function makeParentConstructorCall(): Node\Stmt\Expression
     {
-        return new Node\Stmt\Expression(new Node\Expr\StaticCall(new Node\Name('parent'), self::CONSTRUCTOR_METHOD_NAME));
+        return new Node\Stmt\Expression(new Node\Expr\StaticCall(new Node\Name('parent'), '__construct'));
     }
 }

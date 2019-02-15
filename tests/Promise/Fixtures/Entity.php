@@ -1,14 +1,24 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Tests\Declaration\Fixtures;
+namespace Spiral\Cycle\Promise\Tests\Fixtures;
 
-class Entity
+
+abstract class Entity
 {
+//    use EntityTrait;
+    const MY_CONST = 'value';
+
     public $public;
     public static $publicStatic;
     protected $protected;
+    protected $__resolver;
     private $private = null;
+
+    public function __construct()
+    {
+        //have some body
+    }
 
     public function public()
     {

@@ -45,7 +45,7 @@ class AddTrait extends NodeVisitorAbstract
     private function createTraits(Node\Stmt\Class_ $node)
     {
         array_unshift($node->stmts, new Node\Stmt\TraitUse([
-            new Node\Stmt\Trait_($this->traitName())
+            new Node\Name($this->traitName())
         ]));
     }
 
@@ -79,7 +79,7 @@ class AddTrait extends NodeVisitorAbstract
                 continue;
             }
 
-            $stmt->traits[] = new Node\Stmt\Trait_($this->traitName());
+            $stmt->traits[] = new Node\Name($this->traitName());
         }
     }
 
