@@ -9,6 +9,8 @@ abstract class Entity
 {
     use ResolverTrait;
 
+    const MY_CONST = 'value';
+
     public $public;
     public static $publicStatic;
     protected $protected;

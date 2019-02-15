@@ -25,10 +25,6 @@ class LocateProperties extends NodeVisitorAbstract
         }
 
         foreach ($node->props as $prop) {
-            if (!$prop instanceof Node\Stmt\PropertyProperty) {
-                continue;
-            }
-
             $this->properties[] = $prop->name->name;
         }
 

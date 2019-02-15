@@ -6,10 +6,9 @@ namespace Spiral\Cycle\Promise\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitorAbstract;
-use Spiral\Cycle\Promise\ProxyCreator;
 
 /**
- * Remove use statements from the code.
+ * Remove properties and constants statements from the code.
  */
 class RemoveProperties extends NodeVisitorAbstract
 {
@@ -18,10 +17,10 @@ class RemoveProperties extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node)
     {
-        if (!$node instanceof Node\Stmt\Property) {
-            return null;
+        if ($node instanceof Node\Stmt\ClassConst || $node instanceof Node\Stmt\Property) {
+            return NodeTraverser::REMOVE_NODE;
         }
 
-        return NodeTraverser::REMOVE_NODE;
+        return null;
     }
 }
