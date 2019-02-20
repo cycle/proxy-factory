@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Spiral\Cycle\Promise\Visitor;
 
 use PhpParser\Builder\Property;
-use PhpParser\Comment\Doc;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+use Spiral\Cycle\Promise\PHPDoc;
 use Spiral\Cycle\Promise\Utils;
 
 /**
@@ -15,15 +15,19 @@ use Spiral\Cycle\Promise\Utils;
 class AddResolverProperty extends NodeVisitorAbstract
 {
     /** @var string */
-    private $name;
+    private $property;
 
     /** @var string */
     private $type;
 
-    public function __construct(string $name, string $type)
+    /** @var string */
+    private $class;
+
+    public function __construct(string $property, string $type, string $class)
     {
-        $this->name = $name;
+        $this->property = $property;
         $this->type = $type;
+        $this->class = $class;
     }
 
     /**
@@ -31,19 +35,17 @@ class AddResolverProperty extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node)
     {
-        if (!$node instanceof Node\Stmt\Class_) {
-            return null;
+        if ($node instanceof Node\Stmt\Class_) {
+            $node->stmts = Utils::injectValues($node->stmts, $this->definePlacementID($node), [$this->buildProperty()]);
         }
 
-        $node->stmts = Utils::injectValues($node->stmts, $this->definePlacementID($node), [$this->buildProperty()]);
-
-        return $node;
+        return null;
     }
 
     private function definePlacementID(Node\Stmt\Class_ $node): int
     {
         foreach ($node->stmts as $index => $child) {
-            if ($child instanceof Node\Stmt\ClassMethod || $child instanceof Node\Stmt\Property || $child instanceof Node\Stmt\Trait_) {
+            if ($child instanceof Node\Stmt\ClassMethod) {
                 return $index;
             }
         }
@@ -53,9 +55,9 @@ class AddResolverProperty extends NodeVisitorAbstract
 
     private function buildProperty(): Node\Stmt\Property
     {
-        $property = new Property($this->name);
-        $property->makeProtected();
-        $property->setDocComment(new Doc("/** @var {$this->type} */"));
+        $property = new Property($this->property);
+        $property->makePrivate();
+        $property->setDocComment(PHPDoc::writeProperty("{$this->type}|{$this->class}"));
 
         return $property->getNode();
     }

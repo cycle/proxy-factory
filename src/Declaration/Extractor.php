@@ -15,13 +15,15 @@ class Extractor
         $this->traverser = $traverser;
     }
 
-    public function extract(string $filename): Declaration
+    public function extract(string $class): Declaration
     {
+        $class = new \ReflectionClass($class);
+
         $properties = new Visitor\LocateProperties();
-        $methods = new Visitor\LocateMethods();
+        $methods = new Visitor\LocateMethodsToBeProxied();
 
-        $this->traverser->traverseFilename($filename, $properties, $methods);
+        $this->traverser->traverseFilename($class->getFileName(), $properties, $methods);
 
-        return Declaration::create($properties->getProperties(), $methods->getMethods(), $methods->hasConstructor());
+        return Declaration::create($properties->getProperties(), $methods->getMethods(), !empty($class->getConstructor()));
     }
 }

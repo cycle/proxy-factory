@@ -6,7 +6,6 @@ namespace Spiral\Cycle\Promise\Visitor;
 use PhpParser\Builder\Use_;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Spiral\Cycle\Promise\ProxyCreator;
 use Spiral\Cycle\Promise\Utils;
 
 /**
@@ -15,11 +14,11 @@ use Spiral\Cycle\Promise\Utils;
 class AddUseStmts extends NodeVisitorAbstract
 {
     /** @var array */
-    private $dependencies = [];
+    private $useStmts = [];
 
-    public function __construct(array $dependencies)
+    public function __construct(array $useStmts)
     {
-        $this->dependencies = $dependencies;
+        $this->useStmts = $useStmts;
     }
 
     /**
@@ -27,14 +26,12 @@ class AddUseStmts extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node)
     {
-        if (!$node instanceof Node\Stmt\Namespace_) {
-            return null;
+        if ($node instanceof Node\Stmt\Namespace_) {
+            $placementID = $this->definePlacementID($node);
+            $node->stmts = Utils::injectValues($node->stmts, $placementID, $this->removeDuplicates($node->stmts, $this->buildUseStmts()));
         }
 
-        $placementID = $this->definePlacementID($node);
-        $node->stmts = Utils::injectValues($node->stmts, $placementID, $this->removeDuplicates($node->stmts, $this->buildUseStmts()));
-
-        return $node;
+        return null;
     }
 
     private function definePlacementID(Node\Stmt\Namespace_ $node): int
@@ -100,8 +97,8 @@ class AddUseStmts extends NodeVisitorAbstract
     private function buildUseStmts(): array
     {
         $stmts = [];
-        foreach ($this->dependencies as $dependency) {
-            $stmts[] = $this->buildUse($dependency);
+        foreach ($this->useStmts as $useStmt) {
+            $stmts[] = $this->buildUseStmt($useStmt);
         }
 
         return $stmts;
@@ -112,7 +109,7 @@ class AddUseStmts extends NodeVisitorAbstract
      *
      * @return Node
      */
-    private function buildUse(string $type): Node
+    private function buildUseStmt(string $type): Node
     {
         $use_ = new Use_(new Node\Name($type), Node\Stmt\Use_::TYPE_NORMAL);
 

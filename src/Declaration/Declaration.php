@@ -8,7 +8,7 @@ class Declaration
     /** @var string[] */
     public $properties = [];
 
-    /** @var string[] */
+    /** @var \PhpParser\Node\Stmt\ClassMethod[] */
     public $methods = [];
 
     /** @var bool */

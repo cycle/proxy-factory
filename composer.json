@@ -1,5 +1,5 @@
 {
-  "name": "spiral/cycle-proxy-factory",
+  "name": "cycle/proxy-factory",
   "type": "library",
   "description": "Proxy Factory Interface implementation for cycle ORM",
   "autoload": {
@@ -18,12 +18,14 @@
     "nikic/php-parser": "^4.2",
     "spiral/tokenizer": "^2.1",
     "spiral/config": "^1.1",
-    "ext-mbstring": "*"
+    "ext-mbstring": "*",
+    "spiral/cycle": "0.1a"
   },
   "require-dev": {
     "spiral/dumper": "^1.1",
     "phpunit/phpunit": "~7.0",
     "spiral/core": "^1.1",
-    "spiral/debug": "^1.3"
+    "spiral/debug": "^1.3",
+    "mockery/mockery": "^1.2"
   }
 }

@@ -5,8 +5,6 @@ namespace Spiral\Cycle\Promise\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Spiral\Cycle\Promise\PromiseInterface;
-use Spiral\Cycle\Promise\Utils;
 
 /**
  * Declare proxy class, add extends and implements declarations
@@ -16,9 +14,13 @@ class DeclareClass extends NodeVisitorAbstract
     /** @var string */
     private $name;
 
-    public function __construct(string $name)
+    /** @var string */
+    private $extends;
+
+    public function __construct(string $name, string $extends)
     {
         $this->name = $name;
+        $this->extends = $extends;
     }
 
     /**
@@ -26,23 +28,11 @@ class DeclareClass extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node)
     {
-        if (!$node instanceof Node\Stmt\Class_) {
-            return null;
+        if ($node instanceof Node\Stmt\Class_) {
+            $node->extends = new Node\Name($this->extends);
+            $node->name->name = $this->name;
         }
 
-        if ($node->isAbstract()) {
-            $this->removeAbstract($node);
-        }
-
-        $node->extends = new Node\Name($node->name->name);
-        $node->implements = [new Node\Name(Utils::shortName(PromiseInterface::class))];
-        $node->name->name = $this->name;
-
-        return $node;
-    }
-
-    private function removeAbstract(Node\Stmt\Class_ $node)
-    {
-        $node->flags = $node->flags ^ Node\Stmt\Class_::MODIFIER_ABSTRACT;
+        return null;
     }
 }

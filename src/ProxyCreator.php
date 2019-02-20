@@ -8,23 +8,14 @@ use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Spiral\Cycle\ORMInterface;
-use Spiral\Cycle\Promise\Declaration\Declaration;
+use Spiral\Cycle\Promise\Declaration;
 use Spiral\Cycle\Select\SourceFactoryInterface;
 
 class ProxyCreator
 {
-    private const PROXY_RESOLVER_PROPERTY = '__resolver';
-    private const PROXY_RESOLVER_CALL     = '__resolver';
+    private const PROPERTY = '__resolver';
 
-    private const PROXY_DEPENDENCIES = [
-        ORMInterface::class,
-        SourceFactoryInterface::class,
-        PromiseInterface::class,
-        ResolverTrait::class,
-        PromiseResolver::class,
-    ];
-
-    private const PROXY_CONSTRUCTOR_PARAMS = [
+    private const DEPENDENCIES = [
         'orm'    => ORMInterface::class,
         'source' => SourceFactoryInterface::class,
         'target' => 'string',
@@ -37,6 +28,9 @@ class ProxyCreator
     /** @var Traverser */
     private $traverser;
 
+    /** @var Declaration\Extractor */
+    private $extractor;
+
     /** @var Lexer */
     private $lexer;
 
@@ -46,10 +40,11 @@ class ProxyCreator
     /** @var PrettyPrinterAbstract */
     private $printer;
 
-    public function __construct(ConflictResolver $resolver, Traverser $traverser)
+    public function __construct(ConflictResolver $resolver, Traverser $traverser, Declaration\Extractor $extractor)
     {
         $this->resolver = $resolver;
         $this->traverser = $traverser;
+        $this->extractor = $extractor;
 
         $lexer = new Lexer\Emulative([
             'usedAttributes' => [
@@ -68,58 +63,51 @@ class ProxyCreator
     }
 
     /**
-     * 1 add use statements
-     *      use Spiral\Cycle\ORMInterface;
-     *      use Spiral\Cycle\Promise\PromiseInterface;
-     *      use Spiral\Cycle\Promise\ResolverTrait;
-     *      use Spiral\Cycle\Select\SourceFactoryInterface;
-     * 2 delete use statements
-     * 3 declare class
-     *      rename to <class name>+"Proxy"
-     *      add "extends" declaration
-     *      add "implements" declaration
-     * 4 add "use ResolverTrait;"
      *
-     * 5 add "__resolver" property with PHPDoc (with name conflict resolving)
-     * 6 add "__constructor" with:
-     *      proxy parameters
-     *      $this->__resolver = new ProxyResolver assignment
-     *      parent::__constructor() call
-     * 7 replace all public/protected method calls with resolved stub
-     * 8 add "__resolver()" method with PHPDoc (with name conflict resolving)
-     *
-     * @param string      $class
-     * @param string      $as
-     * @param Declaration $declaration
+     * @param string $class
+     * @param string $as
      *
      * @return string
      */
-    public function make(string $class, string $as, Declaration $declaration): string
+    public function make(string $class, string $as): string
     {
-        $propertyName = $this->propertyName($declaration);
-        $methodName = $this->methodName($declaration);
+        $declaration = $this->extractor->extract($class);
+        $schema = new Declaration\Schema($class, $as);
+
+        $property = $this->propertyName($declaration);
 
         $visitors = [
-            new Visitor\AddUseStmts(self::PROXY_DEPENDENCIES),
-            new Visitor\RemoveUseStmts(self::PROXY_DEPENDENCIES),
-            new Visitor\DeclareClass($as),
-            new Visitor\RemoveProperties(),
-            new Visitor\AddTrait(),
-            new Visitor\AddResolverProperty($propertyName, $this->propertyType()),
-            new Visitor\AddConstructor($declaration->hasConstructor, $propertyName, $this->propertyType(), self::PROXY_CONSTRUCTOR_PARAMS),
-            new Visitor\ModifyProxyMethod($methodName),
-            new Visitor\AddResolverGetter($propertyName, $methodName, $this->propertyType()),
+            new Visitor\AddUseStmts($this->useStmts($schema)),
+            new Visitor\UpdateNamespace($schema->class->namespace),
+            new Visitor\DeclareClass($schema->class->class, $schema->extends->class),
+            new Visitor\AddResolverProperty($property, $this->propertyType(), $schema->extends->class),
+            new Visitor\UpdateConstructor($declaration->hasConstructor, $property, $this->propertyType(), self::DEPENDENCIES),
+            new Visitor\UpdatePromiseMethods($property),
+            new Visitor\AddProxiedMethods($property, $declaration->methods),
         ];
 
-        $nodes = $this->getNodes($class);
+        $nodes = $this->getNodes(__DIR__ . DIRECTORY_SEPARATOR . 'Proxy.stub');
         $output = $this->traverser->traverseClonedNodes($nodes, ...$visitors);
 
-        return $this->printer->printFormatPreserving($output, $nodes, $this->lexer->getTokens());
+        return $this->printer->printFormatPreserving(
+            $output,
+            $nodes,
+            $this->lexer->getTokens()
+        );
     }
 
-    private function propertyName(Declaration $declaration): string
+    private function useStmts(Declaration\Schema $schema): array
     {
-        return $this->resolver->resolve($declaration->properties, self::PROXY_RESOLVER_PROPERTY);
+        if ($schema->class->namespace !== $schema->extends->namespace) {
+            return [$schema->extends->getNamespacesName()];
+        }
+
+        return [];
+    }
+
+    private function propertyName(Declaration\Declaration $declaration): string
+    {
+        return $this->resolver->resolve($declaration->properties, self::PROPERTY);
     }
 
     private function propertyType(): string
@@ -127,20 +115,8 @@ class ProxyCreator
         return Utils::shortName(PromiseResolver::class);
     }
 
-    private function methodName(Declaration $declaration): string
+    private function getNodes(string $stub)
     {
-        return $this->resolver->resolve($declaration->methods, self::PROXY_RESOLVER_CALL);
-    }
-
-    private function getNodes(string $class)
-    {
-        return $this->parser->parse($this->getCode($class));
-    }
-
-    private function getCode(string $class): string
-    {
-        $class = new \ReflectionClass($class);
-
-        return file_get_contents($class->getFileName());
+        return $this->parser->parse(file_get_contents($stub));
     }
 }

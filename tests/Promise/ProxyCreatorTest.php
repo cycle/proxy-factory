@@ -7,14 +7,12 @@ use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
-use Spiral\Cycle\ORM;
 use Spiral\Cycle\ORMInterface;
-use Spiral\Cycle\Promise\Declaration\Declaration;
-use Spiral\Cycle\Promise\Declaration\Extractor;
+use Spiral\Cycle\Promise\Declaration;
+use Spiral\Cycle\Promise\Declaration\Schema;
 use Spiral\Cycle\Promise\PromiseInterface;
 use Spiral\Cycle\Promise\PromiseResolver;
 use Spiral\Cycle\Promise\ProxyCreator;
-use Spiral\Cycle\Promise\ResolverTrait;
 use Spiral\Cycle\Promise\Tests\Fixtures;
 use Spiral\Cycle\Promise\Utils;
 use Spiral\Cycle\Select\SourceFactoryInterface;
@@ -23,36 +21,29 @@ class ProxyCreatorTest extends TestCase
 {
     public function testDeclaration()
     {
-        $className = Fixtures\Entity::class;
+        $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($className, $as);
+        $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $this->assertStringNotContainsString('abstract', $output);
-        $this->assertStringContainsString(sprintf(
-            "\nclass %s extends %s implements %s\n",
-            $as,
-            Utils::shortName($className),
-            Utils::shortName(PromiseInterface::class)
-        ), $output);
-
-        $proxyFullName = $this->changeName($className, $as);
-        $this->assertFalse(class_exists($proxyFullName));
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
 
-        $origReflection = new \ReflectionClass($className);
-        $proxyReflection = new \ReflectionClass($proxyFullName);
-        $this->assertSame($origReflection->getNamespaceName(), $proxyReflection->getNamespaceName());
+        $this->assertStringNotContainsString('abstract', $output);
+        $this->assertStringContainsString(sprintf(
+            "class %s extends %s implements %s",
+            $as,
+            Utils::shortName($class),
+            Utils::shortName(PromiseInterface::class)
+        ), $output);
 
-        $container = new Container();
-        $container->bind(ORMInterface::class, ORM::class);
-        $container->bind(SourceFactoryInterface::class, ORM::class);
-        $proxy = $container->make($proxyFullName, ['target' => Fixtures\Entity::class, 'scope' => []]);
+        $proxy = $this->makeProxyObject($class, $schema->class->getNamespacesName());
 
-        $this->assertInstanceOf($proxyFullName, $proxy);
-        $this->assertInstanceOf(Fixtures\Entity::class, $proxy);
+        $this->assertInstanceOf($schema->class->getNamespacesName(), $proxy);
+        $this->assertInstanceOf($class, $proxy);
         $this->assertInstanceOf(PromiseInterface::class, $proxy);
     }
 
@@ -60,56 +51,138 @@ class ProxyCreatorTest extends TestCase
      * @depends testDeclaration
      * @throws \ReflectionException
      */
-    public function testNamespace()
+    public function testSameNamespace()
     {
-        $className = Fixtures\Entity::class;
+        $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($className, $as);
+        $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $proxyFullName = $this->changeName($className, $as);
-        $this->assertFalse(class_exists($proxyFullName));
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
 
-        $origReflection = new \ReflectionClass($className);
-        $proxyReflection = new \ReflectionClass($proxyFullName);
+        $origReflection = new \ReflectionClass($class);
+        $proxyReflection = new \ReflectionClass($schema->class->getNamespacesName());
         $this->assertSame($origReflection->getNamespaceName(), $proxyReflection->getNamespaceName());
     }
 
     /**
-     * @depends testHasConstructor
+     * @depends testDeclaration
      * @throws \ReflectionException
      */
-    public function testUse()
+    public function testDifferentNamespace()
     {
-        $className = Fixtures\Entity::class;
-        $as = "EntityProxy" . __LINE__;
+        $class = Fixtures\Entity::class;
+        $as = "\EntityProxy" . __LINE__;
 
-        $output = $this->make($className, $as);
+        $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $proxyFullName = $this->changeName($className, $as);
-        $this->assertFalse(class_exists($proxyFullName));
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($proxyFullName));
+        $proxyReflection = new \ReflectionClass($schema->class->getNamespacesName());
+        $this->assertSame('', (string)$proxyReflection->getNamespaceName());
+        $this->assertStringNotContainsString('namespace ', $output);
     }
 
-    public function testTrait()
+    /**
+     * @throws \ReflectionException
+     */
+    public function testUseStmtsInSameNamespace()
     {
-        $this->assertStringContainsString(sprintf(
-            "use %s, %s;",
-            Utils::shortName(Fixtures\EntityTrait::class),
-            Utils::shortName(ResolverTrait::class)
-        ), $this->make(Fixtures\EntityWithTrait::class, "EntityProxy" . __LINE__));
+        $class = Fixtures\Entity::class;
+        $as = "EntityProxy" . __LINE__;
 
-        $this->assertStringContainsString(sprintf(
-            "use %s;",
-            Utils::shortName(ResolverTrait::class)
-        ), $this->make(Fixtures\EntityWithoutTrait::class, "EntityProxy" . __LINE__));
+        $output = $this->make($class, $as);
+        $output = ltrim($output, "<?php");
+
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+
+        eval($output);
+
+        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($schema->class->getNamespacesName(), [
+            PromiseResolver::class,
+            PromiseInterface::class
+        ]));
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testUseStmtsInDifferentNamespace()
+    {
+        $class = Fixtures\Entity::class;
+        $as = "\EntityProxy" . __LINE__;
+
+        $output = $this->make($class, $as);
+        $output = ltrim($output, "<?php");
+
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+
+        eval($output);
+
+        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($schema->class->getNamespacesName(), [
+            PromiseResolver::class,
+            PromiseInterface::class,
+            $class
+        ]));
+    }
+
+    private function fetchUseStatements(string $code): array
+    {
+        $uses = [];
+        foreach (explode("\n", $code) as $line) {
+            if (mb_stripos($line, 'use') !== 0) {
+                continue;
+            }
+
+            $uses[] = trim(mb_substr($line, 4), " ;\r\n");
+        }
+
+        sort($uses);
+
+        return $uses;
+    }
+
+    /**
+     * @param string $class
+     * @param array  $types
+     *
+     * @return array
+     * @throws \ReflectionException
+     */
+    private function fetchExternalDependencies(string $class, array $types = []): array
+    {
+        $reflection = new \ReflectionClass($class);
+
+        foreach ($reflection->getConstructor()->getParameters() as $parameter) {
+            if (!$parameter->hasType() || $parameter->getType()->isBuiltin()) {
+                continue;
+            }
+
+            $types[] = $parameter->getType()->getName();
+        }
+
+        sort($types);
+
+        return $types;
+    }
+
+    /**
+     * @depends testDeclaration
+     */
+    public function testTraits()
+    {
+        $this->assertStringNotContainsString(' use ', $this->make(Fixtures\EntityWithoutTrait::class, "EntityProxy" . __LINE__));
+        $this->assertStringNotContainsString(' use ', $this->make(Fixtures\EntityWithTrait::class, "EntityProxy" . __LINE__));
     }
 
     /**
@@ -126,8 +199,34 @@ class ProxyCreatorTest extends TestCase
      */
     public function testProperties()
     {
-        //test all properties are removed
-        //test resolver property inserted with name resolved
+        $class = Fixtures\Entity::class;
+        $as = "EntityProxy" . __LINE__;
+
+        $output = $this->make($class, $as);
+        $output = ltrim($output, "<?php");
+
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+
+        eval($output);
+
+        $reflection = new \ReflectionClass($schema->class->getNamespacesName());
+
+        /** @var \ReflectionProperty[] $properties */
+        $properties = [];
+        foreach ($reflection->getProperties() as $property) {
+            if ($property->getDeclaringClass()->getName() !== $schema->class->getNamespacesName()) {
+                continue;
+            }
+
+            $properties[] = $property;
+        }
+
+        $this->assertCount(1, $properties);
+        $property = $properties[0];
+        $this->assertTrue($property->isPrivate());
+        $this->assertFalse($property->isStatic());
+        $this->assertStringContainsString('@var PromiseResolver|' . Utils::shortName($class), $property->getDocComment());
     }
 
     /**
@@ -135,18 +234,33 @@ class ProxyCreatorTest extends TestCase
      */
     public function testHasConstructor()
     {
-        $className = Fixtures\EntityWithoutConstructor::class;
+        $class = Fixtures\EntityWithoutConstructor::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($className, $as);
+        $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $proxyFullName = $this->changeName($className, $as);
-        $this->assertFalse(class_exists($proxyFullName));
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
 
-        $reflection = new \ReflectionClass($proxyFullName);
+        $reflection = new \ReflectionClass($schema->class->getNamespacesName());
+        $constructor = $reflection->getConstructor();
+        $this->assertNotNull($constructor);
+
+        $class = Fixtures\EntityWithConstructor::class;
+        $as = "EntityProxy" . __LINE__;
+
+        $output = $this->make($class, $as);
+        $output = ltrim($output, "<?php");
+
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+
+        eval($output);
+
+        $reflection = new \ReflectionClass($schema->class->getNamespacesName());
         $constructor = $reflection->getConstructor();
         $this->assertNotNull($constructor);
     }
@@ -156,14 +270,14 @@ class ProxyCreatorTest extends TestCase
      */
     public function testNotContainParentConstructor()
     {
-        $className = Fixtures\EntityWithoutConstructor::class;
+        $class = Fixtures\EntityWithoutConstructor::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($className, $as);
+        $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $proxyFullName = $this->changeName($className, $as);
-        $this->assertFalse(class_exists($proxyFullName));
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
 
@@ -175,14 +289,14 @@ class ProxyCreatorTest extends TestCase
      */
     public function testContainParentConstructor()
     {
-        $className = Fixtures\EntityWithConstructor::class;
+        $class = Fixtures\EntityWithConstructor::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($className, $as);
+        $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $proxyFullName = $this->changeName($className, $as);
-        $this->assertFalse(class_exists($proxyFullName));
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
 
@@ -192,77 +306,83 @@ class ProxyCreatorTest extends TestCase
     /**
      * @depends testDeclaration
      */
-    public function testMethods()
+    public function testPromiseMethods()
     {
-        //test all methods (except public/protected and not final/abstract/static) are removed
-        //test other methods are changed
+        $class = Fixtures\Entity::class;
+        $as = "EntityProxy" . __LINE__;
+
+        $output = $this->make($class, $as);
+        $output = ltrim($output, "<?php");
+
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+
+        eval($output);
+
+        $i = new \ReflectionClass(PromiseInterface::class);
+        foreach ($i->getMethods() as $method) {
+            $this->assertStringContainsString("public function {$method->getName()}()", $output);
+        }
     }
 
-    private function fetchUseStatements(string $code): array
+    public function testProxiedMethods()
     {
-        $uses = [];
-        foreach (explode("\n", $code) as $line) {
-            if (mb_stripos($line, 'use') !== 0) {
-                continue;
+        $class = Fixtures\Entity::class;
+        $as = "EntityProxy" . __LINE__;
+
+        $output = $this->make($class, $as);
+        $output = ltrim($output, "<?php");
+
+        $schema = new Schema($class, $as);
+        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+
+        eval($output);
+
+        $d = $this->getDeclaration($class);
+        foreach ($d->methods as $method) {
+            if ($method->isPublic()) {
+                $this->assertStringContainsString("public function {$method->name->name}()", $output);
+            } elseif ($method->isProtected()) {
+                $this->assertStringContainsString("protected function {$method->name->name}()", $output);
+            } else {
+                throw new \UnexpectedValueException("\"{$method->name->toString()}\" method not found");
             }
-
-            $uses[] = trim(mb_substr($line, 4), ' ;');
         }
+    }
 
-        sort($uses);
+    private function getDeclaration(string $class): Declaration\Declaration
+    {
+        return $this->extractor()->extract($class);
+    }
 
-        return $uses;
+    private function extractor(): Declaration\Extractor
+    {
+        $container = new Container();
+
+        return $container->get(Declaration\Extractor::class);
     }
 
     /**
-     * @param string $class
+     * @param string $className
+     * @param string $proxyFullName
      *
-     * @return array
-     * @throws \ReflectionException
+     * @return object
      */
-    private function fetchExternalDependencies(string $class): array
+    private function makeProxyObject(string $className, string $proxyFullName)
     {
-        $reflection = new \ReflectionClass($class);
-        $types = [
-            ResolverTrait::class,
-            PromiseResolver::class,
-            PromiseInterface::class
-        ];
-        foreach ($reflection->getConstructor()->getParameters() as $parameter) {
-            if (!$parameter->hasType() || $parameter->getType()->isBuiltin()) {
-                continue;
-            }
+        $orm = \Mockery::mock(ORMInterface::class);
+        $sourceFactory = \Mockery::mock(SourceFactoryInterface::class);
 
-            $types[] = $parameter->getType()->getName();
-        }
+        $container = new Container();
+        $container->bind(ORMInterface::class, $orm);
+        $container->bind(SourceFactoryInterface::class, $sourceFactory);
 
-        sort($types);
-
-        return $types;
-    }
-
-    private function changeName(string $class, string $as): string
-    {
-        return mb_substr($class, 0, mb_strrpos($class, '\\')) . "\\$as";
+        return $container->make($proxyFullName, ['target' => $className, 'scope' => []]);
     }
 
     private function make(string $class, string $as): string
     {
-        return $this->proxyCreator()->make($class, $as, $this->getDeclaration($class));
-    }
-
-    private function getDeclaration(string $class): Declaration
-    {
-        $class = new \ReflectionClass($class);
-
-        return $this->extractor()->extract($class->getFileName());
-    }
-
-    private function extractor(): Extractor
-    {
-        $container = new Container();
-
-        return $container->get(Extractor::class);
+        return $this->proxyCreator()->make($class, $as);
     }
 
     private function proxyCreator(): ProxyCreator

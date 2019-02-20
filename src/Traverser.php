@@ -23,14 +23,14 @@ class Traverser
         return $this->makeTraverser(...$visitors)->traverse($this->parseNodes($filename));
     }
 
-    private function parseNodes(string $filename)
-    {
-        return $this->parser->parse(file_get_contents($filename));
-    }
-
     public function traverseClonedNodes(array $nodes, NodeVisitor ...$visitors)
     {
         return $this->makeTraverser(...$visitors)->traverse($this->cloneNodes($nodes));
+    }
+
+    private function parseNodes(string $filename)
+    {
+        return $this->parser->parse(file_get_contents($filename));
     }
 
     private function cloneNodes(array $nodes)

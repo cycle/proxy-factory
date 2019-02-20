@@ -25,7 +25,11 @@ class ExtractorTest extends TestCase
 
     public function testExtractMethods()
     {
-        $this->assertSame(['public', 'protected'], $this->getDeclaration(Entity::class)->methods);
+        $methods = [];
+        foreach ($this->getDeclaration(Entity::class)->methods as $method) {
+            $methods[] = $method->name->name;
+        }
+        $this->assertSame(['public', 'protected'], $methods);
 
         //__construct is not listed
         $this->assertSame(['public', 'protected'], $this->getDeclaration(EntityWithConstructor::class)->properties);
@@ -33,9 +37,7 @@ class ExtractorTest extends TestCase
 
     private function getDeclaration(string $class): Declaration
     {
-        $class = new \ReflectionClass($class);
-
-        return $this->extractor()->extract($class->getFileName());
+        return $this->extractor()->extract($class);
     }
 
     private function extractor(): Extractor

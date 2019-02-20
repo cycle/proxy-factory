@@ -19,8 +19,9 @@ abstract class Entity
         //have some body
     }
 
-    public function public()
+    public function public(): ?string
     {
+        return 'pub';
     }
 
     public function __resolver()
