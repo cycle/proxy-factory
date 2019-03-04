@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\Declaration;
+use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Declaration\Extractor;
+use Cycle\ORM\Promise\Declaration\Structure;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
@@ -26,7 +28,7 @@ class ProxyPrinter
     /** @var Traverser */
     private $traverser;
 
-    /** @var Declaration\Extractor */
+    /** @var Extractor */
     private $extractor;
 
     /** @var Lexer */
@@ -38,7 +40,7 @@ class ProxyPrinter
     /** @var PrettyPrinterAbstract */
     private $printer;
 
-    public function __construct(ConflictResolver $resolver, Traverser $traverser, Declaration\Extractor $extractor)
+    public function __construct(ConflictResolver $resolver, Traverser $traverser, Extractor $extractor)
     {
         $this->resolver = $resolver;
         $this->traverser = $traverser;
@@ -62,26 +64,24 @@ class ProxyPrinter
 
     /**
      *
-     * @param string $class
-     * @param string $as
+     * @param Declaration $declaration
      *
      * @return string
      */
-    public function make(string $class, string $as): string
+    public function make(Declaration $declaration): string
     {
-        $declaration = $this->extractor->extract($class);
-        $schema = new Declaration\Declaration($class, $as);
+        $structure = $this->extractor->extract($declaration->extends->getNamespacesName());
 
-        $property = $this->propertyName($declaration);
+        $property = $this->propertyName($structure);
 
         $visitors = [
-            new Visitor\AddUseStmts($this->useStmts($schema)),
-            new Visitor\UpdateNamespace($schema->class->namespace),
-            new Visitor\DeclareClass($schema->class->class, $schema->extends->class),
-            new Visitor\AddResolverProperty($property, $this->propertyType(), $schema->extends->class),
-            new Visitor\UpdateConstructor($declaration->hasConstructor, $property, $this->propertyType(), self::DEPENDENCIES),
+            new Visitor\AddUseStmts($this->useStmts($declaration)),
+            new Visitor\UpdateNamespace($declaration->class->namespace),
+            new Visitor\DeclareClass($declaration->class->class, $declaration->extends->class),
+            new Visitor\AddResolverProperty($property, $this->propertyType(), $declaration->extends->class),
+            new Visitor\UpdateConstructor($structure->hasConstructor, $property, $this->propertyType(), self::DEPENDENCIES),
             new Visitor\UpdatePromiseMethods($property),
-            new Visitor\AddProxiedMethods($property, $declaration->methods),
+            new Visitor\AddProxiedMethods($property, $structure->methods),
         ];
 
         $nodes = $this->getNodesFromStub();
@@ -94,12 +94,12 @@ class ProxyPrinter
         );
     }
 
-    private function propertyName(Declaration\Structure $declaration): string
+    private function propertyName(Structure $declaration): string
     {
         return $this->resolver->resolve($declaration->properties, self::PROPERTY);
     }
 
-    private function useStmts(Declaration\Declaration $schema): array
+    private function useStmts(Declaration $schema): array
     {
         if ($schema->class->namespace !== $schema->extends->namespace) {
             return [$schema->extends->getNamespacesName()];

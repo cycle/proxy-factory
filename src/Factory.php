@@ -5,7 +5,10 @@ namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
+use Cycle\ORM\Promise\Naming\DatetimeNaming;
 use Cycle\ORM\PromiseFactoryInterface;
+use Cycle\ORM\Schema;
 use Spiral\Core\Container;
 
 class Factory implements PromiseFactoryInterface
@@ -16,29 +19,33 @@ class Factory implements PromiseFactoryInterface
     /** @var ProxyPrinter */
     private $creator;
 
-    public function __construct(Container $container, ProxyPrinter $creator)
+    /** @var NamingInterface */
+    private $naming;
+
+    /** @var MaterializerInterface */
+    private $materializer;
+
+    public function __construct(Container $container, ProxyPrinter $creator, ?NamingInterface $naming, MaterializerInterface $materializer)
     {
         $this->container = $container;
         $this->creator = $creator;
+        $this->naming = $naming ?? new DatetimeNaming();
+        $this->materializer = $materializer ?? new EvalMaterializer();
     }
 
     public function promise(ORMInterface $orm, string $role, array $scope): ?ReferenceInterface
     {
-        $class = $orm->getSchema()->define($role, \Cycle\ORM\Schema::ENTITY);
+        $class = $orm->getSchema()->define($role, Schema::ENTITY);
         if (empty($class)) {
             return null;
         }
 
-        $now = new \DateTime();
-        $as = $class . 'Proxy_' . $now->format('Ymd_His_u');
+        $declaration = new Declaration($class, $this->naming->name($class));
+        $output = $this->creator->make($declaration);
 
-        $schema = new Declaration($class, $as);
-        $output = $this->creator->make($class, $as);
-        $output = ltrim($output, "<?php");
+        $this->materializer->materialize($output, $declaration);
 
-        eval($output);
-
-        return $this->makeProxyObject($orm, $role, $scope, $schema->class->getNamespacesName());
+        return $this->makeProxyObject($orm, $role, $scope, $declaration->class->getNamespacesName());
     }
 
     private function makeProxyObject(ORMInterface $orm, string $role, array $scope, string $className)

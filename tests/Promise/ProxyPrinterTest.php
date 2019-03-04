@@ -24,11 +24,11 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
@@ -40,9 +40,9 @@ class ProxyPrinterTest extends TestCase
             Utils::shortName(PromiseInterface::class)
         ), $output);
 
-        $proxy = $this->makeProxyObject($class, $schema->class->getNamespacesName());
+        $proxy = $this->makeProxyObject($class, $declaration->class->getNamespacesName());
 
-        $this->assertInstanceOf($schema->class->getNamespacesName(), $proxy);
+        $this->assertInstanceOf($declaration->class->getNamespacesName(), $proxy);
         $this->assertInstanceOf($class, $proxy);
         $this->assertInstanceOf(PromiseInterface::class, $proxy);
     }
@@ -55,16 +55,16 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
         $origReflection = new \ReflectionClass($class);
-        $proxyReflection = new \ReflectionClass($schema->class->getNamespacesName());
+        $proxyReflection = new \ReflectionClass($declaration->class->getNamespacesName());
         $this->assertSame($origReflection->getNamespaceName(), $proxyReflection->getNamespaceName());
     }
 
@@ -76,15 +76,15 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "\EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
-        $proxyReflection = new \ReflectionClass($schema->class->getNamespacesName());
+        $proxyReflection = new \ReflectionClass($declaration->class->getNamespacesName());
         $this->assertSame('', (string)$proxyReflection->getNamespaceName());
         $this->assertStringNotContainsString('namespace ', $output);
     }
@@ -97,15 +97,15 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($schema->class->getNamespacesName(), [
+        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($declaration->class->getNamespacesName(), [
             PromiseResolver::class,
             PromiseInterface::class
         ]));
@@ -119,15 +119,15 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "\EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($schema->class->getNamespacesName(), [
+        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($declaration->class->getNamespacesName(), [
             PromiseResolver::class,
             PromiseInterface::class,
             $class
@@ -176,14 +176,14 @@ class ProxyPrinterTest extends TestCase
 
     public function testTraits()
     {
-        $this->assertStringNotContainsString(' use ', $this->make(Fixtures\EntityWithoutTrait::class, "EntityProxy" . __LINE__));
-        $this->assertStringNotContainsString(' use ', $this->make(Fixtures\EntityWithTrait::class, "EntityProxy" . __LINE__));
+        $this->assertStringNotContainsString(' use ', $this->make(new Declaration(Fixtures\EntityWithoutTrait::class, "EntityProxy" . __LINE__)));
+        $this->assertStringNotContainsString(' use ', $this->make(new Declaration(Fixtures\EntityWithTrait::class, "EntityProxy" . __LINE__)));
     }
 
     public function testConstants()
     {
-        $this->assertStringNotContainsString(' const ', $this->make(Fixtures\EntityWithoutConstants::class, "EntityProxy" . __LINE__));
-        $this->assertStringNotContainsString(' const ', $this->make(Fixtures\EntityWithConstants::class, "EntityProxy" . __LINE__));
+        $this->assertStringNotContainsString(' const ', $this->make(new Declaration(Fixtures\EntityWithoutConstants::class, "EntityProxy" . __LINE__)));
+        $this->assertStringNotContainsString(' const ', $this->make(new Declaration(Fixtures\EntityWithConstants::class, "EntityProxy" . __LINE__)));
     }
 
     public function testProperties()
@@ -191,20 +191,20 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
-        $reflection = new \ReflectionClass($schema->class->getNamespacesName());
+        $reflection = new \ReflectionClass($declaration->class->getNamespacesName());
 
         /** @var \ReflectionProperty[] $properties */
         $properties = [];
         foreach ($reflection->getProperties() as $property) {
-            if ($property->getDeclaringClass()->getName() !== $schema->class->getNamespacesName()) {
+            if ($property->getDeclaringClass()->getName() !== $declaration->class->getNamespacesName()) {
                 continue;
             }
 
@@ -226,30 +226,30 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\EntityWithoutConstructor::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
-        $reflection = new \ReflectionClass($schema->class->getNamespacesName());
+        $reflection = new \ReflectionClass($declaration->class->getNamespacesName());
         $constructor = $reflection->getConstructor();
         $this->assertNotNull($constructor);
 
         $class = Fixtures\EntityWithConstructor::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
-        $reflection = new \ReflectionClass($schema->class->getNamespacesName());
+        $reflection = new \ReflectionClass($declaration->class->getNamespacesName());
         $constructor = $reflection->getConstructor();
         $this->assertNotNull($constructor);
     }
@@ -259,11 +259,11 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\EntityWithoutConstructor::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
@@ -275,11 +275,11 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\EntityWithConstructor::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
@@ -291,11 +291,11 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
@@ -310,11 +310,11 @@ class ProxyPrinterTest extends TestCase
         $class = Fixtures\Entity::class;
         $as = "EntityProxy" . __LINE__;
 
-        $output = $this->make($class, $as);
+        $declaration = new Declaration($class, $as);
+        $output = $this->make($declaration);
         $output = ltrim($output, "<?php");
 
-        $schema = new Declaration($class, $as);
-        $this->assertFalse(class_exists($schema->class->getNamespacesName()));
+        $this->assertFalse(class_exists($declaration->class->getNamespacesName()));
 
         eval($output);
 
@@ -358,9 +358,9 @@ class ProxyPrinterTest extends TestCase
         return $container->make($proxyFullName, ['role' => $className, 'scope' => []]);
     }
 
-    private function make(string $class, string $as): string
+    private function make(Declaration $declaration): string
     {
-        return $this->proxyCreator()->make($class, $as);
+        return $this->proxyCreator()->make($declaration);
     }
 
     private function proxyCreator(): ProxyPrinter
