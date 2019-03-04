@@ -11,10 +11,10 @@ class ProxyStub implements PromiseInterface
 {
     /**
      * @param ORMInterface $orm
-     * @param string       $target
+     * @param string       $role
      * @param array        $scope
      */
-    public function __construct(ORMInterface $orm, string $target, array $scope)
+    public function __construct(ORMInterface $orm, string $role, array $scope)
     {
     }
 

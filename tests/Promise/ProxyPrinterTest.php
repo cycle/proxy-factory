@@ -4,11 +4,12 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests;
 
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\Declaration;
-use Cycle\ORM\Promise\Declaration\Schema;
+use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Declaration\Extractor;
+use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\PromiseInterface;
 use Cycle\ORM\Promise\PromiseResolver;
-use Cycle\ORM\Promise\ProxyCreator;
+use Cycle\ORM\Promise\ProxyPrinter;
 use Cycle\ORM\Promise\Tests\Fixtures;
 use Cycle\ORM\Promise\Utils;
 use PhpParser\PrettyPrinter\Standard;
@@ -16,7 +17,7 @@ use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
 
-class ProxyCreatorTest extends TestCase
+class ProxyPrinterTest extends TestCase
 {
     public function testDeclaration()
     {
@@ -26,7 +27,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -57,7 +58,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -78,7 +79,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -99,7 +100,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -121,7 +122,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -193,7 +194,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -228,7 +229,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -243,7 +244,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -261,7 +262,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -277,7 +278,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -293,7 +294,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -312,7 +313,7 @@ class ProxyCreatorTest extends TestCase
         $output = $this->make($class, $as);
         $output = ltrim($output, "<?php");
 
-        $schema = new Schema($class, $as);
+        $schema = new Declaration($class, $as);
         $this->assertFalse(class_exists($schema->class->getNamespacesName()));
 
         eval($output);
@@ -329,16 +330,16 @@ class ProxyCreatorTest extends TestCase
         }
     }
 
-    private function getDeclaration(string $class): Declaration\Declaration
+    private function getDeclaration(string $class): Structure
     {
         return $this->extractor()->extract($class);
     }
 
-    private function extractor(): Declaration\Extractor
+    private function extractor(): Extractor
     {
         $container = new Container();
 
-        return $container->get(Declaration\Extractor::class);
+        return $container->get(Extractor::class);
     }
 
     /**
@@ -354,7 +355,7 @@ class ProxyCreatorTest extends TestCase
         $container = new Container();
         $container->bind(ORMInterface::class, $orm);
 
-        return $container->make($proxyFullName, ['target' => $className, 'scope' => []]);
+        return $container->make($proxyFullName, ['role' => $className, 'scope' => []]);
     }
 
     private function make(string $class, string $as): string
@@ -362,11 +363,11 @@ class ProxyCreatorTest extends TestCase
         return $this->proxyCreator()->make($class, $as);
     }
 
-    private function proxyCreator(): ProxyCreator
+    private function proxyCreator(): ProxyPrinter
     {
         $container = new Container();
         $container->bind(PrettyPrinterAbstract::class, Standard::class);
 
-        return $container->get(ProxyCreator::class);
+        return $container->get(ProxyPrinter::class);
     }
 }

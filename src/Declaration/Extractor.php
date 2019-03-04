@@ -15,7 +15,7 @@ class Extractor
         $this->traverser = $traverser;
     }
 
-    public function extract(string $class): Declaration
+    public function extract(string $class): Structure
     {
         $class = new \ReflectionClass($class);
 
@@ -24,6 +24,6 @@ class Extractor
 
         $this->traverser->traverseFilename($class->getFileName(), $properties, $methods);
 
-        return Declaration::create($properties->getProperties(), $methods->getMethods(), !empty($class->getConstructor()));
+        return Structure::create($properties->getProperties(), $methods->getMethods(), !empty($class->getConstructor()));
     }
 }

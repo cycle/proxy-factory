@@ -12,7 +12,7 @@ class PromiseResolver implements PromiseInterface
     private $orm;
 
     /** @var string */
-    private $target;
+    private $role;
 
     /** @var array */
     private $scope;
@@ -25,13 +25,13 @@ class PromiseResolver implements PromiseInterface
 
     /**
      * @param ORMInterface $orm
-     * @param string       $target
+     * @param string       $role
      * @param array        $scope
      */
-    public function __construct(ORMInterface $orm, string $target, array $scope)
+    public function __construct(ORMInterface $orm, string $role, array $scope)
     {
         $this->orm = $orm;
-        $this->target = $target;
+        $this->role = $role;
         $this->scope = $scope;
     }
 
@@ -48,7 +48,7 @@ class PromiseResolver implements PromiseInterface
      */
     public function __role(): string
     {
-        return $this->target;
+        return $this->role;
     }
 
     /**
@@ -82,7 +82,7 @@ class PromiseResolver implements PromiseInterface
         $key = key($this->scope);
         $value = $this->scope[$key];
 
-        return $this->orm->getHeap()->find($this->target, $key, $value);
+        return $this->orm->getHeap()->find($this->role, $key, $value);
     }
 
     /**
@@ -90,10 +90,10 @@ class PromiseResolver implements PromiseInterface
      */
     private function getEntityFromSource()
     {
-        $select = new Select($this->orm, $this->target);
+        $select = new Select($this->orm, $this->role);
 
         return $select->constrain(
-            $this->orm->getSource($this->target)->getConstrain()
+            $this->orm->getSource($this->role)->getConstrain()
         )->fetchOne($this->scope);
     }
 }

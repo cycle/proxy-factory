@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration;
 
-use Cycle\ORM\Promise\Declaration\Schema;
+use Cycle\ORM\Promise\Declaration\Declaration;
 use PHPUnit\Framework\TestCase;
 
-class SchemaTest extends TestCase
+class DeclarationTest extends TestCase
 {
     /**
      * @dataProvider classNameProvider
@@ -16,7 +16,7 @@ class SchemaTest extends TestCase
      */
     public function testClassName(string $class, $expected)
     {
-        $schema = new Schema('Any', $class);
+        $schema = new Declaration('Any', $class);
         $this->assertSame($expected, $schema->class->class);
     }
 
@@ -38,7 +38,7 @@ class SchemaTest extends TestCase
      */
     public function testClassNamespace(string $extends, string $class, $expected)
     {
-        $schema = new Schema($extends, $class);
+        $schema = new Declaration($extends, $class);
         $this->assertSame($expected, $schema->class->namespace);
     }
 
@@ -61,7 +61,7 @@ class SchemaTest extends TestCase
      */
     public function testExtendsName(string $extends, $expected)
     {
-        $schema = new Schema($extends, 'Any');
+        $schema = new Declaration($extends, 'Any');
         $this->assertSame($expected, $schema->extends->class);
     }
 
@@ -82,7 +82,7 @@ class SchemaTest extends TestCase
      */
     public function testExtendsNamespace(string $extends, $expected)
     {
-        $schema = new Schema($extends, 'Any');
+        $schema = new Declaration($extends, 'Any');
         $this->assertSame($expected, $schema->extends->namespace);
     }
 

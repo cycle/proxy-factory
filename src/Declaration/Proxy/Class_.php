@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Cycle\ORM\Promise\Declaration\Schema;
+namespace Cycle\ORM\Promise\Declaration\Proxy;
 
 class Class_
 {

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration;
 
-use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\Entity;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\EntityWithConstructor;
@@ -35,7 +35,7 @@ class ExtractorTest extends TestCase
         $this->assertSame(['public', 'protected'], $this->getDeclaration(EntityWithConstructor::class)->properties);
     }
 
-    private function getDeclaration(string $class): Declaration
+    private function getDeclaration(string $class): Structure
     {
         return $this->extractor()->extract($class);
     }

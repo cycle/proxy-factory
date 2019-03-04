@@ -10,14 +10,14 @@ use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 
-class ProxyCreator
+class ProxyPrinter
 {
     private const PROPERTY = '__resolver';
 
     private const DEPENDENCIES = [
-        'orm'    => ORMInterface::class,
-        'target' => 'string',
-        'scope'  => 'array'
+        'orm'   => ORMInterface::class,
+        'role'  => 'string',
+        'scope' => 'array'
     ];
 
     /** @var ConflictResolver */
@@ -70,7 +70,7 @@ class ProxyCreator
     public function make(string $class, string $as): string
     {
         $declaration = $this->extractor->extract($class);
-        $schema = new Declaration\Schema($class, $as);
+        $schema = new Declaration\Declaration($class, $as);
 
         $property = $this->propertyName($declaration);
 
@@ -94,12 +94,12 @@ class ProxyCreator
         );
     }
 
-    private function propertyName(Declaration\Declaration $declaration): string
+    private function propertyName(Declaration\Structure $declaration): string
     {
         return $this->resolver->resolve($declaration->properties, self::PROPERTY);
     }
 
-    private function useStmts(Declaration\Schema $schema): array
+    private function useStmts(Declaration\Declaration $schema): array
     {
         if ($schema->class->namespace !== $schema->extends->namespace) {
             return [$schema->extends->getNamespacesName()];
