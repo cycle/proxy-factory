@@ -1,14 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Tests\Declaration;
+namespace Cycle\ORM\Promise\Tests\Declaration;
 
+use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Declaration\Extractor;
+use Cycle\ORM\Promise\Tests\Declaration\Fixtures\Entity;
+use Cycle\ORM\Promise\Tests\Declaration\Fixtures\EntityWithConstructor;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
-use Spiral\Cycle\Promise\Declaration\Declaration;
-use Spiral\Cycle\Promise\Declaration\Extractor;
-use Spiral\Cycle\Promise\Tests\Declaration\Fixtures\Entity;
-use Spiral\Cycle\Promise\Tests\Declaration\Fixtures\EntityWithConstructor;
 
 class ExtractorTest extends TestCase
 {

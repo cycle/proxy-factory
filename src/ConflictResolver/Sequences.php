@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\ConflictResolver;
+namespace Cycle\ORM\Promise\ConflictResolver;
 
 class Sequences
 {

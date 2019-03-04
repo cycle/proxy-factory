@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Declaration;
+namespace Cycle\ORM\Promise\Declaration;
 
 class Declaration
 {

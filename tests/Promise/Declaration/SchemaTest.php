@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Tests\Declaration;
+namespace Cycle\ORM\Promise\Tests\Declaration;
 
+use Cycle\ORM\Promise\Declaration\Schema;
 use PHPUnit\Framework\TestCase;
-use Spiral\Cycle\Promise\Declaration\Schema;
 
 class SchemaTest extends TestCase
 {

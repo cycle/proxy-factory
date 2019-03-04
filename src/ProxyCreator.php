@@ -1,15 +1,14 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise;
+namespace Cycle\ORM\Promise;
 
+use Cycle\ORM\ORMInterface;
+use Cycle\ORM\Promise\Declaration;
 use PhpParser\Lexer;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
-use Spiral\Cycle\ORMInterface;
-use Spiral\Cycle\Promise\Declaration;
-use Spiral\Cycle\Select\SourceFactoryInterface;
 
 class ProxyCreator
 {
@@ -17,7 +16,6 @@ class ProxyCreator
 
     private const DEPENDENCIES = [
         'orm'    => ORMInterface::class,
-        'source' => SourceFactoryInterface::class,
         'target' => 'string',
         'scope'  => 'array'
     ];
@@ -86,7 +84,7 @@ class ProxyCreator
             new Visitor\AddProxiedMethods($property, $declaration->methods),
         ];
 
-        $nodes = $this->getNodes(__DIR__ . DIRECTORY_SEPARATOR . 'Proxy.stub');
+        $nodes = $this->getNodesFromStub();
         $output = $this->traverser->traverseClonedNodes($nodes, ...$visitors);
 
         return $this->printer->printFormatPreserving(
@@ -94,6 +92,11 @@ class ProxyCreator
             $nodes,
             $this->lexer->getTokens()
         );
+    }
+
+    private function propertyName(Declaration\Declaration $declaration): string
+    {
+        return $this->resolver->resolve($declaration->properties, self::PROPERTY);
     }
 
     private function useStmts(Declaration\Schema $schema): array
@@ -105,18 +108,18 @@ class ProxyCreator
         return [];
     }
 
-    private function propertyName(Declaration\Declaration $declaration): string
-    {
-        return $this->resolver->resolve($declaration->properties, self::PROPERTY);
-    }
-
     private function propertyType(): string
     {
         return Utils::shortName(PromiseResolver::class);
     }
 
-    private function getNodes(string $stub)
+    private function getNodesFromStub()
     {
-        return $this->parser->parse(file_get_contents($stub));
+        return $this->parser->parse(file_get_contents($this->getStubFilename()));
+    }
+
+    private function getStubFilename(): string
+    {
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'proxy.stub';
     }
 }

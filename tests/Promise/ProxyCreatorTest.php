@@ -1,21 +1,20 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Tests;
+namespace Cycle\ORM\Promise\Tests;
 
+use Cycle\ORM\ORMInterface;
+use Cycle\ORM\Promise\Declaration;
+use Cycle\ORM\Promise\Declaration\Schema;
+use Cycle\ORM\Promise\PromiseInterface;
+use Cycle\ORM\Promise\PromiseResolver;
+use Cycle\ORM\Promise\ProxyCreator;
+use Cycle\ORM\Promise\Tests\Fixtures;
+use Cycle\ORM\Promise\Utils;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
-use Spiral\Cycle\ORMInterface;
-use Spiral\Cycle\Promise\Declaration;
-use Spiral\Cycle\Promise\Declaration\Schema;
-use Spiral\Cycle\Promise\PromiseInterface;
-use Spiral\Cycle\Promise\PromiseResolver;
-use Spiral\Cycle\Promise\ProxyCreator;
-use Spiral\Cycle\Promise\Tests\Fixtures;
-use Spiral\Cycle\Promise\Utils;
-use Spiral\Cycle\Select\SourceFactoryInterface;
 
 class ProxyCreatorTest extends TestCase
 {
@@ -48,7 +47,6 @@ class ProxyCreatorTest extends TestCase
     }
 
     /**
-     * @depends testDeclaration
      * @throws \ReflectionException
      */
     public function testSameNamespace()
@@ -70,7 +68,6 @@ class ProxyCreatorTest extends TestCase
     }
 
     /**
-     * @depends testDeclaration
      * @throws \ReflectionException
      */
     public function testDifferentNamespace()
@@ -176,27 +173,18 @@ class ProxyCreatorTest extends TestCase
         return $types;
     }
 
-    /**
-     * @depends testDeclaration
-     */
     public function testTraits()
     {
         $this->assertStringNotContainsString(' use ', $this->make(Fixtures\EntityWithoutTrait::class, "EntityProxy" . __LINE__));
         $this->assertStringNotContainsString(' use ', $this->make(Fixtures\EntityWithTrait::class, "EntityProxy" . __LINE__));
     }
 
-    /**
-     * @depends testDeclaration
-     */
     public function testConstants()
     {
         $this->assertStringNotContainsString(' const ', $this->make(Fixtures\EntityWithoutConstants::class, "EntityProxy" . __LINE__));
         $this->assertStringNotContainsString(' const ', $this->make(Fixtures\EntityWithConstants::class, "EntityProxy" . __LINE__));
     }
 
-    /**
-     * @depends testDeclaration
-     */
     public function testProperties()
     {
         $class = Fixtures\Entity::class;
@@ -265,9 +253,6 @@ class ProxyCreatorTest extends TestCase
         $this->assertNotNull($constructor);
     }
 
-    /**
-     * @depends testDeclaration
-     */
     public function testNotContainParentConstructor()
     {
         $class = Fixtures\EntityWithoutConstructor::class;
@@ -284,9 +269,6 @@ class ProxyCreatorTest extends TestCase
         $this->assertStringNotContainsString('parent::__construct();', $output);
     }
 
-    /**
-     * @depends testDeclaration
-     */
     public function testContainParentConstructor()
     {
         $class = Fixtures\EntityWithConstructor::class;
@@ -303,9 +285,6 @@ class ProxyCreatorTest extends TestCase
         $this->assertStringContainsString('parent::__construct();', $output);
     }
 
-    /**
-     * @depends testDeclaration
-     */
     public function testPromiseMethods()
     {
         $class = Fixtures\Entity::class;
@@ -371,11 +350,9 @@ class ProxyCreatorTest extends TestCase
     private function makeProxyObject(string $className, string $proxyFullName)
     {
         $orm = \Mockery::mock(ORMInterface::class);
-        $sourceFactory = \Mockery::mock(SourceFactoryInterface::class);
 
         $container = new Container();
         $container->bind(ORMInterface::class, $orm);
-        $container->bind(SourceFactoryInterface::class, $sourceFactory);
 
         return $container->make($proxyFullName, ['target' => $className, 'scope' => []]);
     }

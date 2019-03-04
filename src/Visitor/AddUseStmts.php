@@ -1,12 +1,12 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Visitor;
+namespace Cycle\ORM\Promise\Visitor;
 
+use Cycle\ORM\Promise\Utils;
 use PhpParser\Builder\Use_;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Spiral\Cycle\Promise\Utils;
 
 /**
  * Add use statement to the code.

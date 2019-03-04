@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Declaration\Visitor;
+namespace Cycle\ORM\Promise\Declaration\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;

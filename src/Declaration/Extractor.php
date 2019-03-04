@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Declaration;
+namespace Cycle\ORM\Promise\Declaration;
 
-use Spiral\Cycle\Promise\Traverser;
+use Cycle\ORM\Promise\Traverser;
 
 class Extractor
 {

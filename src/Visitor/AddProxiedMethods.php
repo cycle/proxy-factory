@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Visitor;
+namespace Cycle\ORM\Promise\Visitor;
 
+use Cycle\ORM\Promise\PHPDoc;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Spiral\Cycle\Promise\PHPDoc;
 
 /**
  * Add parent call via proxy resolver

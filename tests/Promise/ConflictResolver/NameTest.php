@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Prototype\Tests\ClassDefinition\ConflictResolver;
+namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
 
+use Cycle\ORM\Promise\ConflictResolver\Name;
 use PHPUnit\Framework\TestCase;
-use Spiral\Cycle\Promise\ConflictResolver\Name;
 
 class NameTest extends TestCase
 {

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Tests\Fixtures;
+namespace Cycle\ORM\Promise\Tests\Fixtures;
 
 class EntityWithConstructor
 {

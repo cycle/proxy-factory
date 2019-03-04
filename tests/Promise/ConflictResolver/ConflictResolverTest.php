@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Prototype\Tests\ClassDefinition\ConflictResolver;
+namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
 
+use Cycle\ORM\Promise\ConflictResolver;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
-use Spiral\Cycle\Promise\ConflictResolver;
 
 class ConflictResolverTest extends TestCase
 {

@@ -4,13 +4,12 @@
   "description": "Proxy Factory Interface implementation for cycle ORM",
   "autoload": {
     "psr-4": {
-      "Spiral\\Cycle\\Promise\\": "src/",
-      "Spiral\\Cycle\\": "cycle/"
+      "Cycle\\ORM\\Promise\\": "src/"
     }
   },
   "autoload-dev": {
     "psr-4": {
-      "Spiral\\Cycle\\Promise\\Tests\\": "tests/Promise/"
+      "Cycle\\ORM\\Promise\\Tests\\": "tests/Promise/"
     }
   },
   "require": {
@@ -19,7 +18,7 @@
     "spiral/tokenizer": "^2.1",
     "spiral/config": "^1.1",
     "ext-mbstring": "*",
-    "spiral/cycle": "0.1a"
+    "cycle/orm": "0.2a"
   },
   "require-dev": {
     "spiral/dumper": "^1.1",

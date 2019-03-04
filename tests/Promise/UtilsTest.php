@@ -1,9 +1,9 @@
 <?php
 
-namespace Spiral\Prototype\Tests;
+namespace Cycle\ORM\Promise\Tests;
 
+use Cycle\ORM\Promise\Utils;
 use PHPUnit\Framework\TestCase;
-use Spiral\Cycle\Promise\Utils;
 
 class UtilsTest extends TestCase
 {

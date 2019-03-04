@@ -1,0 +1,48 @@
+<?php
+declare(strict_types=1);
+
+namespace Cycle\ORM\Promise\Example;
+
+use Cycle\ORM\Promise\PromiseInterface;
+use Cycle\ORM\Promise\PromiseResolver;
+use Cycle\ORM\ORMInterface;
+
+class ProxyStub implements PromiseInterface
+{
+    /**
+     * @param ORMInterface $orm
+     * @param string       $target
+     * @param array        $scope
+     */
+    public function __construct(ORMInterface $orm, string $target, array $scope)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __loaded(): bool
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __role(): string
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __scope(): array
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __resolve()
+    {
+    }
+}

@@ -1,20 +1,19 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise;
+namespace Cycle\ORM\Promise;
 
-use Spiral\Cycle\Mapper\MapperInterface;
-use Spiral\Cycle\Promise\PromiseInterface;
-use Spiral\Cycle\Promise\ProxyFactoryInterface;
+use Cycle\ORM\ORMInterface;
+use Cycle\ORM\PromiseFactoryInterface;
 
-class Factory implements ProxyFactoryInterface
+class Factory implements PromiseFactoryInterface
 {
     public function __construct()
     {
     }
 
-    public function makeProxy(array $scope): ?PromiseInterface
+    public function promise(ORMInterface $orm, string $role, array $scope): ?ReferenceInterface
     {
-
+        // TODO: Implement promise() method.
     }
 }

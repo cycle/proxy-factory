@@ -1,18 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise;
+namespace Cycle\ORM\Promise;
 
-use Spiral\Cycle\ORMInterface;
-use Spiral\Cycle\Select;
+use Cycle\ORM\ORMInterface;
+use Cycle\ORM\Select;
 
 class PromiseResolver implements PromiseInterface
 {
     /** @var ORMInterface */
     private $orm;
-
-    /** @var Select\SourceFactoryInterface */
-    private $source;
 
     /** @var string */
     private $target;
@@ -27,17 +24,15 @@ class PromiseResolver implements PromiseInterface
     private $entity;
 
     /**
-     * @param ORMInterface                  $orm
-     * @param Select\SourceFactoryInterface $source
-     * @param string                        $target
-     * @param array                         $scope
+     * @param ORMInterface $orm
+     * @param string       $target
+     * @param array        $scope
      */
-    public function __construct(ORMInterface $orm, Select\SourceFactoryInterface $source, string $target, array $scope)
+    public function __construct(ORMInterface $orm, string $target, array $scope)
     {
         $this->orm = $orm;
         $this->target = $target;
         $this->scope = $scope;
-        $this->source = $source;
     }
 
     /**
@@ -98,7 +93,7 @@ class PromiseResolver implements PromiseInterface
         $select = new Select($this->orm, $this->target);
 
         return $select->constrain(
-            $this->source->getSource($this->target)->getConstrain()
+            $this->orm->getSource($this->target)->getConstrain()
         )->fetchOne($this->scope);
     }
 }

@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Visitor;
+namespace Cycle\ORM\Promise\Visitor;
 
+use Cycle\ORM\Promise\PHPDoc;
+use Cycle\ORM\Promise\Utils;
 use PhpParser\Builder\Property;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Spiral\Cycle\Promise\PHPDoc;
-use Spiral\Cycle\Promise\Utils;
 
 /**
  * Add resolver property

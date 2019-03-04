@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Tests\Declaration\ConflictResolver;
+namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
 
+use Cycle\ORM\Promise\ConflictResolver\Sequences;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
-use Spiral\Cycle\Promise\ConflictResolver\Sequences;
 
 class SequenceTest extends TestCase
 {

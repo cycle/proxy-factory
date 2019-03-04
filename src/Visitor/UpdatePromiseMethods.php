@@ -1,11 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Spiral\Cycle\Promise\Visitor;
+namespace Cycle\ORM\Promise\Visitor;
 
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
-use Spiral\Cycle\Promise\PHPDoc;
 
 /**
  * Modify all accessible methods
@@ -26,7 +25,6 @@ class UpdatePromiseMethods extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\ClassMethod && !$this->ignoreMethod($node)) {
-            $node->setDocComment(PHPDoc::writeInheritdoc());
             $node->stmts = [new Node\Stmt\Return_($this->resolvedParentMethodCall($node))];
         }
 
