@@ -21,9 +21,9 @@ class UpdateNamespace extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Namespace_) {
             if (empty($this->namespace)) {
                 return $node->stmts;
-            } else {
-                $node->name->parts = explode('\\', $this->namespace);
             }
+
+            $node->name->parts = explode('\\', $this->namespace);
         }
 
         return null;

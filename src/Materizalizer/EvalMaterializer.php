@@ -7,14 +7,16 @@ use Cycle\ORM\Promise\MaterializerInterface;
 
 class EvalMaterializer implements MaterializerInterface
 {
+    /**
+     * {@inheritdoc}
+     * If class already exists - do nothing (prevent from memory leaking)
+     */
     public function materialize(string $code, Declaration $declaration): void
     {
         if (class_exists($declaration->class->getNamespacesName())) {
-            throw new \RuntimeException("Class `{$declaration->class->getNamespacesName()}` already exists.");
+            return;
         }
 
-        $output = ltrim($code, "<?php");
-
-        eval($output);
+        eval(ltrim($code, '<?php'));
     }
 }

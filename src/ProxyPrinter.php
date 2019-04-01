@@ -8,6 +8,7 @@ use Cycle\ORM\Promise\Declaration\Declaration;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
 use PhpParser\Lexer;
+use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
@@ -70,15 +71,15 @@ class ProxyPrinter
      */
     public function make(Declaration $declaration): string
     {
-        $structure = $this->extractor->extract($declaration->extends->getNamespacesName());
+        $structure = $this->extractor->extract($declaration->parent->getNamespacesName());
 
         $property = $this->propertyName($structure);
 
         $visitors = [
             new Visitor\AddUseStmts($this->useStmts($declaration)),
             new Visitor\UpdateNamespace($declaration->class->namespace),
-            new Visitor\DeclareClass($declaration->class->class, $declaration->extends->class),
-            new Visitor\AddResolverProperty($property, $this->propertyType(), $declaration->extends->class),
+            new Visitor\DeclareClass($declaration->class->name, $declaration->parent->name),
+            new Visitor\AddResolverProperty($property, $this->propertyType(), $declaration->parent->name),
             new Visitor\UpdateConstructor($structure->hasConstructor, $property, $this->propertyType(), self::DEPENDENCIES),
             new Visitor\UpdatePromiseMethods($property),
             new Visitor\AddProxiedMethods($property, $structure->methods),
@@ -101,8 +102,8 @@ class ProxyPrinter
 
     private function useStmts(Declaration $schema): array
     {
-        if ($schema->class->namespace !== $schema->extends->namespace) {
-            return [$schema->extends->getNamespacesName()];
+        if ($schema->class->namespace !== $schema->parent->namespace) {
+            return [$schema->parent->getNamespacesName()];
         }
 
         return [];
@@ -113,7 +114,10 @@ class ProxyPrinter
         return Utils::shortName(PromiseResolver::class);
     }
 
-    private function getNodesFromStub()
+    /**
+     * @return Node\Stmt[]|null
+     */
+    private function getNodesFromStub(): ?array
     {
         return $this->parser->parse(file_get_contents($this->getStubFilename()));
     }

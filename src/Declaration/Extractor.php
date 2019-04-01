@@ -24,6 +24,6 @@ class Extractor
 
         $this->traverser->traverseFilename($class->getFileName(), $properties, $methods);
 
-        return Structure::create($properties->getProperties(), $methods->getMethods(), !empty($class->getConstructor()));
+        return Structure::create($properties->getProperties(), $methods->getMethods(), $class->getConstructor() !== null);
     }
 }

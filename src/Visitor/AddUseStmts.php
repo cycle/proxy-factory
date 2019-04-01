@@ -61,7 +61,7 @@ class AddUseStmts extends NodeVisitorAbstract
             }
 
             foreach ($node->uses as $use) {
-                if (in_array($use->name->parts, $uses)) {
+                if (in_array($use->name->parts, $uses, true)) {
                     unset($nodes[$i]);
                 }
             }

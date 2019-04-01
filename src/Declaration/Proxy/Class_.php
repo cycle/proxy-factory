@@ -6,15 +6,15 @@ namespace Cycle\ORM\Promise\Declaration\Proxy;
 class Class_
 {
     /** @var string */
-    public $class;
+    public $name;
 
     /** @var string|null */
     public $namespace;
 
-    public static function create(string $class, ?string $namespace): Class_
+    public static function create(string $name, ?string $namespace): Class_
     {
         $self = new self();
-        $self->class = $class;
+        $self->name = $name;
         $self->namespace = $namespace;
 
         return $self;
@@ -23,10 +23,10 @@ class Class_
     public function getNamespacesName(): string
     {
         if (empty($this->namespace)) {
-            return $this->class;
+            return $this->name;
         }
 
-        return "{$this->namespace}\\{$this->class}";
+        return "{$this->namespace}\\{$this->name}";
     }
 
     private function __construct()

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
+use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
 use PhpParser\Parser;
@@ -18,22 +19,44 @@ class Traverser
         $this->parser = $parser ?? (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
     }
 
-    public function traverseFilename(string $filename, NodeVisitor ...$visitors)
+    /**
+     * @param string      $filename
+     * @param NodeVisitor ...$visitors
+     *
+     * @return Node[]
+     */
+    public function traverseFilename(string $filename, NodeVisitor ...$visitors): array
     {
         return $this->makeTraverser(...$visitors)->traverse($this->parseNodes($filename));
     }
 
-    public function traverseClonedNodes(array $nodes, NodeVisitor ...$visitors)
+    /**
+     * @param Node\Stmt[] $nodes
+     * @param NodeVisitor ...$visitors
+     *
+     * @return Node[]
+     */
+    public function traverseClonedNodes(array $nodes, NodeVisitor ...$visitors): array
     {
         return $this->makeTraverser(...$visitors)->traverse($this->cloneNodes($nodes));
     }
 
-    private function parseNodes(string $filename)
+    /**
+     * @param string $filename
+     *
+     * @return Node\Stmt[]|null
+     */
+    private function parseNodes(string $filename): ?array
     {
         return $this->parser->parse(file_get_contents($filename));
     }
 
-    private function cloneNodes(array $nodes)
+    /**
+     * @param Node[] $nodes
+     *
+     * @return Node[]
+     */
+    private function cloneNodes(array $nodes): array
     {
         return $this->makeTraverser(new NodeVisitor\CloningVisitor())->traverse($nodes);
     }

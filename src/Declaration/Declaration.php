@@ -9,15 +9,15 @@ class Declaration
     public $class;
 
     /** @var Proxy\Class_ */
-    public $extends;
+    public $parent;
 
-    public function __construct(string $extends, string $class)
+    public function __construct(string $parent, string $class)
     {
-        $this->class = Proxy\Class_::create($this->extractClass($class), $this->extractExtendedNamespace($class, $extends));
-        $this->extends = Proxy\Class_::create($this->extractClass($extends), $this->extractNamespace($extends));
+        $this->parent = Proxy\Class_::create($this->extractClassName($parent), $this->extractNamespace($parent));
+        $this->class = Proxy\Class_::create($this->extractClassName($class), $this->extractNamespaceOfParentClass($class, $parent));
     }
 
-    private function extractClass(string $class): string
+    private function extractClassName(string $class): string
     {
         $lastPosition = mb_strripos($class, '\\');
         if ($lastPosition === false) {
@@ -27,7 +27,7 @@ class Declaration
         return mb_substr($class, $lastPosition + 1);
     }
 
-    private function extractExtendedNamespace(string $class, string $extends): ?string
+    private function extractNamespaceOfParentClass(string $class, string $parent): ?string
     {
         $lastPosition = mb_strripos($class, '\\');
         if ($lastPosition === 0) {
@@ -38,7 +38,7 @@ class Declaration
             return $this->extractNamespace($class);
         }
 
-        return $this->extractNamespace($extends);
+        return $this->extractNamespace($parent);
     }
 
     private function extractNamespace(string $class): ?string

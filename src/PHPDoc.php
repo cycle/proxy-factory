@@ -10,9 +10,9 @@ class PHPDoc
     public static function writeInheritdoc(): Doc
     {
         $lines = [
-            "/**",
-            " * {@inheritdoc}",
-            " */"
+            '/**',
+            ' * {@inheritdoc}',
+            ' */'
         ];
 
         return self::makeComment(join("\n", $lines));

@@ -21,7 +21,7 @@ class UpdateConstructor extends NodeVisitorAbstract
     private $type;
 
     /** @var array */
-    private $dependencies = [];
+    private $dependencies;
 
     public function __construct(bool $hasConstructor, string $property, string $propertyType, array $dependencies)
     {
@@ -48,7 +48,7 @@ class UpdateConstructor extends NodeVisitorAbstract
 
     private function makeResolverPropertyAssignment(): Node\Stmt\Expression
     {
-        $prop = new Node\Expr\PropertyFetch(new Node\Expr\Variable("this"), $this->property);
+        $prop = new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property);
         $instance = new Node\Expr\New_(new Node\Name($this->type), $this->makeResolverPropertyInstantiationArgs());
 
         return new Node\Stmt\Expression(new Node\Expr\Assign($prop, $instance));

@@ -17,7 +17,7 @@ class DeclarationTest extends TestCase
     public function testClassName(string $class, $expected)
     {
         $schema = new Declaration('Any', $class);
-        $this->assertSame($expected, $schema->class->class);
+        $this->assertSame($expected, $schema->class->name);
     }
 
     public function classNameProvider(): array
@@ -62,7 +62,7 @@ class DeclarationTest extends TestCase
     public function testExtendsName(string $extends, $expected)
     {
         $schema = new Declaration($extends, 'Any');
-        $this->assertSame($expected, $schema->extends->class);
+        $this->assertSame($expected, $schema->parent->name);
     }
 
     public function extendsNameProvider(): array
@@ -83,7 +83,7 @@ class DeclarationTest extends TestCase
     public function testExtendsNamespace(string $extends, $expected)
     {
         $schema = new Declaration($extends, 'Any');
-        $this->assertSame($expected, $schema->extends->namespace);
+        $this->assertSame($expected, $schema->parent->namespace);
     }
 
     public function extendsNamespaceProvider(): array

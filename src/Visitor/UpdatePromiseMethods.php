@@ -33,11 +33,7 @@ class UpdatePromiseMethods extends NodeVisitorAbstract
 
     private function ignoreMethod(Node\Stmt\ClassMethod $node): bool
     {
-        if ($node->isPrivate() || $node->isStatic() || $node->isFinal() || $node->isAbstract() || $node->isMagic()) {
-            return true;
-        }
-
-        return false;
+        return $node->isPrivate() || $node->isStatic() || $node->isFinal() || $node->isAbstract() || $node->isMagic();
     }
 
     private function resolvedParentMethodCall(Node\Stmt\ClassMethod $node): Node\Expr\MethodCall

@@ -44,8 +44,10 @@ class Sequences
     private function skippedSequences(array $sequences): array
     {
         $skipped = [];
-        for ($i = 0; $i < max($sequences); $i++) {
-            if (!in_array($i, $sequences)) {
+        $max = max($sequences);
+
+        for ($i = 0; $i < $max; $i++) {
+            if (!in_array($i, $sequences, true)) {
                 $skipped[$i] = $i;
             }
         }

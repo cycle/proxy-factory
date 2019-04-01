@@ -9,8 +9,13 @@ class DatetimeNaming implements NamingInterface
 {
     public function name(string $class): string
     {
+        return "{$class}Proxy_{$this->timestamp()}";
+    }
+
+    private function timestamp(): string
+    {
         $datetime = new \DateTime();
 
-        return $class . 'Proxy_' . $datetime->format('Ymd_His_u');
+        return $datetime->format('Ymd_His_u');
     }
 }
