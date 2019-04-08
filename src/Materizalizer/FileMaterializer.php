@@ -30,6 +30,8 @@ class FileMaterializer implements MaterializerInterface, SingletonInterface
     public function materialize(string $code, Declaration $declaration, \ReflectionClass $reflection): void
     {
         if (class_exists($declaration->class->getFullName())) {
+            dump("{$declaration->class->getFullName()} exists.");
+
             return;
         }
 
@@ -37,6 +39,8 @@ class FileMaterializer implements MaterializerInterface, SingletonInterface
         $filename = $this->makeFilename($declaration);
 
         if (!isset($this->materialized[$filename]) || $this->materialized[$filename] < $modifiedDate) {
+
+            dump("{$declaration->class->getFullName()} materialized.\n\n");
             $this->materialized[$filename] = $modifiedDate;
             $this->create($filename, $code);
         }
@@ -44,7 +48,7 @@ class FileMaterializer implements MaterializerInterface, SingletonInterface
 
     private function makeFilename(Declaration $declaration): string
     {
-        return $this->directory . DIRECTORY_SEPARATOR . $this->convertName($declaration);
+        return $this->directory . DIRECTORY_SEPARATOR . $this->convertName($declaration) . '.php';
     }
 
     private function convertName(Declaration $declaration): string

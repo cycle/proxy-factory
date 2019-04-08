@@ -67,15 +67,9 @@ class ProxyPrinter
         $this->stubs = $stubs;
     }
 
-    /**
-     *
-     * @param Declaration $declaration
-     *
-     * @return string
-     */
-    public function make(Declaration $declaration): string
+    public function make(\ReflectionClass $reflection, Declaration $declaration): string
     {
-        $structure = $this->extractor->extract($declaration->parent->getFullName());
+        $structure = $this->extractor->extract($reflection);
 
         $property = $this->propertyName($structure);
 

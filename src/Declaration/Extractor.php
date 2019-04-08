@@ -17,10 +17,8 @@ final class Extractor
         $this->properties = $properties;
     }
 
-    public function extract(string $reflection): Structure
+    public function extract(\ReflectionClass $reflection): Structure
     {
-        $reflection = new \ReflectionClass($reflection);
-
         return Structure::create(
             $this->properties->getProperties($reflection),
             $this->methods->getMethods($reflection),

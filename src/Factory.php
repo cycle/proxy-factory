@@ -20,10 +20,14 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     /** @var array */
     private $resolved = [];
 
-    public function __construct(ProxyPrinter $printer, MaterializerInterface $materializer)
+    /** @var Names */
+    private $names;
+
+    public function __construct(ProxyPrinter $printer, MaterializerInterface $materializer, Names $names)
     {
         $this->printer = $printer;
         $this->materializer = $materializer;
+        $this->names = $names;
     }
 
     /**
@@ -48,11 +52,11 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
         try {
             $reflection = new \ReflectionClass($class);
         } catch (\ReflectionException $e) {
-            throw new ProxyFactoryException($e->getMessage(), $e->getCode(), $e);
+            throw ProxyFactoryException::wrap($e);
         }
 
-        $declaration = new Declaration($reflection, $this->createName($reflection));
-        $this->materializer->materialize($this->printer->make($declaration), $declaration, $reflection);
+        $declaration = new Declaration($reflection, $this->names->make($reflection));
+        $this->materializer->materialize($this->printer->make($reflection, $declaration), $declaration, $reflection);
 
         $this->resolved[$role] = $declaration->class->getFullName();
 
@@ -70,10 +74,5 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     private function instantiate(string $className, ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
         return new $className($orm, $role, $scope);
-    }
-
-    private function createName(\ReflectionClass $reflection): string
-    {
-        return "{$reflection->getShortName()}_{$reflection->getName()}{$reflection->getFileName()}";
     }
 }

@@ -62,7 +62,7 @@ final class Methods
             $flags[] = Node\Stmt\Class_::MODIFIER_PROTECTED;
         }
 
-        return array_reduce($flags, function ($a, $b) {
+        return array_reduce($flags, static function ($a, $b) {
             return $a | $b;
         }, 0);
     }

@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration;
 
-use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\Declaration\Extractor;
+use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\Entity;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\EntityWithConstructor;
 use Cycle\ORM\Promise\Tests\Fixtures\ChildEntity;
@@ -55,7 +55,7 @@ class ExtractorTest extends TestCase
 
     private function getDeclaration(string $class): Structure
     {
-        return $this->extractor()->extract($class);
+        return $this->extractor()->extract(new \ReflectionClass($class));
     }
 
     private function extractor(): Extractor

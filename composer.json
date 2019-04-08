@@ -10,7 +10,7 @@
   "autoload-dev": {
     "psr-4": {
       "Cycle\\ORM\\Promise\\Tests\\": "tests/Promise/",
-      "": "tests/noNamespaceFixtures/"
+      "Cycle\\ORM\\Promise\\Tests\\Promises\\": "tests/promises/"
     }
   },
   "require": {
