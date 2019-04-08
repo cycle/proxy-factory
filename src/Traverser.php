@@ -6,30 +6,9 @@ namespace Cycle\ORM\Promise;
 use PhpParser\Node;
 use PhpParser\NodeTraverser;
 use PhpParser\NodeVisitor;
-use PhpParser\Parser;
-use PhpParser\ParserFactory;
 
 final class Traverser
 {
-    /** @var Parser */
-    private $parser;
-
-    public function __construct(Parser $parser = null)
-    {
-        $this->parser = $parser ?? (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
-    }
-
-    /**
-     * @param string      $filename
-     * @param NodeVisitor ...$visitors
-     *
-     * @return Node[]
-     */
-    public function traverseFilename(string $filename, NodeVisitor ...$visitors): array
-    {
-        return $this->makeTraverser(...$visitors)->traverse($this->parseNodes($filename));
-    }
-
     /**
      * @param Node\Stmt[] $nodes
      * @param NodeVisitor ...$visitors
@@ -39,16 +18,6 @@ final class Traverser
     public function traverseClonedNodes(array $nodes, NodeVisitor ...$visitors): array
     {
         return $this->makeTraverser(...$visitors)->traverse($this->cloneNodes($nodes));
-    }
-
-    /**
-     * @param string $filename
-     *
-     * @return Node\Stmt[]|null
-     */
-    private function parseNodes(string $filename): ?array
-    {
-        return $this->parser->parse(file_get_contents($filename));
     }
 
     /**
