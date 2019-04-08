@@ -5,7 +5,6 @@ namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\Declaration;
-use Cycle\ORM\Promise\Naming\HashPostfixNaming;
 use Cycle\ORM\PromiseFactoryInterface;
 use Cycle\ORM\Schema;
 use Spiral\Core\Container\SingletonInterface;
@@ -18,17 +17,13 @@ class Factory implements PromiseFactoryInterface, SingletonInterface
     /** @var MaterializerInterface */
     private $materializer;
 
-    /** @var NamingInterface */
-    private $naming;
-
     /** @var array */
     private $resolved = [];
 
-    public function __construct(ProxyPrinter $printer, MaterializerInterface $materializer, ?NamingInterface $naming)
+    public function __construct(ProxyPrinter $printer, MaterializerInterface $materializer)
     {
         $this->printer = $printer;
         $this->materializer = $materializer;
-        $this->naming = $naming ?? new HashPostfixNaming();
     }
 
     /**
@@ -56,12 +51,8 @@ class Factory implements PromiseFactoryInterface, SingletonInterface
             throw new ProxyFactoryException($e->getMessage(), $e->getCode(), $e);
         }
 
-        // ---
-
-        $declaration = new Declaration($r, $this->naming->name($r));
+        $declaration = new Declaration($r, $this->createName($r));
         $this->materializer->materialize($this->printer->make($declaration), $declaration);
-
-        // ---
 
         $this->resolved[$role] = $declaration->class->getFullName();
 
@@ -79,5 +70,10 @@ class Factory implements PromiseFactoryInterface, SingletonInterface
     private function instantiate(string $className, ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
         return new $className($orm, $role, $scope);
+    }
+
+    private function createName(\ReflectionClass $reflection): string
+    {
+        return "{$reflection->getShortName()}_{$reflection->getName()}{$reflection->getFileName()}";
     }
 }
