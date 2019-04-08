@@ -28,11 +28,11 @@ class FileMaterializer implements MaterializerInterface
      */
     public function materialize(string $code, Declaration $declaration): void
     {
-        if (class_exists($declaration->class->getNamespacesName())) {
+        if (class_exists($declaration->class->getFullName())) {
             return;
         }
 
-        $targets = $this->locator->getClasses($declaration->parent->getNamespacesName(), PromiseInterface::class);
+        $targets = $this->locator->getClasses($declaration->parent->getFullName(), PromiseInterface::class);
         if (count($targets) === 0) {
             $this->create($code, $declaration);
         } else {
@@ -63,7 +63,7 @@ class FileMaterializer implements MaterializerInterface
 
     private function convertName(Declaration $declaration): string
     {
-        return str_replace('\\', '', $declaration->class->getNamespacesName());
+        return str_replace('\\', '', $declaration->class->getFullName());
     }
 
     private function isContentIdentical(\ReflectionClass $target, string $code, Declaration $declaration): bool
@@ -73,7 +73,7 @@ class FileMaterializer implements MaterializerInterface
 
     private function prepareCode(string $code, Declaration $declaration): string
     {
-        $regexp = sprintf('"/class\s(\S+)\sextends\s%s/', $declaration->parent->name);
+        $regexp = sprintf('"/class\s(\S+)\sextends\s%s/', $declaration->parent->getShortName());
 
         return preg_replace($regexp, '', $code);
     }

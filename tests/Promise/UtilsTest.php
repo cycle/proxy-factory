@@ -14,7 +14,7 @@ class UtilsTest extends TestCase
      * @param int    $sequence
      * @param string $expected
      */
-    public function testTrimTrailingDigits(string $name, int $sequence, string $expected)
+    public function testTrimTrailingDigits(string $name, int $sequence, string $expected): void
     {
         $this->assertEquals($expected, Utils::trimTrailingDigits($name, $sequence));
     }
@@ -39,7 +39,7 @@ class UtilsTest extends TestCase
      * @param array $child
      * @param array $expected
      */
-    public function testInjectValues(array $array, int $index, array $child, array $expected)
+    public function testInjectValues(array $array, int $index, array $child, array $expected): void
     {
         $this->assertEquals($expected, Utils::injectValues($array, $index, $child));
     }
@@ -80,7 +80,7 @@ class UtilsTest extends TestCase
      * @param string $name
      * @param string $expected
      */
-    public function testShortName(string $name, string $expected)
+    public function testShortName(string $name, string $expected): void
     {
         $this->assertEquals($expected, Utils::shortName($name));
     }

@@ -3,27 +3,28 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration;
 
-use Cycle\ORM\Promise\Traverser;
-
-class Extractor
+final class Extractor
 {
-    /** @var Traverser */
-    private $traverser;
+    /** @var Extractor\Methods */
+    private $methods;
 
-    public function __construct(Traverser $traverser)
+    /** @var Extractor\Properties */
+    private $properties;
+
+    public function __construct(Extractor\Methods $methods, Extractor\Properties $properties)
     {
-        $this->traverser = $traverser;
+        $this->methods = $methods;
+        $this->properties = $properties;
     }
 
-    public function extract(string $class): Structure
+    public function extract(string $reflection): Structure
     {
-        $class = new \ReflectionClass($class);
+        $reflection = new \ReflectionClass($reflection);
 
-        $properties = new Visitor\LocateProperties();
-        $methods = new Visitor\LocateMethodsToBeProxied();
-
-        $this->traverser->traverseFilename($class->getFileName(), $properties, $methods);
-
-        return Structure::create($properties->getProperties(), $methods->getMethods(), $class->getConstructor() !== null);
+        return Structure::create(
+            $this->properties->getProperties($reflection),
+            $this->methods->getMethods($reflection),
+            $reflection->getConstructor() !== null
+        );
     }
 }

@@ -3,33 +3,62 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration\Proxy;
 
-class Class_
+final class Class_ implements ClassInterface
 {
     /** @var string */
-    public $name;
+    private $shortName;
 
     /** @var string|null */
-    public $namespace;
+    private $namespace;
 
-    public static function create(string $name, ?string $namespace): Class_
+    public function __construct(string $name, ClassInterface $parent)
     {
-        $self = new self();
-        $self->name = $name;
-        $self->namespace = $namespace;
-
-        return $self;
+        $this->shortName = $this->makeShortName($name);
+        $this->namespace = $this->makeNamespaceName($name, $parent);
     }
 
-    public function getNamespacesName(): string
+    public function getShortName(): string
+    {
+        return $this->shortName;
+    }
+
+    public function getNamespaceName(): ?string
+    {
+        return $this->namespace;
+    }
+
+    public function getFullName(): string
     {
         if (empty($this->namespace)) {
-            return $this->name;
+            return "\\{$this->shortName}";
         }
 
-        return "{$this->namespace}\\{$this->name}";
+        return "{$this->namespace}\\{$this->shortName}";
     }
 
-    private function __construct()
+    private function makeShortName(string $class): string
     {
+        $class = rtrim($class, '\\');
+        $lastPosition = mb_strripos($class, '\\');
+        if ($lastPosition === false) {
+            return $class;
+        }
+
+        return mb_substr($class, $lastPosition + 1);
+    }
+
+    private function makeNamespaceName(string $class, ClassInterface $parent): ?string
+    {
+        $class = rtrim($class, '\\');
+        $lastPosition = mb_strripos($class, '\\');
+        if ($lastPosition === 0) {
+            return null;
+        }
+
+        if ($lastPosition !== false) {
+            return ltrim(mb_substr($class, 0, $lastPosition), '\\');
+        }
+
+        return $parent->getNamespaceName();
     }
 }

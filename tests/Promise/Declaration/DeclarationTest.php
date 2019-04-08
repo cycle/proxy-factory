@@ -4,94 +4,92 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\Declaration;
 
 use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Tests\Declaration\Fixtures\HasNamespaceExample;
 use PHPUnit\Framework\TestCase;
 
 class DeclarationTest extends TestCase
 {
     /**
-     * @dataProvider classNameProvider
+     * @dataProvider nameProvider
      *
-     * @param string $class
-     * @param        $expected
+     * @param \ReflectionClass $parent
+     * @param string           $class
+     * @param string           $expected
      */
-    public function testClassName(string $class, $expected)
+    public function testShortName(\ReflectionClass $parent, string $class, string $expected): void
     {
-        $schema = new Declaration('Any', $class);
-        $this->assertSame($expected, $schema->class->name);
+        $declaration = new Declaration($parent, $class);
+        $this->assertSame($expected, $declaration->class->getShortName());
     }
 
-    public function classNameProvider(): array
+    public function nameProvider(): array
     {
+        $r = new \ReflectionClass(\Example::class);
+
         return [
-            ['ExampleProxy', 'ExampleProxy'],
-            ['\ExampleProxy', 'ExampleProxy'],
-            ['Path\To\Proxy\ExampleProxy', 'ExampleProxy'],
+            [$r, 'ExampleProxy\\', 'ExampleProxy'],
+            [$r, 'ExampleProxy', 'ExampleProxy'],
+            [$r, '\ExampleProxy', 'ExampleProxy'],
+            [$r, '\Namespaced\Name\Of\ExampleProxy', 'ExampleProxy'],
         ];
     }
 
     /**
-     * @dataProvider classNamespaceProvider
+     * @dataProvider namespaceProvider
      *
-     * @param string $extends
-     * @param string $class
-     * @param        $expected
+     * @param \ReflectionClass $parent
+     * @param string           $class
+     * @param string|null      $expected
      */
-    public function testClassNamespace(string $extends, string $class, $expected)
+    public function testNamespace(\ReflectionClass $parent, string $class, ?string $expected): void
     {
-        $schema = new Declaration($extends, $class);
-        $this->assertSame($expected, $schema->class->namespace);
+        $declaration = new Declaration($parent, $class);
+        $this->assertSame($expected, $declaration->class->getNamespaceName());
     }
 
-    public function classNamespaceProvider(): array
+    public function namespaceProvider(): array
     {
+        $r1 = new \ReflectionClass(\Example::class);
+        $r2 = new \ReflectionClass(HasNamespaceExample::class);
+
         return [
-            ['Example', 'ExampleProxy', null],
-            ['Example', '\ExampleProxy', null],
-            ['Path\To\Example', '\ExampleProxy', null],
-            ['Path\To\Example', 'ExampleProxy', 'Path\To'],
-            ['Path\To\Example', 'Path\To\Proxy\ExampleProxy', 'Path\To\Proxy'],
+            [$r1, 'ExampleProxy\\', null],
+            [$r1, 'ExampleProxy', null],
+            [$r1, '\ExampleProxy', null],
+            [$r2, '\ExampleProxy', null],
+            [$r2, 'ExampleProxy', $r2->getNamespaceName()],
+            [$r2, 'ExampleProxy\\', $r2->getNamespaceName()],
+            [$r2, '\Namespaced\Name\Of\ExampleProxy', 'Namespaced\Name\Of'],
+            [$r2, 'Namespaced\Name\Of\ExampleProxy', 'Namespaced\Name\Of'],
         ];
     }
 
     /**
-     * @dataProvider extendsNameProvider
+     * @dataProvider fullNameProvider
      *
-     * @param string $extends
-     * @param        $expected
+     * @param \ReflectionClass $parent
+     * @param string           $class
+     * @param string|null      $expected
      */
-    public function testExtendsName(string $extends, $expected)
+    public function testFullName(\ReflectionClass $parent, string $class, ?string $expected): void
     {
-        $schema = new Declaration($extends, 'Any');
-        $this->assertSame($expected, $schema->parent->name);
+        $declaration = new Declaration($parent, $class);
+        $this->assertSame($expected, $declaration->class->getFullName());
     }
 
-    public function extendsNameProvider(): array
+    public function fullNameProvider(): array
     {
+        $r1 = new \ReflectionClass(\Example::class);
+        $r2 = new \ReflectionClass(HasNamespaceExample::class);
+
         return [
-            ['Example', 'Example'],
-            ['\Example', 'Example'],
-            ['Path\To\Proxy\Example', 'Example'],
-        ];
-    }
-
-    /**
-     * @dataProvider extendsNamespaceProvider
-     *
-     * @param string $extends
-     * @param        $expected
-     */
-    public function testExtendsNamespace(string $extends, $expected)
-    {
-        $schema = new Declaration($extends, 'Any');
-        $this->assertSame($expected, $schema->parent->namespace);
-    }
-
-    public function extendsNamespaceProvider(): array
-    {
-        return [
-            ['Example', null],
-            ['\Example', null],
-            ['Path\To\Example', 'Path\To'],
+            [$r1, 'ExampleProxy', '\ExampleProxy'],
+            [$r1, '\ExampleProxy', '\ExampleProxy'],
+            [$r2, '\ExampleProxy', '\ExampleProxy'],
+            [$r2, 'ExampleProxy', $r2->getNamespaceName() . '\\' . 'ExampleProxy'],
+            [$r2, 'ExampleProxy\\', $r2->getNamespaceName() . '\\' . 'ExampleProxy'],
+            [$r2, '\Namespaced\Name\Of\ExampleProxy', 'Namespaced\Name\Of\ExampleProxy'],
+            [$r2, 'Namespaced\Name\Of\ExampleProxy', 'Namespaced\Name\Of\ExampleProxy'],
         ];
     }
 }

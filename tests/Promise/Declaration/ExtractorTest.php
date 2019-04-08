@@ -7,23 +7,41 @@ use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\Entity;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\EntityWithConstructor;
+use Cycle\ORM\Promise\Tests\Fixtures\ChildEntity;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
 
 class ExtractorTest extends TestCase
 {
-    public function testExtractProperties()
+    public function testExtractProperties(): void
     {
-        $this->assertSame(['public', 'protected'], $this->getDeclaration(Entity::class)->properties);
+        $extracted = $this->getDeclaration(ChildEntity::class)->properties;
+        sort($extracted);
+
+        $expected = ['public', 'protected', 'ownProperty', '__resolver'];
+        sort($expected);
+
+        $this->assertSame($expected, $extracted);
     }
 
-    public function testHasConstructor()
+    public function testHasConstructor(): void
     {
         $this->assertFalse($this->getDeclaration(Entity::class)->hasConstructor);
         $this->assertTrue($this->getDeclaration(EntityWithConstructor::class)->hasConstructor);
     }
 
-    public function testExtractMethods()
+    public function testExtractParentMethods(): void
+    {
+        $extracted = [];
+        foreach ($this->getDeclaration(ChildEntity::class)->methods as $method) {
+            $extracted[$method->name->name] = $method->name->name;
+        }
+
+        $this->assertArrayHasKey('getParentProp', $extracted);
+        $this->assertArrayHasKey('parentProtectedProp', $extracted);
+    }
+
+    public function testExtractMethods(): void
     {
         $methods = [];
         foreach ($this->getDeclaration(Entity::class)->methods as $method) {

@@ -5,5 +5,5 @@ namespace Cycle\ORM\Promise;
 
 interface NamingInterface
 {
-    public function name(string $class): string;
+    public function name(\ReflectionClass $reflection): string;
 }

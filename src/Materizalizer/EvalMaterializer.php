@@ -5,7 +5,7 @@ namespace Cycle\ORM\Promise\Materizalizer;
 use Cycle\ORM\Promise\Declaration\Declaration;
 use Cycle\ORM\Promise\MaterializerInterface;
 
-class EvalMaterializer implements MaterializerInterface
+final class EvalMaterializer implements MaterializerInterface
 {
     /**
      * {@inheritdoc}
@@ -13,10 +13,16 @@ class EvalMaterializer implements MaterializerInterface
      */
     public function materialize(string $code, Declaration $declaration): void
     {
-        if (class_exists($declaration->class->getNamespacesName())) {
+        if (class_exists($declaration->class->getFullName())) {
             return;
         }
 
-        eval(ltrim($code, '<?php'));
+        if (mb_strpos($code, '<?php') === 0) {
+            $code = mb_substr($code, 5);
+        } elseif (mb_strpos($code, '<?') === 0) {
+            $code = mb_substr($code, 2);
+        }
+
+        eval($code);
     }
 }

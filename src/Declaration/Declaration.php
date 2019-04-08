@@ -5,49 +5,15 @@ namespace Cycle\ORM\Promise\Declaration;
 
 class Declaration
 {
-    /** @var Proxy\Class_ */
+    /** @var Proxy\ClassInterface */
     public $class;
 
-    /** @var Proxy\Class_ */
+    /** @var Proxy\ClassInterface */
     public $parent;
 
-    public function __construct(string $parent, string $class)
+    public function __construct(\ReflectionClass $parent, string $class)
     {
-        $this->parent = Proxy\Class_::create($this->extractClassName($parent), $this->extractNamespace($parent));
-        $this->class = Proxy\Class_::create($this->extractClassName($class), $this->extractNamespaceOfParentClass($class, $parent));
-    }
-
-    private function extractClassName(string $class): string
-    {
-        $lastPosition = mb_strripos($class, '\\');
-        if ($lastPosition === false) {
-            return $class;
-        }
-
-        return mb_substr($class, $lastPosition + 1);
-    }
-
-    private function extractNamespaceOfParentClass(string $class, string $parent): ?string
-    {
-        $lastPosition = mb_strripos($class, '\\');
-        if ($lastPosition === 0) {
-            return null;
-        }
-
-        if ($lastPosition !== false) {
-            return $this->extractNamespace($class);
-        }
-
-        return $this->extractNamespace($parent);
-    }
-
-    private function extractNamespace(string $class): ?string
-    {
-        $lastPosition = mb_strripos($class, '\\');
-        if ($lastPosition === false || $lastPosition === 0) {
-            return null;
-        }
-
-        return mb_substr($class, 0, $lastPosition);
+        $this->parent = new Proxy\ReflectionClass_($parent);
+        $this->class = new Proxy\Class_($class, $this->parent);
     }
 }

@@ -71,15 +71,15 @@ class ProxyPrinter
      */
     public function make(Declaration $declaration): string
     {
-        $structure = $this->extractor->extract($declaration->parent->getNamespacesName());
+        $structure = $this->extractor->extract($declaration->parent->getFullName());
 
         $property = $this->propertyName($structure);
 
         $visitors = [
             new Visitor\AddUseStmts($this->useStmts($declaration)),
-            new Visitor\UpdateNamespace($declaration->class->namespace),
-            new Visitor\DeclareClass($declaration->class->name, $declaration->parent->name),
-            new Visitor\AddResolverProperty($property, $this->propertyType(), $declaration->parent->name),
+            new Visitor\UpdateNamespace($declaration->class->getNamespaceName()),
+            new Visitor\DeclareClass($declaration->class->getShortName(), $declaration->parent->getShortName()),
+            new Visitor\AddResolverProperty($property, $this->propertyType(), $declaration->parent->getShortName()),
             new Visitor\UpdateConstructor($structure->hasConstructor, $property, $this->propertyType(), self::DEPENDENCIES),
             new Visitor\UpdatePromiseMethods($property),
             new Visitor\AddProxiedMethods($property, $structure->methods),
@@ -102,8 +102,8 @@ class ProxyPrinter
 
     private function useStmts(Declaration $schema): array
     {
-        if ($schema->class->namespace !== $schema->parent->namespace) {
-            return [$schema->parent->getNamespacesName()];
+        if ($schema->class->getNamespaceName() !== $schema->parent->getNamespaceName()) {
+            return [$schema->parent->getFullName()];
         }
 
         return [];
