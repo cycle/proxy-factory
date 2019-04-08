@@ -309,9 +309,40 @@ class ProxyPrinterTest extends TestCase
         }
     }
 
-//    public function testInheritedProperties(): void
-//    {
-//    }
+    public function testInheritedProperties(): void
+    {
+        $class = Fixtures\ChildEntity::class;
+        $as = 'EntityProxy' . __LINE__;
+
+        $reflection = new \ReflectionClass($class);
+
+        $declaration = new Declaration($reflection, $as);
+        $output = $this->make($declaration);
+        $output = ltrim($output, '<?php');
+
+        $this->assertFalse(class_exists($declaration->class->getFullName()));
+
+        eval($output);
+
+        $sourceProperties = [];
+        foreach ($reflection->getProperties() as $property) {
+            $sourceProperties[] = $property->getName();
+        }
+
+        $properties = [];
+        foreach ($this->getDeclaration($class)->properties as $property) {
+            $properties[] = $property;
+        }
+
+        foreach ($sourceProperties as $property) {
+            $this->assertArrayNotHasKey($property, $properties, "Proxied class contains not expected `{$property}` property");
+            $this->assertStringNotContainsString(" $property;", $output);
+        }
+
+        foreach ($properties as $property) {
+            $this->assertArrayNotHasKey($property, $sourceProperties, "Origin class contains not expected `{$property}` property");
+        }
+    }
 
     public function testInheritedMethods(): void
     {
@@ -331,7 +362,7 @@ class ProxyPrinterTest extends TestCase
         $sourceMethods = [];
 
         //There're only public and protected methods inside
-        foreach ($reflection->getMethods() as $method) {
+        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
             $sourceMethods[$method->getName()] = $method->isPublic() ? 'public' : 'protected';
         }
 
