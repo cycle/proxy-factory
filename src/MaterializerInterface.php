@@ -7,5 +7,5 @@ use Cycle\ORM\Promise\Declaration\Declaration;
 
 interface MaterializerInterface
 {
-    public function materialize(string $code, Declaration $declaration): void;
+    public function materialize(string $code, Declaration $declaration, \ReflectionClass $reflection): void;
 }

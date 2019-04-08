@@ -11,7 +11,7 @@ final class EvalMaterializer implements MaterializerInterface
      * {@inheritdoc}
      * If class already exists - do nothing (prevent from memory leaking)
      */
-    public function materialize(string $code, Declaration $declaration): void
+    public function materialize(string $code, Declaration $declaration, \ReflectionClass $reflection): void
     {
         if (class_exists($declaration->class->getFullName())) {
             return;

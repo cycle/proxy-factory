@@ -6,7 +6,7 @@ namespace Cycle\ORM\Promise;
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Select;
 
-class PromiseResolver implements PromiseInterface
+final class PromiseResolver implements PromiseInterface
 {
     /** @var ORMInterface */
     private $orm;

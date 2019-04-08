@@ -5,7 +5,7 @@ namespace Cycle\ORM\Promise;
 
 use PhpParser\Comment\Doc;
 
-class PHPDoc
+final class PHPDoc
 {
     public static function writeInheritdoc(): Doc
     {

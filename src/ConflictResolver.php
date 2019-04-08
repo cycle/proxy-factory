@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
-class ConflictResolver
+final class ConflictResolver
 {
     /** @var ConflictResolver\Sequences */
     private $sequences;

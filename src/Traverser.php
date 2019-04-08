@@ -9,7 +9,7 @@ use PhpParser\NodeVisitor;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
 
-class Traverser
+final class Traverser
 {
     /** @var Parser */
     private $parser;

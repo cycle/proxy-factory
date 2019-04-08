@@ -9,7 +9,7 @@ use Cycle\ORM\PromiseFactoryInterface;
 use Cycle\ORM\Schema;
 use Spiral\Core\Container\SingletonInterface;
 
-class Factory implements PromiseFactoryInterface, SingletonInterface
+final class Factory implements PromiseFactoryInterface, SingletonInterface
 {
     /** @var ProxyPrinter */
     private $printer;
@@ -46,13 +46,13 @@ class Factory implements PromiseFactoryInterface, SingletonInterface
         }
 
         try {
-            $r = new \ReflectionClass($class);
+            $reflection = new \ReflectionClass($class);
         } catch (\ReflectionException $e) {
             throw new ProxyFactoryException($e->getMessage(), $e->getCode(), $e);
         }
 
-        $declaration = new Declaration($r, $this->createName($r));
-        $this->materializer->materialize($this->printer->make($declaration), $declaration);
+        $declaration = new Declaration($reflection, $this->createName($reflection));
+        $this->materializer->materialize($this->printer->make($declaration), $declaration, $reflection);
 
         $this->resolved[$role] = $declaration->class->getFullName();
 

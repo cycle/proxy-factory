@@ -41,7 +41,10 @@ class ProxyPrinter
     /** @var PrettyPrinterAbstract */
     private $printer;
 
-    public function __construct(ConflictResolver $resolver, Traverser $traverser, Extractor $extractor)
+    /** @var Stubs */
+    private $stubs;
+
+    public function __construct(ConflictResolver $resolver, Traverser $traverser, Extractor $extractor, Stubs $stubs)
     {
         $this->resolver = $resolver;
         $this->traverser = $traverser;
@@ -61,6 +64,7 @@ class ProxyPrinter
         $this->parser = new Parser\Php7($this->lexer);
 
         $this->printer = new Standard();
+        $this->stubs = $stubs;
     }
 
     /**
@@ -119,11 +123,6 @@ class ProxyPrinter
      */
     private function getNodesFromStub(): ?array
     {
-        return $this->parser->parse(file_get_contents($this->getStubFilename()));
-    }
-
-    private function getStubFilename(): string
-    {
-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'stubs' . DIRECTORY_SEPARATOR . 'proxy.stub';
+        return $this->parser->parse($this->stubs->getContent());
     }
 }
