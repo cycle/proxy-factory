@@ -10,7 +10,8 @@
   "autoload-dev": {
     "psr-4": {
       "Cycle\\ORM\\Promise\\Tests\\": "tests/Promise/",
-      "Cycle\\ORM\\Promise\\Tests\\Promises\\": "tests/promises/"
+      "Cycle\\ORM\\Promise\\Tests\\Promises\\": "tests/promises/",
+      "": "tests/fixturesWithoutNamespace/"
     }
   },
   "require": {

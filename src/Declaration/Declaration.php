@@ -11,9 +11,12 @@ class Declaration
     /** @var Proxy\ClassInterface */
     public $parent;
 
-    public function __construct(\ReflectionClass $parent, string $class)
+    public static function createFromReflection(\ReflectionClass $parent, string $class): self
     {
-        $this->parent = new Proxy\ReflectionClass_($parent);
-        $this->class = new Proxy\Class_($class, $this->parent);
+        $self = new self();
+        $self->parent = new Proxy\ReflectionClass_($parent);
+        $self->class = new Proxy\Class_($class, $self->parent);
+
+        return $self;
     }
 }

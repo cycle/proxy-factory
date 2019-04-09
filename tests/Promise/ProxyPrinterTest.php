@@ -25,7 +25,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -57,7 +57,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -79,7 +79,7 @@ class ProxyPrinterTest extends TestCase
         $as = "\EntityProxy" . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -101,7 +101,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -124,7 +124,7 @@ class ProxyPrinterTest extends TestCase
         $as = "\EntityProxy" . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -182,19 +182,19 @@ class ProxyPrinterTest extends TestCase
     public function testTraits(): void
     {
         $r = new \ReflectionClass(Fixtures\EntityWithoutTrait::class);
-        $this->assertStringNotContainsString(' use ', $this->make($r, new Declaration($r, 'EntityProxy' . __LINE__)));
+        $this->assertStringNotContainsString(' use ', $this->make($r, Declaration::createFromReflection($r, 'EntityProxy' . __LINE__)));
 
         $r = new \ReflectionClass(Fixtures\EntityWithTrait::class);
-        $this->assertStringNotContainsString(' use ', $this->make($r, new Declaration($r, 'EntityProxy' . __LINE__)));
+        $this->assertStringNotContainsString(' use ', $this->make($r, Declaration::createFromReflection($r, 'EntityProxy' . __LINE__)));
     }
 
     public function testConstants(): void
     {
         $r = new \ReflectionClass(Fixtures\EntityWithoutConstants::class);
-        $this->assertStringNotContainsString(' const ', $this->make($r, new Declaration($r, 'EntityProxy' . __LINE__)));
+        $this->assertStringNotContainsString(' const ', $this->make($r, Declaration::createFromReflection($r, 'EntityProxy' . __LINE__)));
 
         $r = new \ReflectionClass(Fixtures\EntityWithConstants::class);
-        $this->assertStringNotContainsString(' const ', $this->make($r, new Declaration($r, 'EntityProxy' . __LINE__)));
+        $this->assertStringNotContainsString(' const ', $this->make($r, Declaration::createFromReflection($r, 'EntityProxy' . __LINE__)));
     }
 
     public function testProperties(): void
@@ -203,7 +203,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -239,7 +239,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -255,7 +255,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -274,7 +274,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -291,7 +291,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -308,7 +308,7 @@ class ProxyPrinterTest extends TestCase
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -330,7 +330,7 @@ class ProxyPrinterTest extends TestCase
         $reflection = new \ReflectionClass($class);
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 
@@ -366,7 +366,7 @@ class ProxyPrinterTest extends TestCase
         $reflection = new \ReflectionClass($class);
 
         $r = new \ReflectionClass($class);
-        $declaration = new Declaration($r, $as);
+        $declaration = Declaration::createFromReflection($r, $as);
         $output = $this->make($r, $declaration);
         $output = ltrim($output, '<?php');
 

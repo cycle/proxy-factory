@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Materizalizer;
 
-use Cycle\ORM\Promise\Declaration\Declaration;
 use Cycle\ORM\Promise\MaterializerInterface;
 use Spiral\Core\Container\SingletonInterface;
 
@@ -27,33 +26,33 @@ class FileMaterializer implements MaterializerInterface, SingletonInterface
     /**
      * {@inheritdoc}
      */
-    public function materialize(string $code, Declaration $declaration, \ReflectionClass $reflection): void
+    public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void
     {
-        if (class_exists($declaration->class->getFullName())) {
-            dump("{$declaration->class->getFullName()} exists.");
-
-            return;
-        }
-
         $modifiedDate = $this->inspector->getLastModifiedDate($reflection);
-        $filename = $this->makeFilename($declaration);
+        $filename = $this->makeFilename($shortClassName);
 
         if (!isset($this->materialized[$filename]) || $this->materialized[$filename] < $modifiedDate) {
-
-            dump("{$declaration->class->getFullName()} materialized.\n\n");
             $this->materialized[$filename] = $modifiedDate;
-            $this->create($filename, $code);
+            $this->create($filename, $this->prepareCode($code));
+
+            require_once($filename);
         }
     }
 
-    private function makeFilename(Declaration $declaration): string
+    private function makeFilename(string $className): string
     {
-        return $this->directory . DIRECTORY_SEPARATOR . $this->convertName($declaration) . '.php';
+        return $this->directory . DIRECTORY_SEPARATOR . $className . '.php';
     }
 
-    private function convertName(Declaration $declaration): string
+    private function prepareCode(string $code): string
     {
-        return str_replace('\\', '', $declaration->class->getFullName());
+        if (mb_strpos($code, '<?php') === 0) {
+            $code = mb_substr($code, 5);
+        } elseif (mb_strpos($code, '<?') === 0) {
+            $code = mb_substr($code, 2);
+        }
+
+        return "<?php\n" . trim($code);
     }
 
     private function create(string $filename, string $code): void

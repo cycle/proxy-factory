@@ -9,7 +9,7 @@ class Names
     {
         $hash = hash('sha256', $reflection->getName() . $reflection->getFileName());
 
-        $name = "{$reflection->getShortName()}_$hash";
+        $name = "{$reflection->getShortName()}Proxy_$hash";
         if ($namespace !== null) {
             return "$namespace\\$name";
         }

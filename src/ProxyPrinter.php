@@ -15,7 +15,8 @@ use PhpParser\PrettyPrinterAbstract;
 
 class ProxyPrinter
 {
-    private const PROPERTY = '__resolver';
+    private const PROPERTY       = '__resolver';
+    private const RESOLVE_METHOD = '__resolve';
 
     private const DEPENDENCIES = [
         'orm'   => ORMInterface::class,
@@ -80,7 +81,7 @@ class ProxyPrinter
             new Visitor\AddResolverProperty($property, $this->propertyType(), $declaration->parent->getShortName()),
             new Visitor\UpdateConstructor($structure->hasConstructor, $property, $this->propertyType(), self::DEPENDENCIES),
             new Visitor\UpdatePromiseMethods($property),
-            new Visitor\AddProxiedMethods($property, $structure->methods),
+            new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
         ];
 
         $nodes = $this->getNodesFromStub();

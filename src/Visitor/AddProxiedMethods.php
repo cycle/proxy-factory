@@ -18,10 +18,14 @@ class AddProxiedMethods extends NodeVisitorAbstract
     /** @var Node\Stmt\ClassMethod[] */
     private $methods;
 
-    public function __construct(string $property, array $methods)
+    /** @var string */
+    private $resolveMethod;
+
+    public function __construct(string $property, array $methods, string $resolveMethod)
     {
         $this->property = $property;
         $this->methods = $methods;
+        $this->resolveMethod = $resolveMethod;
     }
 
     /**
@@ -46,7 +50,10 @@ class AddProxiedMethods extends NodeVisitorAbstract
         $method->stmts = [
             new Node\Stmt\Return_(
                 new Node\Expr\MethodCall(
-                    new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property),
+                    new Node\Expr\MethodCall(
+                        new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property),
+                        $this->resolveMethod
+                    ),
                     $method->name->name
                 )
             )

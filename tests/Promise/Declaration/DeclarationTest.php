@@ -18,7 +18,7 @@ class DeclarationTest extends TestCase
      */
     public function testShortName(\ReflectionClass $parent, string $class, string $expected): void
     {
-        $declaration = new Declaration($parent, $class);
+        $declaration = Declaration::createFromReflection($parent, $class);
         $this->assertSame($expected, $declaration->class->getShortName());
     }
 
@@ -43,7 +43,7 @@ class DeclarationTest extends TestCase
      */
     public function testNamespace(\ReflectionClass $parent, string $class, ?string $expected): void
     {
-        $declaration = new Declaration($parent, $class);
+        $declaration = Declaration::createFromReflection($parent, $class);
         $this->assertSame($expected, $declaration->class->getNamespaceName());
     }
 
@@ -73,7 +73,7 @@ class DeclarationTest extends TestCase
      */
     public function testFullName(\ReflectionClass $parent, string $class, ?string $expected): void
     {
-        $declaration = new Declaration($parent, $class);
+        $declaration = Declaration::createFromReflection($parent, $class);
         $this->assertSame($expected, $declaration->class->getFullName());
     }
 

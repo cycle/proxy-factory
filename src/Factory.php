@@ -55,8 +55,10 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
             throw ProxyFactoryException::wrap($e);
         }
 
-        $declaration = new Declaration($reflection, $this->names->make($reflection));
-        $this->materializer->materialize($this->printer->make($reflection, $declaration), $declaration, $reflection);
+        $declaration = Declaration::createFromReflection($reflection, $this->names->make($reflection));
+        if (!class_exists($declaration->class->getFullName())) {
+            $this->materializer->materialize($this->printer->make($reflection, $declaration), $declaration->class->getShortName(), $reflection);
+        }
 
         $this->resolved[$role] = $declaration->class->getFullName();
 
