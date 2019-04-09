@@ -90,6 +90,6 @@ class MaterializerTest extends TestCase
 
     private function filesDirectory(): string
     {
-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'promises';
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'promises';
     }
 }

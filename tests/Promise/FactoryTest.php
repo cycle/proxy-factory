@@ -15,8 +15,6 @@ use Spiral\Core\Container;
 
 class FactoryTest extends TestCase
 {
-    private const NS = 'Cycle\ORM\Promise\Tests\Promises';
-
     public function setUp()
     {
         $files = glob($this->filesDirectory() . DIRECTORY_SEPARATOR . '*');
@@ -29,7 +27,7 @@ class FactoryTest extends TestCase
 
     private function filesDirectory(): string
     {
-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'promises';
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'promises';
     }
 
     public function testFilePromise(): void
@@ -44,7 +42,7 @@ class FactoryTest extends TestCase
         $container = new Container();
         $container->bind(ORMInterface::class, $orm);
 
-        $materializer = $container->make(FileMaterializer::class, ['directory' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'promises']);
+        $materializer = $container->make(FileMaterializer::class, ['directory' => $this->filesDirectory()]);
         $container->bind(MaterializerInterface::class, $materializer);
 
         /** @var Factory $factory */
