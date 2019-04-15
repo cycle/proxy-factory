@@ -13,3 +13,7 @@ build:
 
 before_commands:
   - "composer install --no-interaction --prefer-source"
+
+filter:
+  excluded_paths:
+    - tests/
