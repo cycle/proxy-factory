@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration\Extractor;
 
+use PhpParser\Builder\Param;
 use PhpParser\Node;
 
 final class Methods
@@ -34,10 +35,12 @@ final class Methods
                 continue;
             }
 
-            $flags = $this->makeNodeFlags($method);
-            $returnType = $this->makeReturnType($method);
-
-            $methods[] = new Node\Stmt\ClassMethod($method->getName(), compact('flags', 'returnType'));
+            $methods[] = new Node\Stmt\ClassMethod($method->getName(), [
+                'flags'      => $this->packFlags($method),
+                'returnType' => $this->defineReturnType($method),
+                'params'     => $this->packParams($method),
+                'byRef'      => $method->returnsReference()
+            ]);
         }
 
         return $methods;
@@ -53,7 +56,7 @@ final class Methods
         return in_array($name, self::MAGIC_METHOD_NAMES, true);
     }
 
-    private function makeNodeFlags(\ReflectionMethod $method): int
+    private function packFlags(\ReflectionMethod $method): int
     {
         $flags = [];
         if ($method->isPublic()) {
@@ -67,7 +70,7 @@ final class Methods
         }, 0);
     }
 
-    private function makeReturnType(\ReflectionMethod $method): ?Node
+    private function defineReturnType(\ReflectionMethod $method): ?Node
     {
         if (!$method->hasReturnType()) {
             return null;
@@ -90,5 +93,41 @@ final class Methods
         }
 
         return new Node\Identifier($name);
+    }
+
+    private function packParams(\ReflectionMethod $method): array
+    {
+        $params = [];
+        foreach ($method->getParameters() as $parameter) {
+            $param = new Param($parameter->getName());
+
+            $type = $this->defineParamReturnType($parameter);
+            if ($type !== null) {
+                $param->setType($type);
+            }
+
+            $params[] = $param->getNode();
+        }
+
+        return $params;
+    }
+
+    private function defineParamReturnType(\ReflectionParameter $parameter): ?string
+    {
+        if (!$parameter->hasType()) {
+            return null;
+        }
+
+        $typeReflection = $parameter->getType();
+        if ($typeReflection === null) {
+            return null;
+        }
+
+        $type = $typeReflection->getName();
+        if ($typeReflection->allowsNull()) {
+            $type = "?$type";
+        }
+
+        return $type;
     }
 }

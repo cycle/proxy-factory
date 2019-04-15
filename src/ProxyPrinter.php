@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
 use PhpParser\Lexer;
@@ -68,7 +68,7 @@ class ProxyPrinter
         $this->stubs = $stubs;
     }
 
-    public function make(\ReflectionClass $reflection, Declaration $declaration): string
+    public function make(\ReflectionClass $reflection, Declarations $declaration): string
     {
         $structure = $this->extractor->extract($reflection);
 
@@ -94,12 +94,12 @@ class ProxyPrinter
         );
     }
 
-    private function propertyName(Structure $declaration): string
+    private function propertyName(Structure $structure): string
     {
-        return $this->resolver->resolve($declaration->properties, self::PROPERTY);
+        return $this->resolver->resolve($structure->properties, self::PROPERTY);
     }
 
-    private function useStmts(Declaration $schema): array
+    private function useStmts(Declarations $schema): array
     {
         if ($schema->class->getNamespaceName() !== $schema->parent->getNamespaceName()) {
             return [$schema->parent->getFullName()];

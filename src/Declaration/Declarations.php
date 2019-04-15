@@ -3,19 +3,19 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration;
 
-class Declaration
+class Declarations
 {
-    /** @var Proxy\ClassInterface */
+    /** @var DeclarationInterface */
     public $class;
 
-    /** @var Proxy\ClassInterface */
+    /** @var DeclarationInterface */
     public $parent;
 
     public static function createFromReflection(\ReflectionClass $parent, string $class): self
     {
         $self = new self();
-        $self->parent = new Proxy\ReflectionClass_($parent);
-        $self->class = new Proxy\Class_($class, $self->parent);
+        $self->parent = new Declaration\ReflectionDeclarationDeclaration($parent);
+        $self->class = new Declaration\DeclarationDeclaration($class, $self->parent);
 
         return $self;
     }

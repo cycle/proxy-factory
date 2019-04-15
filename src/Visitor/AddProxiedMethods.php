@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Visitor;
 
 use Cycle\ORM\Promise\PHPDoc;
+use PhpParser\Builder\Param;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -47,18 +48,46 @@ class AddProxiedMethods extends NodeVisitorAbstract
     private function modifyMethod(Node\Stmt\ClassMethod $method): Node\Stmt\ClassMethod
     {
         $method->setDocComment(PHPDoc::writeInheritdoc());
-        $method->stmts = [
-            new Node\Stmt\Return_(
-                new Node\Expr\MethodCall(
-                    new Node\Expr\MethodCall(
-                        new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property),
-                        $this->resolveMethod
-                    ),
-                    $method->name->name
-                )
-            )
-        ];
+
+        $stmts = new Node\Expr\MethodCall(
+            new Node\Expr\MethodCall(
+                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property),
+                $this->resolveMethod
+            ),
+            $method->name->name,
+            $this->packMethodArgs($method)
+        );
+
+        if ($this->hasReturnStmt($method)) {
+            $method->stmts = [new Node\Stmt\Return_($stmts)];
+        } else {
+            $method->stmts = [new Node\Stmt\Expression($stmts)];
+        }
 
         return $method;
+    }
+
+    private function packMethodArgs(Node\Stmt\ClassMethod $method): array
+    {
+        $args = [];
+        /** @var \PhpParser\Node\Param $param */
+        foreach ($method->getParams() as $param) {
+            $args[] = (new Param($param->var->name))->getNode();
+        }
+
+        return $args;
+    }
+
+    private function hasReturnStmt(Node\Stmt\ClassMethod $method): bool
+    {
+        if ($method->returnType === null || $method->returnType === 'void') {
+            return false;
+        }
+
+        if ($method->returnType instanceof Node\NullableType) {
+            return true;
+        }
+
+        return $method->returnType instanceof Node\Identifier && $method->returnType->name !== 'void';
     }
 }

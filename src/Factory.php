@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\PromiseFactoryInterface;
 use Cycle\ORM\Schema;
 use Spiral\Core\Container\SingletonInterface;
@@ -55,7 +55,7 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
             throw ProxyFactoryException::wrap($e);
         }
 
-        $declaration = Declaration::createFromReflection($reflection, $this->names->make($reflection));
+        $declaration = Declarations::createFromReflection($reflection, $this->names->make($reflection));
         if (!class_exists($declaration->class->getFullName())) {
             $this->materializer->materialize($this->printer->make($reflection, $declaration), $declaration->class->getShortName(), $reflection);
         }

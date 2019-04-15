@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Cycle\ORM\Promise\Declaration\Proxy;
+namespace Cycle\ORM\Promise\Declaration\Declaration;
 
-final class ReflectionClass_ implements ClassInterface
+use Cycle\ORM\Promise\Declaration\DeclarationInterface;
+
+final class ReflectionDeclarationDeclaration implements DeclarationInterface
 {
     /** @var \ReflectionClass */
     private $reflection;

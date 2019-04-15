@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration;
 
-use Cycle\ORM\Promise\Declaration\Declaration;
+use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\HasNamespaceExample;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class DeclarationTest extends TestCase
      */
     public function testShortName(\ReflectionClass $parent, string $class, string $expected): void
     {
-        $declaration = Declaration::createFromReflection($parent, $class);
+        $declaration = Declarations::createFromReflection($parent, $class);
         $this->assertSame($expected, $declaration->class->getShortName());
     }
 
@@ -43,7 +43,7 @@ class DeclarationTest extends TestCase
      */
     public function testNamespace(\ReflectionClass $parent, string $class, ?string $expected): void
     {
-        $declaration = Declaration::createFromReflection($parent, $class);
+        $declaration = Declarations::createFromReflection($parent, $class);
         $this->assertSame($expected, $declaration->class->getNamespaceName());
     }
 
@@ -73,7 +73,7 @@ class DeclarationTest extends TestCase
      */
     public function testFullName(\ReflectionClass $parent, string $class, ?string $expected): void
     {
-        $declaration = Declaration::createFromReflection($parent, $class);
+        $declaration = Declarations::createFromReflection($parent, $class);
         $this->assertSame($expected, $declaration->class->getFullName());
     }
 

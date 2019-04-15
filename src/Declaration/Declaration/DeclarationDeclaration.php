@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Cycle\ORM\Promise\Declaration\Proxy;
+namespace Cycle\ORM\Promise\Declaration\Declaration;
 
-final class Class_ implements ClassInterface
+use Cycle\ORM\Promise\Declaration\DeclarationInterface;
+
+final class DeclarationDeclaration implements DeclarationInterface
 {
     /** @var string */
     private $shortName;
@@ -11,7 +13,7 @@ final class Class_ implements ClassInterface
     /** @var string|null */
     private $namespace;
 
-    public function __construct(string $name, ClassInterface $parent)
+    public function __construct(string $name, DeclarationInterface $parent)
     {
         $this->shortName = $this->makeShortName($name);
         $this->namespace = $this->makeNamespaceName($name, $parent);
@@ -47,7 +49,7 @@ final class Class_ implements ClassInterface
         return mb_substr($class, $lastPosition + 1);
     }
 
-    private function makeNamespaceName(string $class, ClassInterface $parent): ?string
+    private function makeNamespaceName(string $class, DeclarationInterface $parent): ?string
     {
         $class = rtrim($class, '\\');
         $lastPosition = mb_strripos($class, '\\');
