@@ -246,7 +246,7 @@ class ProxyPrinterTest extends BaseTest
         /** @var \ReflectionProperty[] $properties */
         $properties = [];
         foreach ($reflection->getProperties() as $property) {
-            if ($property->getDeclaringClass()->getName() !== $declaration->class->getFullName()) {
+            if ($property->getDeclaringClass()->name !== $declaration->class->getFullName()) {
                 continue;
             }
 
@@ -348,7 +348,7 @@ class ProxyPrinterTest extends BaseTest
 
         $i = new \ReflectionClass(PromiseInterface::class);
         foreach ($i->getMethods() as $method) {
-            $this->assertStringContainsString("public function {$method->getName()}()", $output);
+            $this->assertStringContainsString("public function {$method->name}()", $output);
         }
     }
 
@@ -370,7 +370,7 @@ class ProxyPrinterTest extends BaseTest
 
         $sourceProperties = [];
         foreach ($reflection->getProperties() as $property) {
-            $sourceProperties[] = $property->getName();
+            $sourceProperties[] = $property->name;
         }
 
         $properties = [];
@@ -408,7 +408,7 @@ class ProxyPrinterTest extends BaseTest
 
         //There're only public and protected methods inside
         foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
-            $sourceMethods[$method->getName()] = $method->isPublic() ? 'public' : 'protected';
+            $sourceMethods[$method->name] = $method->isPublic() ? 'public' : 'protected';
         }
 
         /** @var \PhpParser\Node\Stmt\ClassMethod[] $methods */
