@@ -56,4 +56,24 @@ class Utils
 
         return mb_substr($name, 0, $pos);
     }
+
+    /**
+     * Remove any kinds of php open tags.
+     *
+     * @param string $code
+     *
+     * @return string
+     */
+    public static function trimPHPOpenTag(string $code): string
+    {
+        if (mb_strpos($code, '<?php') === 0) {
+            return mb_substr($code, 5);
+        }
+
+        if (mb_strpos($code, '<?') === 0) {
+            return mb_substr($code, 2);
+        }
+
+        return $code;
+    }
 }

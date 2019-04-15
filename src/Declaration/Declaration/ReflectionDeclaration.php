@@ -5,7 +5,7 @@ namespace Cycle\ORM\Promise\Declaration\Declaration;
 
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 
-final class ReflectionDeclarationDeclaration implements DeclarationInterface
+final class ReflectionDeclaration implements DeclarationInterface
 {
     /** @var \ReflectionClass */
     private $reflection;
@@ -27,6 +27,6 @@ final class ReflectionDeclarationDeclaration implements DeclarationInterface
 
     public function getFullName(): string
     {
-        return $this->reflection->getName();
+        return $this->reflection->name;
     }
 }

@@ -46,8 +46,8 @@ class AddUseStmts extends NodeVisitorAbstract
     }
 
     /**
-     * @param Node\Stmt[]      $stmts
-     * @param Node\Stmt\Use_[] $nodes
+     * @param Node\Stmt[] $stmts
+     * @param Node[]      $nodes
      *
      * @return Node\Stmt\Use_[]
      */

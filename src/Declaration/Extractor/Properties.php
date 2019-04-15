@@ -14,7 +14,7 @@ final class Properties
                 continue;
             }
 
-            $properties[] = $property->getName();
+            $properties[] = $property->name;
         }
 
         return $properties;

@@ -114,10 +114,10 @@ class ProxyPrinter
     }
 
     /**
-     * @return Node\Stmt[]|null
+     * @return Node\Stmt[]
      */
-    private function getNodesFromStub(): ?array
+    private function getNodesFromStub(): array
     {
-        return $this->parser->parse($this->stubs->getContent());
+        return $this->parser->parse($this->stubs->getContent()) ?? [];
     }
 }

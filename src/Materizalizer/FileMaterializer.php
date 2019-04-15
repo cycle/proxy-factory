@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Materizalizer;
 
 use Cycle\ORM\Promise\MaterializerInterface;
+use Cycle\ORM\Promise\Utils;
 use Spiral\Core\Container\SingletonInterface;
 
 class FileMaterializer implements MaterializerInterface, SingletonInterface
@@ -46,13 +47,7 @@ class FileMaterializer implements MaterializerInterface, SingletonInterface
 
     private function prepareCode(string $code): string
     {
-        if (mb_strpos($code, '<?php') === 0) {
-            $code = mb_substr($code, 5);
-        } elseif (mb_strpos($code, '<?') === 0) {
-            $code = mb_substr($code, 2);
-        }
-
-        return "<?php\n" . trim($code);
+        return "<?php\n" . trim(Utils::trimPHPOpenTag($code));
     }
 
     private function create(string $filename, string $code): void

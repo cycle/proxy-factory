@@ -3,6 +3,7 @@
 namespace Cycle\ORM\Promise\Materizalizer;
 
 use Cycle\ORM\Promise\MaterializerInterface;
+use Cycle\ORM\Promise\Utils;
 
 final class EvalMaterializer implements MaterializerInterface
 {
@@ -12,12 +13,6 @@ final class EvalMaterializer implements MaterializerInterface
      */
     public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void
     {
-        if (mb_strpos($code, '<?php') === 0) {
-            $code = mb_substr($code, 5);
-        } elseif (mb_strpos($code, '<?') === 0) {
-            $code = mb_substr($code, 2);
-        }
-
-        eval($code);
+        eval(Utils::trimPHPOpenTag($code));
     }
 }

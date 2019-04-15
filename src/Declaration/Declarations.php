@@ -14,7 +14,7 @@ class Declarations
     public static function createFromReflection(\ReflectionClass $parent, string $class): self
     {
         $self = new self();
-        $self->parent = new Declaration\ReflectionDeclarationDeclaration($parent);
+        $self->parent = new Declaration\ReflectionDeclaration($parent);
         $self->class = new Declaration\DeclarationDeclaration($class, $self->parent);
 
         return $self;

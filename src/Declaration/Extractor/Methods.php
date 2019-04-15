@@ -35,7 +35,7 @@ final class Methods
                 continue;
             }
 
-            $methods[] = new Node\Stmt\ClassMethod($method->getName(), [
+            $methods[] = new Node\Stmt\ClassMethod($method->name, [
                 'flags'      => $this->packFlags($method),
                 'returnType' => $this->defineReturnType($method),
                 'params'     => $this->packParams($method),
@@ -48,7 +48,7 @@ final class Methods
 
     private function isIgnoredMethod(\ReflectionMethod $method): bool
     {
-        return $method->isPrivate() || $method->isStatic() || $method->isFinal() || $method->isAbstract() || $this->isMagicMethod($method->getName());
+        return $method->isPrivate() || $method->isStatic() || $method->isFinal() || $method->isAbstract() || $this->isMagicMethod($method->name);
     }
 
     private function isMagicMethod(string $name): bool
@@ -99,7 +99,7 @@ final class Methods
     {
         $params = [];
         foreach ($method->getParameters() as $parameter) {
-            $param = new Param($parameter->getName());
+            $param = new Param($parameter->name);
 
             $type = $this->defineParamReturnType($parameter);
             if ($type !== null) {
