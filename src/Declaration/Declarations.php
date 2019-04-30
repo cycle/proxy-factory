@@ -5,18 +5,13 @@ namespace Cycle\ORM\Promise\Declaration;
 
 class Declarations
 {
-    /** @var DeclarationInterface */
-    public $class;
-
-    /** @var DeclarationInterface */
-    public $parent;
-
-    public static function createFromReflection(\ReflectionClass $parent, string $class): self
+    public static function createParentFromReflection(\ReflectionClass $parent): DeclarationInterface
     {
-        $self = new self();
-        $self->parent = new Declaration\ReflectionDeclaration($parent);
-        $self->class = new Declaration\DeclarationDeclaration($class, $self->parent);
+        return new Declaration\ReflectionDeclaration($parent);
+    }
 
-        return $self;
+    public static function createClassFromName(string $class, DeclarationInterface $parent): DeclarationInterface
+    {
+        return new Declaration\ChildClassDeclaration($class, $parent);
     }
 }

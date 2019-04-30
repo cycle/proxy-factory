@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
 use PhpParser\Lexer;
@@ -68,17 +68,17 @@ class ProxyPrinter
         $this->stubs = $stubs;
     }
 
-    public function make(\ReflectionClass $reflection, Declarations $declaration): string
+    public function make(\ReflectionClass $reflection, DeclarationInterface $class, DeclarationInterface $parent): string
     {
         $structure = $this->extractor->extract($reflection);
 
         $property = $this->propertyName($structure);
 
         $visitors = [
-            new Visitor\AddUseStmts($this->useStmts($declaration)),
-            new Visitor\UpdateNamespace($declaration->class->getNamespaceName()),
-            new Visitor\DeclareClass($declaration->class->getShortName(), $declaration->parent->getShortName()),
-            new Visitor\AddResolverProperty($property, $this->propertyType(), $declaration->parent->getShortName()),
+            new Visitor\AddUseStmts($this->useStmts($class, $parent)),
+            new Visitor\UpdateNamespace($class->getNamespaceName()),
+            new Visitor\DeclareClass($class->getShortName(), $parent->getShortName()),
+            new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
             new Visitor\UpdateConstructor($structure->hasConstructor, $property, $this->propertyType(), self::DEPENDENCIES),
             new Visitor\UpdatePromiseMethods($property),
             new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
@@ -99,10 +99,10 @@ class ProxyPrinter
         return $this->resolver->resolve($structure->properties, self::PROPERTY);
     }
 
-    private function useStmts(Declarations $schema): array
+    private function useStmts(DeclarationInterface $class, DeclarationInterface $parent): array
     {
-        if ($schema->class->getNamespaceName() !== $schema->parent->getNamespaceName()) {
-            return [$schema->parent->getFullName()];
+        if ($class->getNamespaceName() !== $parent->getNamespaceName()) {
+            return [$parent->getFullName()];
         }
 
         return [];

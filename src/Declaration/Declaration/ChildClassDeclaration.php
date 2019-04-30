@@ -5,7 +5,7 @@ namespace Cycle\ORM\Promise\Declaration\Declaration;
 
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 
-final class DeclarationDeclaration implements DeclarationInterface
+final class ChildClassDeclaration implements DeclarationInterface
 {
     /** @var string */
     private $shortName;

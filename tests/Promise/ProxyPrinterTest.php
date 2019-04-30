@@ -5,6 +5,7 @@ namespace Cycle\ORM\Promise\Tests;
 
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
+use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
@@ -51,15 +52,16 @@ class ProxyPrinterTest extends BaseTest
 
     public function testDeclaration(): void
     {
-        $class = Fixtures\Entity::class;
+        $classname = Fixtures\Entity::class;
         $as = 'EntityProxy' . __LINE__;
 
-        $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
@@ -67,14 +69,14 @@ class ProxyPrinterTest extends BaseTest
         $this->assertStringContainsString(sprintf(
             'class %s extends %s implements %s',
             $as,
-            Utils::shortName($class),
+            Utils::shortName($classname),
             Utils::shortName(PromiseInterface::class)
         ), $output);
 
-        $proxy = $this->makeProxyObject($class, $declaration->class->getFullName());
+        $proxy = $this->makeProxyObject($classname, $class->getFullName());
 
-        $this->assertInstanceOf($declaration->class->getFullName(), $proxy);
-        $this->assertInstanceOf($class, $proxy);
+        $this->assertInstanceOf($class->getFullName(), $proxy);
+        $this->assertInstanceOf($classname, $proxy);
         $this->assertInstanceOf(PromiseInterface::class, $proxy);
     }
 
@@ -83,20 +85,21 @@ class ProxyPrinterTest extends BaseTest
      */
     public function testSameNamespace(): void
     {
-        $class = Fixtures\Entity::class;
+        $classname = Fixtures\Entity::class;
         $as = 'EntityProxy' . __LINE__;
 
-        $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $origReflection = new \ReflectionClass($class);
-        $proxyReflection = new \ReflectionClass($declaration->class->getFullName());
+        $origReflection = new \ReflectionClass($classname);
+        $proxyReflection = new \ReflectionClass($class->getFullName());
         $this->assertSame($origReflection->getNamespaceName(), $proxyReflection->getNamespaceName());
     }
 
@@ -105,19 +108,20 @@ class ProxyPrinterTest extends BaseTest
      */
     public function testDifferentNamespace(): void
     {
-        $class = Fixtures\Entity::class;
+        $classname = Fixtures\Entity::class;
         $as = "\EntityProxy" . __LINE__;
 
-        $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $proxyReflection = new \ReflectionClass($declaration->class->getFullName());
+        $proxyReflection = new \ReflectionClass($class->getFullName());
         $this->assertSame('', (string)$proxyReflection->getNamespaceName());
         $this->assertStringNotContainsString('namespace ', $output);
     }
@@ -127,19 +131,20 @@ class ProxyPrinterTest extends BaseTest
      */
     public function testUseStmtsInSameNamespace(): void
     {
-        $class = Fixtures\Entity::class;
+        $classname = Fixtures\Entity::class;
         $as = 'EntityProxy' . __LINE__;
 
-        $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($declaration->class->getFullName(), [
+        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), [
             PromiseResolver::class,
             PromiseInterface::class
         ]));
@@ -150,22 +155,23 @@ class ProxyPrinterTest extends BaseTest
      */
     public function testUseStmtsInDifferentNamespace(): void
     {
-        $class = Fixtures\Entity::class;
+        $classname = Fixtures\Entity::class;
         $as = "\EntityProxy" . __LINE__;
 
-        $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($declaration->class->getFullName(), [
+        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), [
             PromiseResolver::class,
             PromiseInterface::class,
-            $class
+            $classname
         ]));
     }
 
@@ -209,44 +215,76 @@ class ProxyPrinterTest extends BaseTest
         return $types;
     }
 
-    public function testTraits(): void
+    /**
+     * @dataProvider traitsDataProvider
+     *
+     * @param string $classname
+     * @param string $as
+     *
+     * @throws \ReflectionException
+     */
+    public function testTraits(string $classname, string $as): void
     {
-        $r = new \ReflectionClass(Fixtures\EntityWithoutTrait::class);
-        $this->assertStringNotContainsString(' use ', $this->make($r, Declarations::createFromReflection($r, 'EntityProxy' . __LINE__)));
-
-        $r = new \ReflectionClass(Fixtures\EntityWithTrait::class);
-        $this->assertStringNotContainsString(' use ', $this->make($r, Declarations::createFromReflection($r, 'EntityProxy' . __LINE__)));
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $this->assertStringNotContainsString(' use ', $this->make($r, $class, $parent));
     }
 
-    public function testConstants(): void
+    public function traitsDataProvider(): array
     {
-        $r = new \ReflectionClass(Fixtures\EntityWithoutConstants::class);
-        $this->assertStringNotContainsString(' const ', $this->make($r, Declarations::createFromReflection($r, 'EntityProxy' . __LINE__)));
+        return [
+            [Fixtures\EntityWithoutTrait::class, 'EntityProxy' . __LINE__],
+            [Fixtures\EntityWithTrait::class, 'EntityProxy' . __LINE__],
+        ];
+    }
 
-        $r = new \ReflectionClass(Fixtures\EntityWithConstants::class);
-        $this->assertStringNotContainsString(' const ', $this->make($r, Declarations::createFromReflection($r, 'EntityProxy' . __LINE__)));
+    /**
+     * @dataProvider constantsDataProvider
+     *
+     * @param string $classname
+     * @param string $as
+     *
+     * @throws \ReflectionException
+     */
+    public function testConstants(string $classname, string $as): void
+    {
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $this->assertStringNotContainsString(' const ', $this->make($r, $class, $parent));
+    }
+
+    public function constantsDataProvider(): array
+    {
+        return [
+            [Fixtures\EntityWithoutTrait::class, 'EntityProxy' . __LINE__],
+            [Fixtures\EntityWithTrait::class, 'EntityProxy' . __LINE__],
+        ];
     }
 
     public function testProperties(): void
     {
-        $class = Fixtures\Entity::class;
+        $classname = Fixtures\Entity::class;
         $as = 'EntityProxy' . __LINE__;
 
-        $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $r = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $reflection = new \ReflectionClass($declaration->class->getFullName());
+        $reflection = new \ReflectionClass($class->getFullName());
 
         /** @var \ReflectionProperty[] $properties */
         $properties = [];
         foreach ($reflection->getProperties() as $property) {
-            if ($property->getDeclaringClass()->name !== $declaration->class->getFullName()) {
+            if ($property->getDeclaringClass()->name !== $class->getFullName()) {
                 continue;
             }
 
@@ -257,45 +295,43 @@ class ProxyPrinterTest extends BaseTest
         $property = $properties[0];
         $this->assertTrue($property->isPrivate());
         $this->assertFalse($property->isStatic());
-        $this->assertStringContainsString('@var PromiseResolver|' . Utils::shortName($class), $property->getDocComment());
+        $this->assertStringContainsString('@var PromiseResolver|' . Utils::shortName($classname), $property->getDocComment());
     }
 
     /**
      * @throws \ReflectionException
      */
-    public function testHasConstructor(): void
+    /**
+     * @dataProvider constructorDataProvider
+     *
+     * @param string $class
+     * @param string $as
+     *
+     * @throws \ReflectionException
+     */
+    public function testHasConstructor(string $class, string $as): void
     {
-        $class = Fixtures\EntityWithoutConstructor::class;
-        $as = 'EntityProxy' . __LINE__;
-
         $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $reflection = new \ReflectionClass($declaration->class->getFullName());
+        $reflection = new \ReflectionClass($class->getFullName());
         $constructor = $reflection->getConstructor();
         $this->assertNotNull($constructor);
+    }
 
-        $class = Fixtures\EntityWithConstructor::class;
-        $as = 'EntityProxy' . __LINE__;
-
-        $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
-        $output = ltrim($output, '<?php');
-
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
-
-        eval($output);
-
-        $reflection = new \ReflectionClass($declaration->class->getFullName());
-        $constructor = $reflection->getConstructor();
-        $this->assertNotNull($constructor);
+    public function constructorDataProvider(): array
+    {
+        return [
+            [Fixtures\EntityWithoutConstructor::class, 'EntityProxy' . __LINE__],
+            [Fixtures\EntityWithConstructor::class, 'EntityProxy' . __LINE__],
+        ];
     }
 
     public function testNotContainParentConstructor(): void
@@ -304,11 +340,12 @@ class ProxyPrinterTest extends BaseTest
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
@@ -321,11 +358,12 @@ class ProxyPrinterTest extends BaseTest
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
@@ -338,11 +376,12 @@ class ProxyPrinterTest extends BaseTest
         $as = 'EntityProxy' . __LINE__;
 
         $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
@@ -360,11 +399,12 @@ class ProxyPrinterTest extends BaseTest
         $reflection = new \ReflectionClass($class);
 
         $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
@@ -396,11 +436,12 @@ class ProxyPrinterTest extends BaseTest
         $reflection = new \ReflectionClass($class);
 
         $r = new \ReflectionClass($class);
-        $declaration = Declarations::createFromReflection($r, $as);
-        $output = $this->make($r, $declaration);
+        $parent = Declarations::createParentFromReflection($r);
+        $class = Declarations::createClassFromName($as, $parent);
+        $output = $this->make($r, $class, $parent);
         $output = ltrim($output, '<?php');
 
-        $this->assertFalse(class_exists($declaration->class->getFullName()));
+        $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
@@ -465,9 +506,9 @@ class ProxyPrinterTest extends BaseTest
         return $this->container->make($proxyFullName, ['role' => $className, 'scope' => []]);
     }
 
-    private function make(\ReflectionClass $reflection, Declarations $declaration): string
+    private function make(\ReflectionClass $reflection, DeclarationInterface $class, DeclarationInterface $parent): string
     {
-        return $this->proxyCreator()->make($reflection, $declaration);
+        return $this->proxyCreator()->make($reflection, $class, $parent);
     }
 
     private function proxyCreator(): ProxyPrinter

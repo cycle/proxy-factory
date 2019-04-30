@@ -12,14 +12,16 @@ class DeclarationTest extends TestCase
     /**
      * @dataProvider nameProvider
      *
-     * @param \ReflectionClass $parent
-     * @param string           $class
+     * @param \ReflectionClass $reflection
+     * @param string           $name
      * @param string           $expected
      */
-    public function testShortName(\ReflectionClass $parent, string $class, string $expected): void
+    public function testShortName(\ReflectionClass $reflection, string $name, string $expected): void
     {
-        $declaration = Declarations::createFromReflection($parent, $class);
-        $this->assertSame($expected, $declaration->class->getShortName());
+        $parent = Declarations::createParentFromReflection($reflection);
+        $class = Declarations::createClassFromName($name, $parent);
+
+        $this->assertSame($expected, $class->getShortName());
     }
 
     public function nameProvider(): array
@@ -37,14 +39,16 @@ class DeclarationTest extends TestCase
     /**
      * @dataProvider namespaceProvider
      *
-     * @param \ReflectionClass $parent
-     * @param string           $class
+     * @param \ReflectionClass $reflection
+     * @param string           $name
      * @param string|null      $expected
      */
-    public function testNamespace(\ReflectionClass $parent, string $class, ?string $expected): void
+    public function testNamespace(\ReflectionClass $reflection, string $name, ?string $expected): void
     {
-        $declaration = Declarations::createFromReflection($parent, $class);
-        $this->assertSame($expected, $declaration->class->getNamespaceName());
+        $parent = Declarations::createParentFromReflection($reflection);
+        $class = Declarations::createClassFromName($name, $parent);
+
+        $this->assertSame($expected, $class->getNamespaceName());
     }
 
     public function namespaceProvider(): array
@@ -67,14 +71,16 @@ class DeclarationTest extends TestCase
     /**
      * @dataProvider fullNameProvider
      *
-     * @param \ReflectionClass $parent
-     * @param string           $class
+     * @param \ReflectionClass $reflection
+     * @param string           $name
      * @param string|null      $expected
      */
-    public function testFullName(\ReflectionClass $parent, string $class, ?string $expected): void
+    public function testFullName(\ReflectionClass $reflection, string $name, ?string $expected): void
     {
-        $declaration = Declarations::createFromReflection($parent, $class);
-        $this->assertSame($expected, $declaration->class->getFullName());
+        $parent = Declarations::createParentFromReflection($reflection);
+        $class = Declarations::createClassFromName($name, $parent);
+
+        $this->assertSame($expected, $class->getFullName());
     }
 
     public function fullNameProvider(): array
