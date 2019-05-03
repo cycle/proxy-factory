@@ -29,7 +29,6 @@ class ModifyMagicIsset extends NodeVisitorAbstract
 
         return null;
 
-
         if (in_array($name, $this->unsetProperties, true)) {
             $entity = $this->resolver->__resolve();
             unset($entity->{$name});
@@ -42,7 +41,9 @@ class ModifyMagicIsset extends NodeVisitorAbstract
     {
         $if = new Node\Stmt\If_(Expressions::inArrayFunc('name', 'this', $this->unsetPropertiesProperty));
         $if->stmts[] = Expressions::resolveIntoVar('entity', 'this', $this->resolverProperty, '__resolve');
+        $if->stmts[] = new Node\Stmt\Return_(Expressions::issetFunc('entity', '{$name}'));
         $if->else = new Node\Stmt\Else_();
+        $if->else->stmts[] = new Node\Stmt\Return_(Expressions::issetFunc('this', '{$name}'));
 
         return $if;
     }

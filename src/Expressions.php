@@ -16,6 +16,15 @@ class Expressions
             )
         );
     }
+    public static function issetFunc(string $object, string $property): Node\Expr\FuncCall
+    {
+        return
+            new Node\Expr\FuncCall(
+                new Node\Name('isset'),
+                [new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))]
+
+        );
+    }
 
     public static function inArrayFunc(string $name, string $object, string $haystackProperty): Node\Expr\FuncCall
     {

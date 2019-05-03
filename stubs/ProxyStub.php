@@ -19,6 +19,13 @@ class ProxyStub implements PromiseInterface
 
     public function __isset($name)
     {
+        if (in_array($name, $this->unsetProperties, true)) {
+            $entity = $this->resolver->__resolve();
+
+            return isset($entity->{$name});
+        }
+
+        return isset($this->{$name});
     }
 
     public function __unset($name)
