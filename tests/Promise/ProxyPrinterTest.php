@@ -35,8 +35,8 @@ class ProxyPrinterTest extends BaseTest
             'benchmark' => false,
             'sqlite'    => [
                 'driver' => SQLiteDriver::class,
-                'check'  => function () {
-                    return !in_array('sqlite', \PDO::getAvailableDrivers());
+                'check'  => static function () {
+                    return !in_array('sqlite', \PDO::getAvailableDrivers(), true);
                 },
                 'conn'   => 'sqlite::memory:',
                 'user'   => 'sqlite',

@@ -10,6 +10,7 @@ use Cycle\ORM\Promise\MaterializerInterface;
 use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\Promise\Materizalizer\FileMaterializer;
 use Cycle\ORM\Promise\Tests\Fixtures\SchematicEntity;
+use Cycle\ORM\Transaction;
 use Cycle\Schema;
 use Spiral\Core\Container;
 use Spiral\Database\Driver\SQLite\SQLiteDriver;
@@ -29,8 +30,8 @@ class FactoryTest extends BaseTest
             'benchmark' => false,
             'sqlite'    => [
                 'driver' => SQLiteDriver::class,
-                'check'  => function () {
-                    return !in_array('sqlite', \PDO::getAvailableDrivers());
+                'check'  => static function () {
+                    return !in_array('sqlite', \PDO::getAvailableDrivers(), true);
                 },
                 'conn'   => 'sqlite::memory:',
                 'user'   => 'sqlite',
@@ -56,36 +57,50 @@ class FactoryTest extends BaseTest
         return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'promises';
     }
 
-    public function testFilePromise(): void
+    /**
+     * @dataProvider dataProvider
+     *
+     * @param string $materializer
+     * @param array  $params
+     *
+     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     * @throws \Throwable
+     */
+    public function testPromise(string $materializer, array $params): void
     {
         $role = SchematicEntity::class;
-        $scope = [];
+        $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
+        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name']);
 
-        $this->bindMaterializer($this->container->make(FileMaterializer::class, ['directory' => $this->filesDirectory()]));
+        $scope = ['id' => 2];
+
+        $this->bindMaterializer($this->container->make($materializer, $params));
 
         /** @var SchematicEntity $promise */
         $promise = $this->factory()->promise($this->orm(), $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
 
-//        $promise->setName('my name');
-//        $this->assertSame('my name', $promise->getName());
+        $this->assertSame('my second name', $promise->getName());
+
+        $promise->setName('my third name');
+        $this->assertSame('my third name', $promise->getName());
+
+        $tr = new Transaction($this->orm());
+        $tr->persist($promise);
+        $tr->run();
+
+        /** @var SchematicEntity $o */
+        $o = $this->orm()->get($role, 'id', 2);
+        $this->assertEquals('my third name', $o->getName());
     }
 
-    public function testEvalPromise(): void
+    public function dataProvider(): array
     {
-        $role = SchematicEntity::class;
-        $scope = [];
-
-        $this->bindMaterializer($this->container->get(EvalMaterializer::class));
-
-        /** @var SchematicEntity $promise */
-        $promise = $this->factory()->promise($this->orm(), $role, $scope);
-
-        $this->assertInstanceOf($role, $promise);
-
-//        $promise->setName('my name');
-//        $this->assertSame('my name', $promise->getName());
+        return [
+            [FileMaterializer::class, ['directory' => $this->filesDirectory()]],
+            [EvalMaterializer::class, []]
+        ];
     }
 
     private function orm(): ORMInterface
@@ -109,7 +124,7 @@ class FactoryTest extends BaseTest
         return $this->container->get(Factory::class);
     }
 
-    private function bindMaterializer(MaterializerInterface $materializer)
+    private function bindMaterializer(MaterializerInterface $materializer): void
     {
         $this->container->bind(MaterializerInterface::class, $materializer);
     }

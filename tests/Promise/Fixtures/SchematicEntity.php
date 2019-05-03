@@ -20,6 +20,12 @@ class SchematicEntity
      */
     protected $name;
 
+    /**
+     * @column(type=string)
+     * @var string
+     */
+    public $email;
+
     public function getId(): int
     {
         return $this->id;
