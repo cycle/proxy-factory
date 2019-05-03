@@ -414,7 +414,7 @@ class ProxyPrinterTest extends BaseTest
         }
 
         $properties = [];
-        foreach ($this->getDeclaration($r)->properties as $property) {
+        foreach ($this->getStructure($r)->properties as $property) {
             $properties[] = $property;
         }
 
@@ -454,7 +454,7 @@ class ProxyPrinterTest extends BaseTest
 
         /** @var \PhpParser\Node\Stmt\ClassMethod[] $methods */
         $methods = [];
-        foreach ($this->getDeclaration($r)->methods as $method) {
+        foreach ($this->getStructure($r)->methods as $method) {
             $methods[$method->name->name] = $method;
         }
 
@@ -483,7 +483,7 @@ class ProxyPrinterTest extends BaseTest
         }
     }
 
-    private function getDeclaration(\ReflectionClass $class): Structure
+    private function getStructure(\ReflectionClass $class): Structure
     {
         return $this->extractor()->extract($class);
     }
