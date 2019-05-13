@@ -14,7 +14,7 @@ class PropertiesTest extends BaseProxyPrinterTest
     public function testWithoutConflicts(): void
     {
         $classname = Fixtures\EntityWithoutPropConflicts::class;
-        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __LINE__;
+        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __CLASS__ . __LINE__;
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
@@ -57,7 +57,7 @@ class PropertiesTest extends BaseProxyPrinterTest
     public function testWithConflicts(): void
     {
         $classname = Fixtures\EntityWithPropConflicts::class;
-        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __LINE__;
+        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __CLASS__ . __LINE__;
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);

@@ -5,89 +5,95 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
-use Cycle\ORM\Promise\Tests\Fixtures;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\PromiseInterface;
 use Spiral\Core\Container;
 
 class MethodsTest extends BaseProxyPrinterTest
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testPromiseMethods(): void
     {
-        $class = Fixtures\Entity::class;
-        $as = 'EntityProxy' . __LINE__;
+        $classname = Fixtures\EntityWithMethods::class;
+        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __CLASS__ . __LINE__;
+        $reflection = new \ReflectionClass($classname);
 
-        $r = new \ReflectionClass($class);
-        $parent = Declarations::createParentFromReflection($r);
+        $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
-        $output = $this->make($r, $class, $parent);
+
+        $output = $this->make($reflection, $class, $parent);
         $output = ltrim($output, '<?php');
 
         $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $i = new \ReflectionClass(PromiseInterface::class);
-        foreach ($i->getMethods() as $method) {
-            $this->assertStringContainsString("public function {$method->name}()", $output);
+        $methods = [];
+        $reflection = new \ReflectionClass($as);
+        foreach ($reflection->getMethods() as $method) {
+            $methods[$method->name] = $method->name;
+        }
+
+        foreach ($this->interfaceMethods() as $method) {
+            $this->assertArrayHasKey($method, $methods);
         }
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testInheritedMethods(): void
     {
-        $class = Fixtures\ChildEntity::class;
-        $as = 'EntityProxy' . __LINE__;
+        $classname = Fixtures\ChildEntityWithMethods::class;
+        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __CLASS__ . __LINE__;
+        $reflection = new \ReflectionClass($classname);
 
-        $reflection = new \ReflectionClass($class);
-
-        $r = new \ReflectionClass($class);
-        $parent = Declarations::createParentFromReflection($r);
+        $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
-        $output = $this->make($r, $class, $parent);
+
+        $output = $this->make($reflection, $class, $parent);
         $output = ltrim($output, '<?php');
 
         $this->assertFalse(class_exists($class->getFullName()));
 
         eval($output);
 
-        $sourceMethods = [];
-
-        //There're only public and protected methods inside
+        //There're only public and protected methods inside (not static and not final)
+        $originMethods = [];
         foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
-            $sourceMethods[$method->name] = $method->isPublic() ? 'public' : 'protected';
+            if ($method->isStatic() || $method->isFinal()) {
+                continue;
+            }
+
+            $originMethods[$method->name] = $method->isPublic() ? 'public' : 'protected';
         }
 
-        /** @var \PhpParser\Node\Stmt\ClassMethod[] $methods */
-        $methods = [];
-        foreach ($this->getStructure($r)->methods as $method) {
-            $methods[$method->name->name] = $method;
-        }
+        $methods = $this->promiseMethods($class->getFullName());
 
-        foreach ($sourceMethods as $name => $accessor) {
+        foreach ($originMethods as $name => $accessor) {
             $this->assertArrayHasKey($name, $methods, "Proxy class does not contain expected `{$name}` method");
 
             if ($accessor === 'public') {
                 $this->assertTrue($methods[$name]->isPublic(), "Proxied method `{$name}` expected to be public");
-                $this->assertStringContainsString("public function {$name}()", $output);
             } else {
                 $this->assertTrue($methods[$name]->isProtected(), "Proxied method `{$name}` expected to be protected");
-                $this->assertStringContainsString("protected function {$name}()", $output);
             }
         }
 
         foreach ($methods as $name => $method) {
-            $this->assertArrayHasKey($name, $sourceMethods, "Origin class does not contain expected `{$name}` method");
+            $this->assertArrayHasKey($name, $originMethods, "Origin class does not contain expected `{$name}` method");
 
             if ($method->isPublic()) {
-                $this->assertEquals('public', $sourceMethods[$name], "Proxied method `{$name}` expected to be public");
+                $this->assertEquals('public', $originMethods[$name], "Proxied method `{$name}` expected to be public");
             } elseif ($method->isProtected()) {
-                $this->assertEquals('protected', $sourceMethods[$name], "Proxied method `{$name}` expected to be public");
+                $this->assertEquals('protected', $originMethods[$name], "Proxied method `{$name}` expected to be public");
             } else {
                 throw new \UnexpectedValueException("\"{$method->name->toString()}\" method not found");
             }
         }
     }
-
 
     private function getStructure(\ReflectionClass $class): Structure
     {
@@ -99,5 +105,38 @@ class MethodsTest extends BaseProxyPrinterTest
         $container = new Container();
 
         return $container->get(Extractor::class);
+    }
+
+    /**
+     * @param string $classname
+     *
+     * @return \PhpParser\Node\Stmt\ClassMethod[]
+     * @throws \ReflectionException
+     */
+    private function promiseMethods(string $classname): array
+    {
+        $interfaceMethods = $this->interfaceMethods();
+        $methods = [];
+        $reflection = new \ReflectionClass($classname);
+        foreach ($this->getStructure($reflection)->methods as $method) {
+            if (isset($interfaceMethods[$method->name->name]) || $method->isMagic()) {
+                continue;
+            }
+
+            $methods[$method->name->name] = $method;
+        }
+
+        return $methods;
+    }
+
+    private function interfaceMethods(): array
+    {
+        $methods = [];
+        $reflection = new \ReflectionClass(PromiseInterface::class);
+        foreach ($reflection->getMethods() as $method) {
+            $methods[$method->name] = $method->name;
+        }
+
+        return $methods;
     }
 }
