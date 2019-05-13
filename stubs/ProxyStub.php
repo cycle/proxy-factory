@@ -3,9 +3,8 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Example;
 
-use Cycle\ORM\Promise\PromiseInterface;
-use Cycle\ORM\Promise\PromiseResolver;
 use Cycle\ORM\ORMInterface;
+use Cycle\ORM\Promise\PromiseInterface;
 
 class ProxyStub implements PromiseInterface
 {

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Visitor;
 
+use Cycle\ORM\Promise\Expressions;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
@@ -38,11 +39,6 @@ class UpdatePromiseMethods extends NodeVisitorAbstract
 
     private function resolvedParentMethodCall(Node\Stmt\ClassMethod $node): Node\Expr\MethodCall
     {
-        return new Node\Expr\MethodCall($this->resolverCall(), $node->name->name);
-    }
-
-    private function resolverCall(): Node\Expr\PropertyFetch
-    {
-        return new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property);
+        return new Node\Expr\MethodCall(Expressions::resolvePropertyFetch('this', $this->property), $node->name->name);
     }
 }

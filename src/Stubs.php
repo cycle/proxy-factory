@@ -5,7 +5,7 @@ namespace Cycle\ORM\Promise;
 
 class Stubs
 {
-    private const FILENAME = 'stubs' . DIRECTORY_SEPARATOR . 'proxy.stub';
+    private const FILENAME = 'stubs' . DIRECTORY_SEPARATOR . 'ProxyStub.php';
 
     public function getContent(): string
     {

@@ -70,7 +70,7 @@ class FactoryTest extends BaseTest
     {
         $role = SchematicEntity::class;
         $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
-        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name']);
+        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
 
         $scope = ['id' => 2];
 
@@ -86,6 +86,8 @@ class FactoryTest extends BaseTest
         $promise->setName('my third name');
         $this->assertSame('my third name', $promise->getName());
 
+        $promise->email = 'my second email';
+
         $tr = new Transaction($this->orm());
         $tr->persist($promise);
         $tr->run();
@@ -93,6 +95,7 @@ class FactoryTest extends BaseTest
         /** @var SchematicEntity $o */
         $o = $this->orm()->get($role, 'id', 2);
         $this->assertEquals('my third name', $o->getName());
+        $this->assertEquals('my second email', $o->email);
     }
 
     public function dataProvider(): array

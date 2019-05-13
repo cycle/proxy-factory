@@ -11,18 +11,39 @@ final class Extractor
     /** @var Extractor\Properties */
     private $properties;
 
-    public function __construct(Extractor\Methods $methods, Extractor\Properties $properties)
+    /** @var Extractor\Constants */
+    private $constants;
+
+    public function __construct(Extractor\Constants $constants, Extractor\Properties $properties, Extractor\Methods $methods)
     {
-        $this->methods = $methods;
+        $this->constants = $constants;
         $this->properties = $properties;
+        $this->methods = $methods;
     }
 
     public function extract(\ReflectionClass $reflection): Structure
     {
         return Structure::create(
+            $this->constants->getConstants($reflection),
             $this->properties->getProperties($reflection),
             $this->methods->getMethods($reflection),
-            $reflection->getConstructor() !== null
+            $reflection->getConstructor() !== null,
+            $this->hasCloneMethod($reflection)
         );
+    }
+
+    private function hasCloneMethod(\ReflectionClass $reflection): bool
+    {
+        if (!$reflection->hasMethod('__clone')) {
+            return false;
+        }
+
+        try {
+            $cloneMethod = $reflection->getMethod('__clone');
+        } catch (\ReflectionException $exception) {
+            return false;
+        }
+
+        return !$cloneMethod->isPrivate();
     }
 }
