@@ -35,6 +35,13 @@ final class PromiseResolver implements PromiseInterface
         $this->scope = $scope;
     }
 
+    public function __clone()
+    {
+        if ($this->entity !== null) {
+            $this->entity = clone $this->entity;
+        }
+    }
+
     /**
      * @inheritdoc
      */

@@ -7,7 +7,11 @@ use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
-use Cycle\ORM\Promise\Visitor\ModifyMagicIsset;
+use Cycle\ORM\Promise\Visitor\AddMagicClone;
+use Cycle\ORM\Promise\Visitor\AddMagicIsset;
+use Cycle\ORM\Promise\Visitor\AddMagicGet;
+use Cycle\ORM\Promise\Visitor\AddMagicSet;
+use Cycle\ORM\Promise\Visitor\AddMagicUnset;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Parser;
@@ -16,9 +20,9 @@ use PhpParser\PrettyPrinterAbstract;
 
 class ProxyPrinter
 {
-    private const PROPERTY         = '__resolver';
-    private const UNSET_PROPERTIES = '__unsetProperties';
-    private const RESOLVE_METHOD   = '__resolve';
+    private const RESOLVER_PROPERTY = '__resolver';
+    private const UNSET_PROPERTIES  = 'UNSET_PROPERTIES';
+    private const RESOLVE_METHOD    = '__resolve';
 
     private const DEPENDENCIES = [
         'orm'   => ORMInterface::class,
@@ -75,22 +79,26 @@ class ProxyPrinter
         $structure = $this->extractor->extract($reflection);
 
         $property = $this->resolverPropertyName($structure);
-        $unsetPropertiesProperty = $this->unsetPropertiesPropertyName($structure);
+        $unsetPropertiesConst = $this->unsetPropertiesConstName($structure);
 
         $visitors = [
             new Visitor\AddUseStmts($this->useStmts($class, $parent)),
             new Visitor\UpdateNamespace($class->getNamespaceName()),
             new Visitor\DeclareClass($class->getShortName(), $parent->getShortName()),
+            new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
             new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
-            new Visitor\AddUnsetPropertiesProperty($unsetPropertiesProperty, $structure->properties),
             new Visitor\UpdateConstructor(
                 $structure->hasConstructor,
                 $property,
                 $this->propertyType(),
                 self::DEPENDENCIES,
-                $this->unsetPropertiesPropertyName($structure)
+                $this->unsetPropertiesConstName($structure)
             ),
-            new ModifyMagicIsset($property,$unsetPropertiesProperty),
+            new AddMagicClone($property, $structure->hasClone),
+            new AddMagicGet($property, self::RESOLVE_METHOD),
+            new AddMagicSet($property, self::RESOLVE_METHOD),
+            new AddMagicIsset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
+            new AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
             new Visitor\UpdatePromiseMethods($property),
             new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
         ];
@@ -107,12 +115,12 @@ class ProxyPrinter
 
     private function resolverPropertyName(Structure $structure): string
     {
-        return $this->resolver->resolve($structure->properties, self::PROPERTY);
+        return $this->resolver->resolve($structure->properties, self::RESOLVER_PROPERTY)->fullName();
     }
 
-    private function unsetPropertiesPropertyName(Structure $structure): string
+    private function unsetPropertiesConstName(Structure $structure): string
     {
-        return $this->resolver->resolve($structure->properties, self::UNSET_PROPERTIES);
+        return $this->resolver->resolve($structure->constants, self::UNSET_PROPERTIES)->fullName('_');
     }
 
     private function useStmts(DeclarationInterface $class, DeclarationInterface $parent): array

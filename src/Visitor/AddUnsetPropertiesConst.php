@@ -3,26 +3,24 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Visitor;
 
-use Cycle\ORM\Promise\PHPDoc;
 use Cycle\ORM\Promise\Utils;
-use PhpParser\Builder\Property;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
  * Add "unset properties" property
  */
-class AddUnsetPropertiesProperty extends NodeVisitorAbstract
+class AddUnsetPropertiesConst extends NodeVisitorAbstract
 {
     /** @var string */
-    private $unsetProperty;
+    private $unsetPropertyConst;
 
     /** @var array */
     private $unsetPropertiesValues;
 
-    public function __construct(string $unsetPropertiesProperty, array $unsetPropertiesValues)
+    public function __construct(string $unsetPropertiesConst, array $unsetPropertiesValues)
     {
-        $this->unsetProperty = $unsetPropertiesProperty;
+        $this->unsetPropertyConst = $unsetPropertiesConst;
         $this->unsetPropertiesValues = $unsetPropertiesValues;
     }
 
@@ -49,13 +47,17 @@ class AddUnsetPropertiesProperty extends NodeVisitorAbstract
         return 0;
     }
 
-    private function buildProperty(): Node\Stmt\Property
+    private function buildProperty(): Node\Stmt\ClassConst
     {
-        $property = new Property($this->unsetProperty);
-        $property->makePrivate();
-        $property->setDocComment(PHPDoc::writeProperty('array'));
-        $property->setDefault($this->unsetPropertiesValues);
+        $array = [];
+        foreach ($this->unsetPropertiesValues as $value) {
+            $array[] = new Node\Expr\ArrayItem(new Node\Scalar\String_($value));
+        }
 
-        return $property->getNode();
+        $const = new Node\Stmt\ClassConst([
+            new Node\Const_($this->unsetPropertyConst, new Node\Expr\Array_($array, ['kind' => Node\Expr\Array_::KIND_SHORT]))
+        ], Node\Stmt\Class_::MODIFIER_PRIVATE);
+
+        return $const;
     }
 }

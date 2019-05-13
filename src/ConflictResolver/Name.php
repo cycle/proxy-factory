@@ -28,11 +28,15 @@ class Name
         return $self;
     }
 
-    public function fullName(): string
+    public function fullName(string $delimiter = null): string
     {
         $name = $this->name;
         if ($this->sequence > 0) {
-            $name .= $this->sequence;
+            if ($delimiter) {
+                return $name . $delimiter . $this->sequence;
+            }
+
+            return $name . $this->sequence;
         }
 
         return $name;

@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Visitor;
 
+use Cycle\ORM\Promise\Expressions;
 use Cycle\ORM\Promise\PHPDoc;
 use PhpParser\Builder\Param;
 use PhpParser\Node;
@@ -39,10 +40,25 @@ class AddProxiedMethods extends NodeVisitorAbstract
         }
 
         foreach ($this->methods as $method) {
-            $node->stmts[] = $this->modifyMethod($method);
+            if ($method->name->name === '__clone') {
+                $method->stmts = [$this->buildCloneExpression()];
+                $node->stmts[] = $method;
+            } else {
+                $node->stmts[] = $this->modifyMethod($method);
+            }
         }
 
         return $node;
+    }
+
+    private function buildCloneExpression(): Node\Stmt\Expression
+    {
+        return new Node\Stmt\Expression(
+            new Node\Expr\Assign(
+                Expressions::resolvePropertyFetch('this', $this->property),
+                new Node\Expr\Clone_(Expressions::resolvePropertyFetch('this', $this->property))
+            )
+        );
     }
 
     private function modifyMethod(Node\Stmt\ClassMethod $method): Node\Stmt\ClassMethod
@@ -50,10 +66,7 @@ class AddProxiedMethods extends NodeVisitorAbstract
         $method->setDocComment(PHPDoc::writeInheritdoc());
 
         $stmts = new Node\Expr\MethodCall(
-            new Node\Expr\MethodCall(
-                new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property),
-                $this->resolveMethod
-            ),
+            Expressions::resolveMethodCall('this', $this->property, $this->resolveMethod),
             $method->name->name,
             $this->packMethodArgs($method)
         );

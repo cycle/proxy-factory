@@ -60,7 +60,7 @@ class UpdateConstructor extends NodeVisitorAbstract
 
     private function unsetProperties(): Node\Stmt\Foreach_
     {
-        $prop = new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->unsetPropertiesProperty);
+        $prop = new Node\Expr\ClassConstFetch(new Node\Name('self'), $this->unsetPropertiesProperty);
         $foreach = new Node\Stmt\Foreach_($prop, new Node\Expr\Variable('property'));
         $foreach->stmts[] = Expressions::unsetFunc('this', '{$property}');
 

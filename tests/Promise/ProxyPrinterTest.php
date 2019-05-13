@@ -252,7 +252,7 @@ class ProxyPrinterTest extends BaseTest
         $r = new \ReflectionClass($classname);
         $parent = Declarations::createParentFromReflection($r);
         $class = Declarations::createClassFromName($as, $parent);
-        $this->assertStringNotContainsString(' const ', $this->make($r, $class, $parent));
+        $this->assertStringNotContainsString(' const MY_CONST', $this->make($r, $class, $parent));
     }
 
     public function constantsDataProvider(): array

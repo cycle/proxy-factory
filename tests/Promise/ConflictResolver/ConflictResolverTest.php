@@ -16,12 +16,12 @@ class ConflictResolverTest extends TestCase
      * @param array $input
      * @param array $expected
      */
-    public function testFind(array $reserved, array $input, array $expected)
+    public function testFind(array $reserved, array $input, array $expected): void
     {
         $resolver = $this->conflictResolver();
 
         foreach ($input as $i => $name) {
-            $this->assertEquals($expected[$i], $resolver->resolve($reserved, $name));
+            $this->assertEquals($expected[$i], $resolver->resolve($reserved, $name)->fullName());
         }
     }
 

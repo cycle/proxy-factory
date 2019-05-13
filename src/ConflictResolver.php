@@ -13,12 +13,12 @@ final class ConflictResolver
         $this->sequences = $sequences;
     }
 
-    public function resolve(array $names, string $name): string
+    public function resolve(array $names, string $name): ConflictResolver\Name
     {
         return $this->addPostfix($this->initiateCounters($names), $this->parseName($name));
     }
 
-    private function addPostfix(array $counters, ConflictResolver\Name $name): string
+    private function addPostfix(array $counters, ConflictResolver\Name $name): ConflictResolver\Name
     {
         if (isset($counters[$name->name])) {
             $sequence = $this->sequences->find(array_keys($counters[$name->name]), $name->sequence);
@@ -27,7 +27,7 @@ final class ConflictResolver
             }
         }
 
-        return $name->fullName();
+        return $name;
     }
 
     private function initiateCounters(array $names): array
