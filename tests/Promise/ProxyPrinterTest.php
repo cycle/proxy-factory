@@ -7,8 +7,6 @@ use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
-use Cycle\ORM\Promise\Declaration\Extractor;
-use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\PromiseInterface;
 use Cycle\ORM\Promise\PromiseResolver;
 use Cycle\ORM\Promise\ProxyPrinter;
@@ -78,52 +76,6 @@ class ProxyPrinterTest extends BaseTest
         $this->assertInstanceOf($class->getFullName(), $proxy);
         $this->assertInstanceOf($classname, $proxy);
         $this->assertInstanceOf(PromiseInterface::class, $proxy);
-    }
-
-    /**
-     * @throws \ReflectionException
-     */
-    public function testSameNamespace(): void
-    {
-        $classname = Fixtures\Entity::class;
-        $as = 'EntityProxy' . __LINE__;
-
-        $r = new \ReflectionClass($classname);
-        $parent = Declarations::createParentFromReflection($r);
-        $class = Declarations::createClassFromName($as, $parent);
-        $output = $this->make($r, $class, $parent);
-        $output = ltrim($output, '<?php');
-
-        $this->assertFalse(class_exists($class->getFullName()));
-
-        eval($output);
-
-        $origReflection = new \ReflectionClass($classname);
-        $proxyReflection = new \ReflectionClass($class->getFullName());
-        $this->assertSame($origReflection->getNamespaceName(), $proxyReflection->getNamespaceName());
-    }
-
-    /**
-     * @throws \ReflectionException
-     */
-    public function testDifferentNamespace(): void
-    {
-        $classname = Fixtures\Entity::class;
-        $as = "\EntityProxy" . __LINE__;
-
-        $r = new \ReflectionClass($classname);
-        $parent = Declarations::createParentFromReflection($r);
-        $class = Declarations::createClassFromName($as, $parent);
-        $output = $this->make($r, $class, $parent);
-        $output = ltrim($output, '<?php');
-
-        $this->assertFalse(class_exists($class->getFullName()));
-
-        eval($output);
-
-        $proxyReflection = new \ReflectionClass($class->getFullName());
-        $this->assertSame('', (string)$proxyReflection->getNamespaceName());
-        $this->assertStringNotContainsString('namespace ', $output);
     }
 
     /**
