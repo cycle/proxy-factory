@@ -13,7 +13,7 @@ class ConstantsTest extends BaseProxyPrinterTest
     public function testWithoutConflicts(): void
     {
         $classname = Fixtures\EntityWithoutConstConflicts::class;
-        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' .__CLASS__ . __LINE__;
+        $as = self::NS .__CLASS__ . __LINE__;
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
@@ -43,7 +43,7 @@ class ConstantsTest extends BaseProxyPrinterTest
     public function testWithConflicts(): void
     {
         $classname = Fixtures\EntityWithConstConflicts::class;
-        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __CLASS__ .__LINE__;
+        $as = self::NS . __CLASS__ .__LINE__;
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
