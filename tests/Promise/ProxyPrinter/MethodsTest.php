@@ -17,7 +17,7 @@ class MethodsTest extends BaseProxyPrinterTest
     public function testPromiseMethods(): void
     {
         $classname = Fixtures\EntityWithMethods::class;
-        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __CLASS__ . __LINE__;
+        $as = self::NS . __CLASS__ . __LINE__;
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
@@ -47,7 +47,7 @@ class MethodsTest extends BaseProxyPrinterTest
     public function testInheritedMethods(): void
     {
         $classname = Fixtures\ChildEntityWithMethods::class;
-        $as = 'Cycle\ORM\Promise\Tests\Promises\EntityProxy' . __CLASS__ . __LINE__;
+        $as = self::NS . __CLASS__ . __LINE__;
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);

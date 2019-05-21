@@ -1,11 +1,11 @@
 <?php
 declare(strict_types=1);
 
-namespace Cycle\ORM\Promise\Tests\Fixtures;
+namespace Cycle\ORM\Promise\Tests\ProxyPrinter\Fixtures;
 
-class EntityWithTrait
+abstract class Entity
 {
-    use EntityTrait;
+    use TestTrait;
     const MY_CONST = 'value';
 
     public $public;
@@ -19,8 +19,9 @@ class EntityWithTrait
         //have some body
     }
 
-    public function public()
+    public function public(): ?string
     {
+        return 'pub';
     }
 
     public function __resolver()

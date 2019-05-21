@@ -18,6 +18,7 @@ use Cycle\Schema;
 
 abstract class BaseProxyPrinterTest extends BaseTest
 {
+    protected const NS = 'Cycle\ORM\Promise\Tests\Promises';
     public const DRIVER = 'sqlite';
 
     /** @var \Spiral\Core\Container */
