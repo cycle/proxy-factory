@@ -7,7 +7,6 @@
 
 ## Usage
 ```php
-
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Factory;
 use Cycle\ORM\Promise\ReferenceInterface;
