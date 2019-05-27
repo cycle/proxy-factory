@@ -36,13 +36,16 @@ class AddMagicSet extends NodeVisitorAbstract
         return null;
     }
 
-    private function buildSetExpression(): Node\Stmt\Expression
+    private function buildSetExpression(): Node\Stmt\If_
     {
-        return new Node\Stmt\Expression(
+        $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
+        $stmt = new Node\Stmt\Expression(
             new Node\Expr\Assign(
-                new Node\Expr\PropertyFetch(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod), '{$name}'),
+                new Node\Expr\PropertyFetch($resolved, '{$name}'),
                 new Node\Expr\Variable('value')
             )
         );
+
+        return Expressions::throwExceptionOnNull($resolved, $stmt);
     }
 }

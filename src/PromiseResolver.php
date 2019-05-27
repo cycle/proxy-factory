@@ -18,7 +18,7 @@ final class PromiseResolver implements PromiseInterface
     private $scope;
 
     /** @var bool */
-    private $loaded;
+    private $loaded = false;
 
     /** @var PromiseInterface|null */
     private $entity;
@@ -86,6 +86,10 @@ final class PromiseResolver implements PromiseInterface
      */
     private function getEntityFromHeap()
     {
+        if (empty($this->scope)) {
+            return null;
+        }
+
         $key = key($this->scope);
         $value = $this->scope[$key];
 

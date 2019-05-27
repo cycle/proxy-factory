@@ -44,7 +44,10 @@ class AddMagicUnset extends NodeVisitorAbstract
     {
         $if = new Node\Stmt\If_(Expressions::inConstArrayFunc('name', 'self', $this->unsetPropertiesConst));
         $if->stmts[] = Expressions::resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod);
-        $if->stmts[] = Expressions::unsetFunc('entity', '{$name}');
+        $if->stmts[] = Expressions::throwExceptionOnNull(
+            new Node\Expr\Variable('entity'),
+            Expressions::unsetFunc('entity', '{$name}')
+        );
         $if->else = new Node\Stmt\Else_();
         $if->else->stmts[] = Expressions::unsetFunc('this', '{$name}');
 

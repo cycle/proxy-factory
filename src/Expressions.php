@@ -23,7 +23,6 @@ class Expressions
             new Node\Expr\FuncCall(
                 new Node\Name('isset'),
                 [new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))]
-
             );
     }
 
@@ -32,9 +31,24 @@ class Expressions
         return new Node\Expr\FuncCall(new Node\Name('in_array'), [
                 new Node\Arg(new Node\Expr\Variable($name)),
                 new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($object), $haystackConst)),
-                new Node\Arg(new Node\Expr\ConstFetch(new Node\Name('true')))
+                new Node\Arg(self::const('true'))
             ]
         );
+    }
+
+    public static function throwExceptionOnNull(Node\Expr $condition, Node\Stmt $stmt): Node\Stmt\If_
+    {
+        $if = new Node\Stmt\If_(self::notNull($condition));
+        $if->stmts[] = $stmt;
+        $if->else = new Node\Stmt\Else_();
+        $if->else->stmts[] = self::throwException(Utils::shortName(PromiseException::class), 'Promise not loaded.');
+
+        return $if;
+    }
+
+    public static function const(string $name): Node\Expr\ConstFetch
+    {
+        return new Node\Expr\ConstFetch(new Node\Name($name));
     }
 
     public static function resolveIntoVar(string $var, string $object, string $property, string $method): Node\Stmt\Expression
@@ -55,5 +69,15 @@ class Expressions
     public static function resolvePropertyFetch(string $object, string $property): Node\Expr\PropertyFetch
     {
         return new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property);
+    }
+
+    private static function notNull(Node\Expr $expr): Node\Expr\BinaryOp\NotIdentical
+    {
+        return new Node\Expr\BinaryOp\NotIdentical($expr, self::const('null'));
+    }
+
+    private static function throwException(string $class, string $message): Node\Stmt\Throw_
+    {
+        return new Node\Stmt\Throw_(new Node\Expr\New_(new Node\Name($class), [new Node\Arg(new Node\Scalar\String_($message))]));
     }
 }

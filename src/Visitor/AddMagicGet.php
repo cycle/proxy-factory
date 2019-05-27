@@ -36,10 +36,11 @@ class AddMagicGet extends NodeVisitorAbstract
         return null;
     }
 
-    private function buildGetExpression(): Node\Stmt\Return_
+    private function buildGetExpression(): Node\Stmt\If_
     {
-        return new Node\Stmt\Return_(
-            new Node\Expr\PropertyFetch(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod), '{$name}')
-        );
+        $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
+        $stmt = new Node\Stmt\Return_(new Node\Expr\PropertyFetch($resolved, '{$name}'));
+
+        return Expressions::throwExceptionOnNull($resolved, $stmt);
     }
 }

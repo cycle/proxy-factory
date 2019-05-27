@@ -76,10 +76,11 @@ class FactoryTest extends BaseTest
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
-        /** @var SchematicEntity $promise */
+        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseResolver $promise */
         $promise = $this->factory()->promise($this->orm(), $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
+        $this->assertNotNull($promise->__resolve());
 
         $this->assertSame('my second name', $promise->getName());
 
@@ -96,6 +97,68 @@ class FactoryTest extends BaseTest
         $o = $this->orm()->get($role, 'id', 2);
         $this->assertEquals('my third name', $o->getName());
         $this->assertEquals('my second email', $o->email);
+
+        $cloned = clone $promise;
+        $cloned->email = 'my cloned email';
+        $this->assertNotEquals($cloned->email, $promise->email);
+    }
+
+    /**
+     * @dataProvider dataProvider
+     * @expectedException \Cycle\ORM\Promise\PromiseException
+     *
+     * @param string $materializer
+     * @param array  $params
+     *
+     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     * @throws \Throwable
+     */
+    public function testNullScope(string $materializer, array $params): void
+    {
+        $role = SchematicEntity::class;
+        $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
+        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
+
+        $scope = ['id' => 3];
+
+        $this->bindMaterializer($this->container->make($materializer, $params));
+
+        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
+        $promise = $this->factory()->promise($this->orm(), $role, $scope);
+
+        $this->assertInstanceOf($role, $promise);
+        $this->assertNull($promise->__resolve());
+
+        $this->assertSame('my second name', $promise->getName());
+    }
+
+    /**
+     * @dataProvider dataProvider
+     * @expectedException \Cycle\ORM\Promise\PromiseException
+     *
+     * @param string $materializer
+     * @param array  $params
+     *
+     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     * @throws \Throwable
+     */
+    public function testUnknownScope(string $materializer, array $params): void
+    {
+        $role = SchematicEntity::class;
+        $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
+        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
+
+        $scope = [];
+
+        $this->bindMaterializer($this->container->make($materializer, $params));
+
+        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
+        $promise = $this->factory()->promise($this->orm(), $role, $scope);
+
+        $this->assertInstanceOf($role, $promise);
+        $this->assertNull($promise->__resolve());
+
+        $this->assertSame('my second name', $promise->getName());
     }
 
     public function dataProvider(): array

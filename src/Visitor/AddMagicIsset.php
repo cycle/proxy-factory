@@ -44,7 +44,10 @@ class AddMagicIsset extends NodeVisitorAbstract
     {
         $if = new Node\Stmt\If_(Expressions::inConstArrayFunc('name', 'self', $this->unsetPropertiesProperty));
         $if->stmts[] = Expressions::resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod);
-        $if->stmts[] = new Node\Stmt\Return_(Expressions::issetFunc('entity', '{$name}'));
+        $if->stmts[] = Expressions::throwExceptionOnNull(
+            new Node\Expr\Variable('entity'),
+            new Node\Stmt\Return_(Expressions::issetFunc('entity', '{$name}'))
+        );
         $if->else = new Node\Stmt\Else_();
         $if->else->stmts[] = new Node\Stmt\Return_(Expressions::issetFunc('this', '{$name}'));
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\PromiseException;
 use Cycle\ORM\Promise\PromiseInterface;
 use Cycle\ORM\Promise\PromiseResolver;
 
@@ -29,7 +30,8 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
         $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), [
             PromiseResolver::class,
-            PromiseInterface::class
+            PromiseInterface::class,
+            PromiseException::class,
         ]));
     }
 
@@ -39,7 +41,7 @@ class UseStmtsTest extends BaseProxyPrinterTest
     public function testDistinctNamespace(): void
     {
         $classname = Fixtures\Entity::class;
-        $as = "\EntityProxy" .str_replace('\\', '', __CLASS__) . __LINE__;
+        $as = "\EntityProxy" . str_replace('\\', '', __CLASS__) . __LINE__;
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
@@ -54,6 +56,7 @@ class UseStmtsTest extends BaseProxyPrinterTest
         $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), [
             PromiseResolver::class,
             PromiseInterface::class,
+            PromiseException::class,
             $classname
         ]));
     }

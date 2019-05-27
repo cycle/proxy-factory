@@ -30,6 +30,11 @@ class ProxyPrinter
         'scope' => 'array'
     ];
 
+    private const USE_STMTS = [
+        PromiseResolver::class,
+        PromiseException::class,
+    ];
+
     /** @var ConflictResolver */
     private $resolver;
 
@@ -125,12 +130,10 @@ class ProxyPrinter
 
     private function useStmts(DeclarationInterface $class, DeclarationInterface $parent): array
     {
-        $useStmts = [];
+        $useStmts = self::USE_STMTS;
         if ($class->getNamespaceName() !== $parent->getNamespaceName()) {
             $useStmts[] = $parent->getFullName();
         }
-
-        $useStmts[] = PromiseResolver::class;
 
         return $useStmts;
     }
