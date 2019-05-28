@@ -20,7 +20,14 @@ final class PHPDoc
 
     public static function writeProperty(string $type): Doc
     {
-        return self::makeComment("/** @var $type */");
+        $lines = [
+            '/**',
+            ' * @internal',
+            " * @var $type",
+            ' */'
+        ];
+
+        return self::makeComment(join("\n", $lines));
     }
 
     private static function makeComment(string $comment): Doc

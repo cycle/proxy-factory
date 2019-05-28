@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
+use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\PromiseException;
 use Cycle\ORM\Promise\PromiseInterface;
@@ -10,6 +11,13 @@ use Cycle\ORM\Promise\PromiseResolver;
 
 class UseStmtsTest extends BaseProxyPrinterTest
 {
+    private const USE_STMTS = [
+        PromiseResolver::class,
+        PromiseInterface::class,
+        PromiseException::class,
+        ORMInterface::class,
+    ];
+
     /**
      * @throws \ReflectionException
      */
@@ -28,11 +36,7 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), [
-            PromiseResolver::class,
-            PromiseInterface::class,
-            PromiseException::class,
-        ]));
+        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), self::USE_STMTS));
     }
 
     /**
@@ -53,12 +57,8 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), [
-            PromiseResolver::class,
-            PromiseInterface::class,
-            PromiseException::class,
-            $classname
-        ]));
+        $this->assertSame($this->fetchUseStatements($output),
+            $this->fetchExternalDependencies($class->getFullName(), array_merge(self::USE_STMTS, [$classname])));
     }
 
     private function fetchUseStatements(string $code): array

@@ -71,7 +71,7 @@ class Expressions
         return new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property);
     }
 
-    private static function notNull(Node\Expr $expr): Node\Expr\BinaryOp\NotIdentical
+    public static function notNull(Node\Expr $expr): Node\Expr\BinaryOp\NotIdentical
     {
         return new Node\Expr\BinaryOp\NotIdentical($expr, self::const('null'));
     }

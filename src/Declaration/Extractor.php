@@ -27,7 +27,6 @@ final class Extractor
             $this->constants->getConstants($reflection),
             $this->properties->getProperties($reflection),
             $this->methods->getMethods($reflection),
-            $reflection->getConstructor() !== null,
             $this->hasCloneMethod($reflection)
         );
     }

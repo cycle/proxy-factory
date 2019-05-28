@@ -15,21 +15,27 @@ class Structure
     public $methods = [];
 
     /** @var bool */
-    public $hasConstructor;
-
-    /** @var bool */
     public $hasClone;
 
-    public static function create(array $constants, array $properties, array $methods, bool $hasConstructor, bool $hasClone): Structure
+    public static function create(array $constants, array $properties, array $methods, bool $hasClone): Structure
     {
         $self = new self();
         $self->constants = $constants;
         $self->properties = $properties;
         $self->methods = $methods;
-        $self->hasConstructor = $hasConstructor;
         $self->hasClone = $hasClone;
 
         return $self;
+    }
+
+    public function methodNames(): array
+    {
+        $names = [];
+        foreach ($this->methods as $method) {
+            $names[] = $method->name->name;
+        }
+
+        return $names;
     }
 
     protected function __construct()

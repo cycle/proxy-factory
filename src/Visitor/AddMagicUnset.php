@@ -21,9 +21,9 @@ class AddMagicUnset extends NodeVisitorAbstract
 
     public function __construct(string $resolverProperty, string $resolveMethod, string $unsetPropertiesConst)
     {
-        $this->unsetPropertiesConst = $unsetPropertiesConst;
         $this->resolveMethod = $resolveMethod;
         $this->resolverProperty = $resolverProperty;
+        $this->unsetPropertiesConst = $unsetPropertiesConst;
     }
 
     public function leaveNode(Node $node)

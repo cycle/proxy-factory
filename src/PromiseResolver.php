@@ -101,10 +101,6 @@ final class PromiseResolver implements PromiseInterface
      */
     private function getEntityFromSource()
     {
-        $select = new Select($this->orm, $this->role);
-
-        return $select->constrain(
-            $this->orm->getSource($this->role)->getConstrain()
-        )->fetchOne($this->scope);
+        return $this->orm->getRepository($this->role)->findOne($this->scope);
     }
 }

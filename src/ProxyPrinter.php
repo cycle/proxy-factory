@@ -7,11 +7,6 @@ use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
-use Cycle\ORM\Promise\Visitor\AddMagicClone;
-use Cycle\ORM\Promise\Visitor\AddMagicIsset;
-use Cycle\ORM\Promise\Visitor\AddMagicGet;
-use Cycle\ORM\Promise\Visitor\AddMagicSet;
-use Cycle\ORM\Promise\Visitor\AddMagicUnset;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Parser;
@@ -23,6 +18,7 @@ class ProxyPrinter
     private const RESOLVER_PROPERTY = '__resolver';
     private const UNSET_PROPERTIES  = 'UNSET_PROPERTIES';
     private const RESOLVE_METHOD    = '__resolve';
+    private const INIT_METHOD       = '__init';
 
     private const DEPENDENCIES = [
         'orm'   => ORMInterface::class,
@@ -33,6 +29,7 @@ class ProxyPrinter
     private const USE_STMTS = [
         PromiseResolver::class,
         PromiseException::class,
+        ORMInterface::class
     ];
 
     /** @var ConflictResolver */
@@ -92,18 +89,19 @@ class ProxyPrinter
             new Visitor\DeclareClass($class->getShortName(), $parent->getShortName()),
             new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
             new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
-            new Visitor\UpdateConstructor(
-                $structure->hasConstructor,
+            new Visitor\AddInit(
                 $property,
                 $this->propertyType(),
                 self::DEPENDENCIES,
-                $this->unsetPropertiesConstName($structure)
+                $this->unsetPropertiesConstName($structure),
+                $this->initMethodName($structure)
             ),
-            new AddMagicClone($property, $structure->hasClone),
-            new AddMagicGet($property, self::RESOLVE_METHOD),
-            new AddMagicSet($property, self::RESOLVE_METHOD),
-            new AddMagicIsset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
-            new AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
+            new Visitor\AddMagicClone($property, $structure->hasClone),
+            new Visitor\AddMagicGet($property, self::RESOLVE_METHOD),
+            new Visitor\AddMagicSet($property, self::RESOLVE_METHOD),
+            new Visitor\AddMagicIsset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
+            new Visitor\AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
+            new Visitor\AddMagicDebugInfo($property, self::RESOLVE_METHOD, $structure->properties),
             new Visitor\UpdatePromiseMethods($property),
             new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
         ];
@@ -116,6 +114,11 @@ class ProxyPrinter
             $nodes,
             $this->lexer->getTokens()
         );
+    }
+
+    public function initMethodName(Structure $structure): string
+    {
+        return $this->resolver->resolve($structure->methodNames(), self::INIT_METHOD)->fullName();
     }
 
     private function resolverPropertyName(Structure $structure): string

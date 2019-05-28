@@ -83,6 +83,11 @@ class MethodsTest extends BaseProxyPrinterTest
         }
 
         foreach ($methods as $name => $method) {
+            //todo dirty test
+            if (mb_strpos('__init', $name) === 0) {
+                continue;
+            }
+
             $this->assertArrayHasKey($name, $originMethods, "Origin class does not contain expected `{$name}` method");
 
             if ($method->isPublic()) {

@@ -24,12 +24,6 @@ class ExtractorTest extends TestCase
         $this->assertSame($expected, $extracted);
     }
 
-    public function testHasConstructor(): void
-    {
-        $this->assertFalse($this->getDeclaration(Entity::class)->hasConstructor);
-        $this->assertTrue($this->getDeclaration(EntityWithConstructor::class)->hasConstructor);
-    }
-
     public function testExtractParentMethods(): void
     {
         $extracted = [];

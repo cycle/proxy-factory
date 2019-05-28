@@ -4,17 +4,15 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Visitor;
 
 use Cycle\ORM\Promise\Expressions;
+use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 /**
  * Add constructor
  */
-class UpdateConstructor extends NodeVisitorAbstract
+class AddInit extends NodeVisitorAbstract
 {
-    /** @var bool */
-    private $hasConstructor;
-
     /** @var string */
     private $property;
 
@@ -25,20 +23,23 @@ class UpdateConstructor extends NodeVisitorAbstract
     private $dependencies;
 
     /** @var string */
-    private $unsetPropertiesProperty;
+    private $unsetPropertiesConst;
+
+    /** @var string */
+    private $initMethod;
 
     public function __construct(
-        bool $hasConstructor,
         string $property,
         string $propertyType,
         array $dependencies,
-        string $unsetPropertiesProperty
+        string $unsetPropertiesConst,
+        string $initMethod
     ) {
-        $this->hasConstructor = $hasConstructor;
         $this->property = $property;
         $this->type = $propertyType;
         $this->dependencies = $dependencies;
-        $this->unsetPropertiesProperty = $unsetPropertiesProperty;
+        $this->unsetPropertiesConst = $unsetPropertiesConst;
+        $this->initMethod = $initMethod;
     }
 
     /**
@@ -46,13 +47,16 @@ class UpdateConstructor extends NodeVisitorAbstract
      */
     public function leaveNode(Node $node)
     {
-        if ($node instanceof Node\Stmt\ClassMethod && $node->name->name === '__construct') {
-            $node->stmts[] = $this->unsetProperties();
-            $node->stmts[] = $this->assignResolverProperty();
+        if ($node instanceof Node\Stmt\Class_) {
+            $method = new Builder\Method($this->initMethod);
+            $method->makePublic();
+            $method->addParam((new Builder\Param('orm'))->setType('ORMInterface'));
+            $method->addParam((new Builder\Param('role'))->setType('string'));
+            $method->addParam((new Builder\Param('scope'))->setType('array'));
+            $method->addStmt($this->unsetProperties());
+            $method->addStmt($this->assignResolverProperty());
 
-            if ($this->hasConstructor) {
-                $node->stmts[] = $this->callParentConstruct();
-            }
+            $node->stmts[] = $method->getNode();
         }
 
         return null;
@@ -60,7 +64,7 @@ class UpdateConstructor extends NodeVisitorAbstract
 
     private function unsetProperties(): Node\Stmt\Foreach_
     {
-        $prop = new Node\Expr\ClassConstFetch(new Node\Name('self'), $this->unsetPropertiesProperty);
+        $prop = new Node\Expr\ClassConstFetch(new Node\Name('self'), $this->unsetPropertiesConst);
         $foreach = new Node\Stmt\Foreach_($prop, new Node\Expr\Variable('property'));
         $foreach->stmts[] = Expressions::unsetFunc('this', '{$property}');
 
@@ -83,10 +87,5 @@ class UpdateConstructor extends NodeVisitorAbstract
         }
 
         return $args;
-    }
-
-    private function callParentConstruct(): Node\Stmt\Expression
-    {
-        return new Node\Stmt\Expression(new Node\Expr\StaticCall(new Node\Name('parent'), '__construct'));
     }
 }

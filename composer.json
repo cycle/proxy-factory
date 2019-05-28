@@ -9,7 +9,8 @@
     "spiral/tokenizer": "^2.1",
     "spiral/config": "^1.1",
     "ext-mbstring": "*",
-    "cycle/orm": "^1.0"
+    "cycle/orm": "^1.0",
+    "doctrine/instantiator": "^1.2"
   },
   "require-dev": {
     "spiral/dumper": "^1.1",
