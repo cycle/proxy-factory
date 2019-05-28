@@ -29,7 +29,7 @@ class AddMagicDebugInfo extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
-            $method = new Builder\Method('__debugInfo');
+            $method = new Builder\Method('__debuginfo');
             $method->makePublic();
             $method->addStmt(Expressions::resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod));
             $method->addStmt($this->buildExpression());
