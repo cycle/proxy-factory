@@ -56,10 +56,6 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
      */
     public function promise(ORMInterface $orm, string $role, array $scope): ?ReferenceInterface
     {
-        if (isset($this->resolved[$role])) {
-            return $this->instantiate($this->resolved[$role], $orm, $role, $scope);
-        }
-
         $class = $orm->getSchema()->define($role, Schema::ENTITY);
         if (empty($class)) {
             return null;
@@ -69,6 +65,10 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
             $reflection = new \ReflectionClass($class);
         } catch (\ReflectionException $e) {
             throw ProxyFactoryException::wrap($e);
+        }
+
+        if (isset($this->resolved[$role])) {
+            return $this->instantiate($reflection, $this->resolved[$role], $orm, $role, $scope);
         }
 
         $parent = Declarations::createParentFromReflection($reflection);
