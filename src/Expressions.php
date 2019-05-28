@@ -7,33 +7,27 @@ use PhpParser\Node;
 
 class Expressions
 {
-    public static function unsetFunc(string $object, string $property): Node\Stmt\Expression
+    public static function unsetFunc(string $object, string $property): Node\Expr\FuncCall
     {
-        return new Node\Stmt\Expression(
-            new Node\Expr\FuncCall(
-                new Node\Name('unset'),
-                [new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))]
-            )
-        );
+        return self::funcCall('unset', [
+            new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))
+        ]);
     }
 
     public static function issetFunc(string $object, string $property): Node\Expr\FuncCall
     {
-        return
-            new Node\Expr\FuncCall(
-                new Node\Name('isset'),
-                [new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))]
-            );
+        return self::funcCall('isset', [
+            new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))
+        ]);
     }
 
     public static function inConstArrayFunc(string $name, string $object, string $haystackConst): Node\Expr\FuncCall
     {
-        return new Node\Expr\FuncCall(new Node\Name('in_array'), [
-                new Node\Arg(new Node\Expr\Variable($name)),
-                new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($object), $haystackConst)),
-                new Node\Arg(self::const('true'))
-            ]
-        );
+        return self::funcCall('in_array', [
+            new Node\Arg(new Node\Expr\Variable($name)),
+            new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($object), $haystackConst)),
+            new Node\Arg(self::const('true'))
+        ]);
     }
 
     public static function throwExceptionOnNull(Node\Expr $condition, Node\Stmt $stmt): Node\Stmt\If_
@@ -74,6 +68,11 @@ class Expressions
     public static function notNull(Node\Expr $expr): Node\Expr\BinaryOp\NotIdentical
     {
         return new Node\Expr\BinaryOp\NotIdentical($expr, self::const('null'));
+    }
+
+    private static function funcCall(string $name, array $args = [], array $attributes = []): Node\Expr\FuncCall
+    {
+        return new Node\Expr\FuncCall(new Node\Name($name), $args, $attributes);
     }
 
     private static function throwException(string $class, string $message): Node\Stmt\Throw_

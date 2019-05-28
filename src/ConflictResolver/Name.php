@@ -32,7 +32,7 @@ class Name
     {
         $name = $this->name;
         if ($this->sequence > 0) {
-            if ($delimiter) {
+            if ($delimiter !== null) {
                 return $name . $delimiter . $this->sequence;
             }
 

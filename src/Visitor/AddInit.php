@@ -66,7 +66,7 @@ class AddInit extends NodeVisitorAbstract
     {
         $prop = new Node\Expr\ClassConstFetch(new Node\Name('self'), $this->unsetPropertiesConst);
         $foreach = new Node\Stmt\Foreach_($prop, new Node\Expr\Variable('property'));
-        $foreach->stmts[] = Expressions::unsetFunc('this', '{$property}');
+        $foreach->stmts[] = new Node\Stmt\Expression(Expressions::unsetFunc('this', '{$property}'));
 
         return $foreach;
     }
