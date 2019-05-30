@@ -8,7 +8,7 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class AddMagicSet extends NodeVisitorAbstract
+class AddMagicSetMethod extends NodeVisitorAbstract
 {
     /** @var string */
     private $resolverProperty;

@@ -7,8 +7,11 @@ use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
+use PhpParser\Builder\Use_;
 use PhpParser\Lexer;
 use PhpParser\Node;
+use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\CloningVisitor;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
@@ -27,6 +30,7 @@ class ProxyPrinter
     ];
 
     private const USE_STMTS = [
+        PromiseInterface::class,
         PromiseResolver::class,
         PromiseException::class,
         ORMInterface::class
@@ -86,25 +90,53 @@ class ProxyPrinter
         $visitors = [
             new Visitor\AddUseStmts($this->useStmts($class, $parent)),
             new Visitor\UpdateNamespace($class->getNamespaceName()),
-            new Visitor\DeclareClass($class->getShortName(), $parent->getShortName()),
+            new Visitor\DeclareClass($class->getShortName(), $parent->getShortName(), Utils::shortName(PromiseInterface::class)),
             new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
             new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
-            new Visitor\AddInit(
+            new Visitor\AddInitMethod(
                 $property,
                 $this->propertyType(),
                 self::DEPENDENCIES,
                 $this->unsetPropertiesConstName($structure),
                 $this->initMethodName($structure)
             ),
-            new Visitor\AddMagicClone($property, $structure->hasClone),
-            new Visitor\AddMagicGet($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicSet($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicIsset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
+            new Visitor\AddMagicCloneMethod($property, $structure->hasClone),
+            new Visitor\AddMagicGetMethod($property, self::RESOLVE_METHOD),
+            new Visitor\AddMagicSetMethod($property, self::RESOLVE_METHOD),
+            new Visitor\AddMagicIssetMethod($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
             new Visitor\AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
-            new Visitor\AddMagicDebugInfo($property, self::RESOLVE_METHOD, $structure->properties),
+            new Visitor\AddMagicDebugInfoMethod($property, self::RESOLVE_METHOD, $structure->properties),
             new Visitor\UpdatePromiseMethods($property),
+            new Visitor\AddPromiseMethod($property, '__loaded', 'bool'),
+            new Visitor\AddPromiseMethod($property, '__role', 'string'),
+            new Visitor\AddPromiseMethod($property, '__scope', 'array'),
+            new Visitor\AddPromiseMethod($property, '__resolve'),
             new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
         ];
+
+        $nodes = $this->parser->parse(file_get_contents($reflection->getFileName()));
+        $cloner = new NodeTraverser();
+        $cloner->addVisitor(new CloningVisitor());
+        $tr = new NodeTraverser();
+        $output = $tr->traverse($cloner->traverse($nodes));
+        $in = null;
+        foreach ($output as $i => $o) {
+            if ($o instanceof Node\Stmt\Class_) {
+                $in = $i;
+                break;
+            }
+        }
+
+        if ($in !== null) {
+            $use = new Use_(new Node\Name(self::class), Node\Stmt\Use_::TYPE_NORMAL);
+            $output = Utils::injectValues($output, $in, [$use->getNode()]);
+        }
+
+//        dump($this->printer->printFormatPreserving(
+//            $output,
+//            $nodes,
+//            $this->lexer->getTokens()
+//        ));
 
         $nodes = $this->getNodesFromStub();
         $output = $this->traverser->traverseClonedNodes($nodes, ...$visitors);
