@@ -13,10 +13,10 @@ use PhpParser\PrettyPrinterAbstract;
 
 class Printer
 {
-    private const RESOLVER_PROPERTY = '__resolver';
-    private const UNSET_PROPERTIES  = 'UNSET_PROPERTIES';
-    private const RESOLVE_METHOD    = '__resolve';
-    private const INIT_METHOD       = '__init';
+    private const RESOLVER_PROPERTY      = '__resolver';
+    private const UNSET_PROPERTIES_CONST = 'UNSET_PROPERTIES';
+    private const RESOLVE_METHOD         = '__resolve';
+    private const INIT_METHOD            = '__init';
 
     private const DEPENDENCIES = [
         'orm'   => ORMInterface::class,
@@ -151,7 +151,7 @@ class Printer
 
     private function unsetPropertiesConstName(Declaration\Structure $structure): string
     {
-        return $this->resolver->resolve($structure->constants, self::UNSET_PROPERTIES)->fullName('_');
+        return $this->resolver->resolve($structure->constants, self::UNSET_PROPERTIES_CONST)->fullName('_');
     }
 
     private function useStmts(Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): array

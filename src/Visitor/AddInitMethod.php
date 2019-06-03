@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Visitor;
 
 use Cycle\ORM\Promise\Expressions;
+use Cycle\ORM\Promise\Utils;
 use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
@@ -47,9 +48,11 @@ class AddInitMethod extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             $method = new Builder\Method($this->initMethod);
             $method->makePublic();
-            $method->addParam((new Builder\Param('orm'))->setType('ORMInterface'));
-            $method->addParam((new Builder\Param('role'))->setType('string'));
-            $method->addParam((new Builder\Param('scope'))->setType('array'));
+            foreach ($this->dependencies as $name => $type) {
+                if ($type !== null) {
+                    $method->addParam((new Builder\Param($name))->setType(Utils::shortName($type)));
+                }
+            }
             $method->addStmt($this->unsetProperties());
             $method->addStmt($this->assignResolverProperty());
 
