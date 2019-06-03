@@ -119,7 +119,7 @@ class FactoryTest extends BaseTest
         $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
         $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
 
-        $scope = ['id' => 3];
+        $scope = [];
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
@@ -148,7 +148,7 @@ class FactoryTest extends BaseTest
         $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
         $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
 
-        $scope = [];
+        $scope = ['id' => 3];
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
