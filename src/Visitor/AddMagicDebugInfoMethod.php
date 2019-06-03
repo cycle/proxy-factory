@@ -16,13 +16,31 @@ class AddMagicDebugInfoMethod extends NodeVisitorAbstract
     /** @var string */
     private $resolveMethod;
 
+    /** @var string */
+    private $loadedMethod;
+
+    /** @var string */
+    private $roleMethod;
+
+    /** @var string */
+    private $scopeMethod;
+
     /** @var array */
     private $unsetPropertiesValues;
 
-    public function __construct(string $resolverProperty, string $resolveMethod, array $unsetPropertiesValues)
-    {
+    public function __construct(
+        string $resolverProperty,
+        string $resolveMethod,
+        string $loadedMethod,
+        string $roleMethod,
+        string $scopeMethod,
+        array $unsetPropertiesValues
+    ) {
         $this->resolverProperty = $resolverProperty;
         $this->resolveMethod = $resolveMethod;
+        $this->loadedMethod = $loadedMethod;
+        $this->roleMethod = $roleMethod;
+        $this->scopeMethod = $scopeMethod;
         $this->unsetPropertiesValues = $unsetPropertiesValues;
     }
 
@@ -31,7 +49,6 @@ class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             $method = new Builder\Method('__debuginfo');
             $method->makePublic();
-            $method->addStmt(Expressions::resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod));
             $method->addStmt($this->buildExpression());
 
             $node->stmts[] = $method->getNode();
@@ -42,10 +59,18 @@ class AddMagicDebugInfoMethod extends NodeVisitorAbstract
 
     private function buildExpression(): Node\Stmt\If_
     {
-        $if = new Node\Stmt\If_(Expressions::notNull(new Node\Expr\Variable('entity')));
-        $if->stmts[] = new Node\Stmt\Return_($this->resolvedProperties());
-        $if->else = new Node\Stmt\Else_();
-        $if->else->stmts[] = new Node\Stmt\Return_($this->unresolvedProperties());
+        $loaded = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->loadedMethod);
+        $if = new Node\Stmt\If_(Expressions::equalsFalse($loaded));
+        $if->stmts[] = new Node\Stmt\Return_($this->unresolvedProperties('false'));
+        $if->else = new Node\Stmt\Else_([
+            Expressions::resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod),
+            new Node\Stmt\If_(Expressions::notNull(new Node\Expr\Variable('entity')), [
+                'stmts' => [new Node\Stmt\Return_($this->resolvedProperties())],
+                'else'  => new Node\Stmt\Else_([
+                    new Node\Stmt\Return_($this->unresolvedProperties('true'))
+                ])
+            ])
+        ]);
 
         return $if;
     }
@@ -60,10 +85,13 @@ class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         return $this->array($array);
     }
 
-    private function unresolvedProperties(): Node\Expr\Array_
+    private function unresolvedProperties(string $loaded): Node\Expr\Array_
     {
         $array = [];
-        $array[] = $this->arrayItem(Expressions::const('true'), '~unresolved');
+        $array[] = $this->arrayItem(Expressions::const($loaded), ':loaded');
+        $array[] = $this->arrayItem(Expressions::const('false'), ':resolved');
+        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->roleMethod), ':role');
+        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->scopeMethod), ':scope');
         foreach ($this->unsetPropertiesValues as $value) {
             $array[] = $this->arrayItem(Expressions::const('null'), $value);
         }

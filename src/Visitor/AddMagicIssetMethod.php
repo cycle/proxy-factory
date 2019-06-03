@@ -48,8 +48,9 @@ class AddMagicIssetMethod extends NodeVisitorAbstract
             new Node\Expr\Variable('entity'),
             new Node\Stmt\Return_(Expressions::issetFunc('entity', '{$name}'))
         );
-        $if->else = new Node\Stmt\Else_();
-        $if->else->stmts[] = new Node\Stmt\Return_(Expressions::issetFunc('this', '{$name}'));
+        $if->else = new Node\Stmt\Else_([
+            new Node\Stmt\Return_(Expressions::issetFunc('this', '{$name}'))
+        ]);
 
         return $if;
     }

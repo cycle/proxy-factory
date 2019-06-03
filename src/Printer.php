@@ -15,8 +15,12 @@ class Printer
 {
     private const RESOLVER_PROPERTY      = '__resolver';
     private const UNSET_PROPERTIES_CONST = 'UNSET_PROPERTIES';
-    private const RESOLVE_METHOD         = '__resolve';
     private const INIT_METHOD            = '__init';
+
+    private const LOADED_METHOD  = '__loaded';
+    private const ROLE_METHOD    = '__role';
+    private const SCOPE_METHOD   = '__scope';
+    private const RESOLVE_METHOD = '__resolve';
 
     private const DEPENDENCIES = [
         'orm'   => ORMInterface::class,
@@ -32,10 +36,10 @@ class Printer
     ];
 
     private const PROMISE_METHODS = [
-        '__loaded'  => 'bool',
-        '__role'    => 'string',
-        '__scope'   => 'array',
-        '__resolve' => null,
+        self::LOADED_METHOD  => 'bool',
+        self::ROLE_METHOD    => 'string',
+        self::SCOPE_METHOD   => 'array',
+        self::RESOLVE_METHOD => null,
     ];
 
     /** @var ConflictResolver */
@@ -120,7 +124,14 @@ class Printer
             new Visitor\AddMagicSetMethod($property, self::RESOLVE_METHOD),
             new Visitor\AddMagicIssetMethod($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
             new Visitor\AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
-            new Visitor\AddMagicDebugInfoMethod($property, self::RESOLVE_METHOD, $structure->properties),
+            new Visitor\AddMagicDebugInfoMethod(
+                $property,
+                self::RESOLVE_METHOD,
+                self::LOADED_METHOD,
+                self::ROLE_METHOD,
+                self::SCOPE_METHOD,
+                $structure->properties
+            ),
             new Visitor\UpdatePromiseMethods($property),
             new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
         ];

@@ -48,8 +48,9 @@ class AddMagicUnset extends NodeVisitorAbstract
             new Node\Expr\Variable('entity'),
             new Node\Stmt\Expression(Expressions::unsetFunc('entity', '{$name}'))
         );
-        $if->else = new Node\Stmt\Else_();
-        $if->else->stmts[] = new Node\Stmt\Expression(Expressions::unsetFunc('this', '{$name}'));
+        $if->else = new Node\Stmt\Else_([
+            new Node\Stmt\Expression(Expressions::unsetFunc('this', '{$name}'))
+        ]);
 
         return $if;
     }

@@ -65,6 +65,11 @@ class Expressions
         return new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property);
     }
 
+    public static function equalsFalse(Node\Expr $expr): Node\Expr\BinaryOp\Identical
+    {
+        return new Node\Expr\BinaryOp\Identical($expr, self::const('false'));
+    }
+
     public static function notNull(Node\Expr $expr): Node\Expr\BinaryOp\NotIdentical
     {
         return new Node\Expr\BinaryOp\NotIdentical($expr, self::const('null'));
