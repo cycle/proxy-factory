@@ -8,7 +8,7 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class AddMagicClone extends NodeVisitorAbstract
+class AddMagicCloneMethod extends NodeVisitorAbstract
 {
     /** @var string */
     private $resolverProperty;

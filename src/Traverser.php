@@ -10,7 +10,7 @@ use PhpParser\NodeVisitor;
 final class Traverser
 {
     /**
-     * @param Node\Stmt[] $nodes
+     * @param Node[]      $nodes
      * @param NodeVisitor ...$visitors
      *
      * @return Node[]

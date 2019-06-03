@@ -13,7 +13,7 @@ use Doctrine\Instantiator\Instantiator;
 
 final class Factory implements PromiseFactoryInterface, SingletonInterface
 {
-    /** @var ProxyPrinter */
+    /** @var Printer */
     private $printer;
 
     /** @var MaterializerInterface */
@@ -32,7 +32,7 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     private $resolved = [];
 
     public function __construct(
-        ProxyPrinter $printer,
+        Printer $printer,
         MaterializerInterface $materializer,
         Names $names,
         Instantiator $instantiator,

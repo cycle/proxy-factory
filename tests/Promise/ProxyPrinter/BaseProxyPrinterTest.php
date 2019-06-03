@@ -8,7 +8,7 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
-use Cycle\ORM\Promise\ProxyPrinter;
+use Cycle\ORM\Promise\Printer;
 use Cycle\ORM\Promise\Tests\BaseTest;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
@@ -68,10 +68,10 @@ abstract class BaseProxyPrinterTest extends BaseTest
         return $this->proxyCreator()->make($reflection, $class, $parent);
     }
 
-    private function proxyCreator(): ProxyPrinter
+    private function proxyCreator(): Printer
     {
         $this->container->bind(PrettyPrinterAbstract::class, Standard::class);
 
-        return $this->container->get(ProxyPrinter::class);
+        return $this->container->get(Printer::class);
     }
 }

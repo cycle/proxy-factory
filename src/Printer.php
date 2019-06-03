@@ -4,21 +4,19 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\Declaration\DeclarationInterface;
-use Cycle\ORM\Promise\Declaration\Extractor;
-use Cycle\ORM\Promise\Declaration\Structure;
+use Cycle\ORM\Promise\Declaration;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 
-class ProxyPrinter
+class Printer
 {
-    private const RESOLVER_PROPERTY = '__resolver';
-    private const UNSET_PROPERTIES  = 'UNSET_PROPERTIES';
-    private const RESOLVE_METHOD    = '__resolve';
-    private const INIT_METHOD       = '__init';
+    private const RESOLVER_PROPERTY      = '__resolver';
+    private const UNSET_PROPERTIES_CONST = 'UNSET_PROPERTIES';
+    private const RESOLVE_METHOD         = '__resolve';
+    private const INIT_METHOD            = '__init';
 
     private const DEPENDENCIES = [
         'orm'   => ORMInterface::class,
@@ -27,9 +25,17 @@ class ProxyPrinter
     ];
 
     private const USE_STMTS = [
+        PromiseInterface::class,
         PromiseResolver::class,
         PromiseException::class,
         ORMInterface::class
+    ];
+
+    private const PROMISE_METHODS = [
+        '__loaded'  => 'bool',
+        '__role'    => 'string',
+        '__scope'   => 'array',
+        '__resolve' => null,
     ];
 
     /** @var ConflictResolver */
@@ -38,7 +44,7 @@ class ProxyPrinter
     /** @var Traverser */
     private $traverser;
 
-    /** @var Extractor */
+    /** @var Declaration\Extractor */
     private $extractor;
 
     /** @var Lexer */
@@ -53,7 +59,7 @@ class ProxyPrinter
     /** @var Stubs */
     private $stubs;
 
-    public function __construct(ConflictResolver $resolver, Traverser $traverser, Extractor $extractor, Stubs $stubs)
+    public function __construct(ConflictResolver $resolver, Traverser $traverser, Declaration\Extractor $extractor, Stubs $stubs)
     {
         $this->resolver = $resolver;
         $this->traverser = $traverser;
@@ -76,9 +82,22 @@ class ProxyPrinter
         $this->stubs = $stubs;
     }
 
-    public function make(\ReflectionClass $reflection, DeclarationInterface $class, DeclarationInterface $parent): string
+    /**
+     * @param \ReflectionClass                 $reflection
+     * @param Declaration\DeclarationInterface $class
+     * @param Declaration\DeclarationInterface $parent
+     *
+     * @return string
+     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     */
+    public function make(\ReflectionClass $reflection, Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): string
     {
         $structure = $this->extractor->extract($reflection);
+        foreach ($structure->methodNames() as $name) {
+            if (array_key_exists($name, self::PROMISE_METHODS)) {
+                throw new ProxyFactoryException("Promise method `$name` already defined.");
+            }
+        }
 
         $property = $this->resolverPropertyName($structure);
         $unsetPropertiesConst = $this->unsetPropertiesConstName($structure);
@@ -86,25 +105,29 @@ class ProxyPrinter
         $visitors = [
             new Visitor\AddUseStmts($this->useStmts($class, $parent)),
             new Visitor\UpdateNamespace($class->getNamespaceName()),
-            new Visitor\DeclareClass($class->getShortName(), $parent->getShortName()),
+            new Visitor\DeclareClass($class->getShortName(), $parent->getShortName(), Utils::shortName(PromiseInterface::class)),
             new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
             new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
-            new Visitor\AddInit(
+            new Visitor\AddInitMethod(
                 $property,
                 $this->propertyType(),
                 self::DEPENDENCIES,
                 $this->unsetPropertiesConstName($structure),
                 $this->initMethodName($structure)
             ),
-            new Visitor\AddMagicClone($property, $structure->hasClone),
-            new Visitor\AddMagicGet($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicSet($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicIsset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
+            new Visitor\AddMagicCloneMethod($property, $structure->hasClone),
+            new Visitor\AddMagicGetMethod($property, self::RESOLVE_METHOD),
+            new Visitor\AddMagicSetMethod($property, self::RESOLVE_METHOD),
+            new Visitor\AddMagicIssetMethod($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
             new Visitor\AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
-            new Visitor\AddMagicDebugInfo($property, self::RESOLVE_METHOD, $structure->properties),
+            new Visitor\AddMagicDebugInfoMethod($property, self::RESOLVE_METHOD, $structure->properties),
             new Visitor\UpdatePromiseMethods($property),
             new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
         ];
+
+        foreach (self::PROMISE_METHODS as $method => $returnType) {
+            $visitors[] = new Visitor\AddPromiseMethod($property, $method, $returnType);
+        }
 
         $nodes = $this->getNodesFromStub();
         $output = $this->traverser->traverseClonedNodes($nodes, ...$visitors);
@@ -116,22 +139,22 @@ class ProxyPrinter
         );
     }
 
-    public function initMethodName(Structure $structure): string
+    public function initMethodName(Declaration\Structure $structure): string
     {
         return $this->resolver->resolve($structure->methodNames(), self::INIT_METHOD)->fullName();
     }
 
-    private function resolverPropertyName(Structure $structure): string
+    private function resolverPropertyName(Declaration\Structure $structure): string
     {
         return $this->resolver->resolve($structure->properties, self::RESOLVER_PROPERTY)->fullName();
     }
 
-    private function unsetPropertiesConstName(Structure $structure): string
+    private function unsetPropertiesConstName(Declaration\Structure $structure): string
     {
-        return $this->resolver->resolve($structure->constants, self::UNSET_PROPERTIES)->fullName('_');
+        return $this->resolver->resolve($structure->constants, self::UNSET_PROPERTIES_CONST)->fullName('_');
     }
 
-    private function useStmts(DeclarationInterface $class, DeclarationInterface $parent): array
+    private function useStmts(Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): array
     {
         $useStmts = self::USE_STMTS;
         if ($class->getNamespaceName() !== $parent->getNamespaceName()) {

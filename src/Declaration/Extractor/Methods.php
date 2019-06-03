@@ -22,7 +22,6 @@ final class Methods
         '__toString',
         '__invoke',
         '__set_state',
-//        '__clone',
         '__debuginfo',
     ];
 

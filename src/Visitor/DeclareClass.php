@@ -17,10 +17,14 @@ class DeclareClass extends NodeVisitorAbstract
     /** @var string */
     private $extends;
 
-    public function __construct(string $name, string $extends)
+    /** @var string */
+    private $implements;
+
+    public function __construct(string $name, string $extends, string $implements)
     {
         $this->name = $name;
         $this->extends = $extends;
+        $this->implements = $implements;
     }
 
     /**
@@ -31,8 +35,23 @@ class DeclareClass extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             $node->extends = new Node\Name($this->extends);
             $node->name->name = $this->name;
+            if ($this->canBeImplemented($node)) {
+                $node->implements[] = new Node\Name($this->implements);
+            }
         }
 
         return null;
+    }
+
+    private function canBeImplemented(Node\Stmt\Class_ $node): bool
+    {
+        foreach ($node->implements as $implement) {
+            $name = join('\\', $implement->parts);
+            if ($name === $this->implements) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

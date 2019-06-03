@@ -8,7 +8,7 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class AddMagicDebugInfo extends NodeVisitorAbstract
+class AddMagicDebugInfoMethod extends NodeVisitorAbstract
 {
     /** @var string */
     private $resolverProperty;
