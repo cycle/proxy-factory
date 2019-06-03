@@ -7,13 +7,13 @@ class Stubs
 {
     public function getContent(): string
     {
-        return '<?php
-declare(strict_types=1);
+        $lines = [
+            '<?php',
+            'declare(strict_types=1);',
+            'namespace StubNamespace;',
+            'class ProxyStub {}'
+        ];
 
-namespace StubNamespace;
-
-class ProxyStub
-{
-}';
+        return join("\n", $lines);
     }
 }
