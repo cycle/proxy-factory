@@ -5,16 +5,16 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
-use Cycle\ORM\Promise\PromiseException;
 use Cycle\ORM\Promise\PromiseInterface;
-use Cycle\ORM\Promise\PromiseResolver;
+use Cycle\ORM\Promise\ProxyFactoryException;
+use Cycle\ORM\Promise\Resolver;
 
 class UseStmtsTest extends BaseProxyPrinterTest
 {
     private const USE_STMTS = [
-        PromiseResolver::class,
+        Resolver::class,
         PromiseInterface::class,
-        PromiseException::class,
+        ProxyFactoryException::class,
         ORMInterface::class,
     ];
 

@@ -30,8 +30,8 @@ class Printer
 
     private const USE_STMTS = [
         PromiseInterface::class,
-        PromiseResolver::class,
-        PromiseException::class,
+        Resolver::class,
+        ProxyFactoryException::class,
         ORMInterface::class
     ];
 
@@ -177,7 +177,7 @@ class Printer
 
     private function propertyType(): string
     {
-        return Utils::shortName(PromiseResolver::class);
+        return Utils::shortName(Resolver::class);
     }
 
     /**

@@ -50,15 +50,15 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
      * @param string       $role
      * @param array        $scope
      *
-     * @return ReferenceInterface|null
+     * @return PromiseInterface
      * @throws ProxyFactoryException
      * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
      */
-    public function promise(ORMInterface $orm, string $role, array $scope): ?ReferenceInterface
+    public function promise(ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
         $class = $orm->getSchema()->define($role, Schema::ENTITY);
         if (empty($class)) {
-            return null;
+            return new PromiseOne($orm, $role, $scope);
         }
 
         try {

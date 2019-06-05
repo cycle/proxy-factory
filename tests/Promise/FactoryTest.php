@@ -76,7 +76,7 @@ class FactoryTest extends BaseTest
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
-        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseResolver $promise */
+        /** @var SchematicEntity|\Cycle\ORM\Promise\Resolver $promise */
         $promise = $this->factory()->promise($this->orm(), $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
@@ -105,7 +105,7 @@ class FactoryTest extends BaseTest
 
     /**
      * @dataProvider dataProvider
-     * @expectedException \Cycle\ORM\Promise\PromiseException
+     * @expectedException \Cycle\ORM\Promise\ProxyFactoryException
      *
      * @param string $materializer
      * @param array  $params
@@ -134,7 +134,7 @@ class FactoryTest extends BaseTest
 
     /**
      * @dataProvider dataProvider
-     * @expectedException \Cycle\ORM\Promise\PromiseException
+     * @expectedException \Cycle\ORM\Promise\ProxyFactoryException
      *
      * @param string $materializer
      * @param array  $params

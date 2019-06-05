@@ -35,7 +35,7 @@ class Expressions
         $if = new Node\Stmt\If_(self::notNull($condition));
         $if->stmts[] = $stmt;
         $if->else = new Node\Stmt\Else_();
-        $if->else->stmts[] = self::throwException(Utils::shortName(PromiseException::class), 'Promise not loaded.');
+        $if->else->stmts[] = self::throwException(Utils::shortName(ProxyFactoryException::class), 'Promise not loaded.');
 
         return $if;
     }
