@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
-class Stubs
+final class Stubs
 {
     public function getContent(): string
     {

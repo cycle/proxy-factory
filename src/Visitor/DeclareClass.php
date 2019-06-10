@@ -9,7 +9,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Declare proxy class, add extends and implements declarations
  */
-class DeclareClass extends NodeVisitorAbstract
+final class DeclareClass extends NodeVisitorAbstract
 {
     /** @var string */
     private $name;

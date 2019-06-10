@@ -12,7 +12,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Add resolver property
  */
-class AddResolverProperty extends NodeVisitorAbstract
+final class AddResolverProperty extends NodeVisitorAbstract
 {
     /** @var string */
     private $property;

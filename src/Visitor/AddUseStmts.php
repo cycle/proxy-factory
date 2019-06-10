@@ -11,7 +11,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Add use statement to the code.
  */
-class AddUseStmts extends NodeVisitorAbstract
+final class AddUseStmts extends NodeVisitorAbstract
 {
     /** @var array */
     private $useStmts = [];
@@ -48,7 +48,6 @@ class AddUseStmts extends NodeVisitorAbstract
     /**
      * @param Node\Stmt[] $stmts
      * @param Node[]      $nodes
-     *
      * @return Node\Stmt\Use_[]
      */
     private function removeDuplicates(array $stmts, array $nodes): array
@@ -72,7 +71,6 @@ class AddUseStmts extends NodeVisitorAbstract
 
     /**
      * @param Node\Stmt[] $stmts
-     *
      * @return string[]
      */
     private function getExistingUseParts(array $stmts): array
@@ -106,7 +104,6 @@ class AddUseStmts extends NodeVisitorAbstract
 
     /**
      * @param string $type
-     *
      * @return Node
      */
     private function buildUseStmt(string $type): Node

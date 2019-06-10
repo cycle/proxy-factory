@@ -9,7 +9,7 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class AddInitMethod extends NodeVisitorAbstract
+final class AddInitMethod extends NodeVisitorAbstract
 {
     /** @var string */
     private $property;

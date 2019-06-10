@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
-class Names
+final class Names
 {
     public function make(\ReflectionClass $reflection, ?string $namespace = null): string
     {

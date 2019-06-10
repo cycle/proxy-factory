@@ -10,7 +10,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Modify all accessible methods
  */
-class UpdatePromiseMethods extends NodeVisitorAbstract
+final class UpdatePromiseMethods extends NodeVisitorAbstract
 {
     /** @var string */
     private $property;

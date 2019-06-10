@@ -12,7 +12,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Add parent call via proxy resolver
  */
-class AddProxiedMethods extends NodeVisitorAbstract
+final class AddProxiedMethods extends NodeVisitorAbstract
 {
     /** @var string */
     private $resolverProperty;

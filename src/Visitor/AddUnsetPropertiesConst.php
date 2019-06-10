@@ -10,7 +10,7 @@ use PhpParser\NodeVisitorAbstract;
 /**
  * Add "unset properties" property
  */
-class AddUnsetPropertiesConst extends NodeVisitorAbstract
+final class AddUnsetPropertiesConst extends NodeVisitorAbstract
 {
     /** @var string */
     private $unsetPropertyConst;

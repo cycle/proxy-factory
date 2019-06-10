@@ -12,7 +12,6 @@ final class Sequences
      *
      * @param array $sequences
      * @param int   $originSequence
-     *
      * @return int
      */
     public function find(array $sequences, int $originSequence): int

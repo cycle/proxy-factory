@@ -3,13 +3,12 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
-class Utils
+final class Utils
 {
     /**
      * Create short name (without namespaces).
      *
      * @param string $name
-     *
      * @return string
      */
     public static function shortName(string $name): string
@@ -28,7 +27,6 @@ class Utils
      * @param array $stmts
      * @param int   $index
      * @param array $child
-     *
      * @return array
      */
     public static function injectValues(array $stmts, int $index, array $child): array
@@ -44,7 +42,6 @@ class Utils
      *
      * @param string $name
      * @param int    $number
-     *
      * @return string
      */
     public static function trimTrailingDigits(string $name, int $number): string
@@ -61,7 +58,6 @@ class Utils
      * Remove any kinds of php open tags.
      *
      * @param string $code
-     *
      * @return string
      */
     public static function trimPHPOpenTag(string $code): string

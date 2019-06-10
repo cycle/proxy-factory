@@ -6,7 +6,7 @@ namespace Cycle\ORM\Promise\Visitor;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class UpdateNamespace extends NodeVisitorAbstract
+final class UpdateNamespace extends NodeVisitorAbstract
 {
     /** @var string|null */
     private $namespace;

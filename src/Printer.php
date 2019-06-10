@@ -11,7 +11,7 @@ use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 
-class Printer
+final class Printer
 {
     private const RESOLVER_PROPERTY      = '__resolver';
     private const UNSET_PROPERTIES_CONST = 'UNSET_PROPERTIES';
@@ -90,8 +90,8 @@ class Printer
      * @param \ReflectionClass                 $reflection
      * @param Declaration\DeclarationInterface $class
      * @param Declaration\DeclarationInterface $parent
-     *
      * @return string
+     *
      * @throws \Cycle\ORM\Promise\ProxyFactoryException
      */
     public function make(\ReflectionClass $reflection, Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): string

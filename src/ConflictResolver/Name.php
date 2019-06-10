@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\ConflictResolver;
 
-class Name
+final class Name
 {
     /** @var string */
     public $name;

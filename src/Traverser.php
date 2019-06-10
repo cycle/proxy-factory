@@ -12,7 +12,6 @@ final class Traverser
     /**
      * @param Node[]      $nodes
      * @param NodeVisitor ...$visitors
-     *
      * @return Node[]
      */
     public function traverseClonedNodes(array $nodes, NodeVisitor ...$visitors): array
@@ -22,7 +21,6 @@ final class Traverser
 
     /**
      * @param Node[] $nodes
-     *
      * @return Node[]
      */
     private function cloneNodes(array $nodes): array

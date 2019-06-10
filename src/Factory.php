@@ -49,8 +49,8 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
      * @param ORMInterface $orm
      * @param string       $role
      * @param array        $scope
-     *
      * @return PromiseInterface
+     *
      * @throws ProxyFactoryException
      * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
      */
@@ -88,8 +88,8 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
      * @param ORMInterface     $orm
      * @param string           $role
      * @param array            $scope
-     *
      * @return PromiseInterface
+     *
      * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
      */
     private function instantiate(\ReflectionClass $reflection, string $className, ORMInterface $orm, string $role, array $scope): PromiseInterface

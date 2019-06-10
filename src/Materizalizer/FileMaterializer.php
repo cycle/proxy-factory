@@ -7,7 +7,7 @@ use Cycle\ORM\Promise\MaterializerInterface;
 use Cycle\ORM\Promise\Utils;
 use Spiral\Core\Container\SingletonInterface;
 
-class FileMaterializer implements MaterializerInterface, SingletonInterface
+final class FileMaterializer implements MaterializerInterface, SingletonInterface
 {
     /** @var ModificationInspector */
     private $inspector;

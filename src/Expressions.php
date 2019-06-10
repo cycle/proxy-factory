@@ -5,7 +5,7 @@ namespace Cycle\ORM\Promise;
 
 use PhpParser\Node;
 
-class Expressions
+final class Expressions
 {
     public static function unsetFunc(string $object, string $property): Node\Expr\FuncCall
     {

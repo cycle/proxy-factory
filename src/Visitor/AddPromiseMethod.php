@@ -9,7 +9,7 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class AddPromiseMethod extends NodeVisitorAbstract
+final class AddPromiseMethod extends NodeVisitorAbstract
 {
     /** @var string */
     private $resolverProperty;

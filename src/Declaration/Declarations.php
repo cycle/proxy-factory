@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration;
 
-class Declarations
+final class Declarations
 {
     public static function createParentFromReflection(\ReflectionClass $parent): DeclarationInterface
     {

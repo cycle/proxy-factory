@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Materizalizer;
 
-class ModificationInspector
+final class ModificationInspector
 {
     public function getLastModifiedDate(\ReflectionClass $reflection): \DateTime
     {

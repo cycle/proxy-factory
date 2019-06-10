@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration;
 
-class Structure
+final class Structure
 {
     /** @var string[] */
     public $properties = [];
