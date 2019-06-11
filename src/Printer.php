@@ -31,14 +31,17 @@ final class Printer
         self::RESOLVE_METHOD => null,
     ];
 
-    /** @var ConflictResolver */
-    private $resolver;
-
     /** @var Traverser */
     private $traverser;
 
     /** @var Declaration\Extractor */
     private $extractor;
+
+    /** @var Stubs */
+    private $stubs;
+
+    /** @var Schema */
+    private $schema;
 
     /** @var Lexer */
     private $lexer;
@@ -49,17 +52,12 @@ final class Printer
     /** @var PrettyPrinterAbstract */
     private $printer;
 
-    /** @var Stubs */
-    private $stubs;
-
-    /** @var Schema */
-    private $schema;
-
-    public function __construct(ConflictResolver $resolver, Traverser $traverser, Declaration\Extractor $extractor, Stubs $stubs, Schema $schema)
+    public function __construct(Traverser $traverser, Declaration\Extractor $extractor, Stubs $stubs, Schema $schema)
     {
-        $this->resolver = $resolver;
         $this->traverser = $traverser;
         $this->extractor = $extractor;
+        $this->stubs = $stubs;
+        $this->schema = $schema;
 
         $lexer = new Lexer\Emulative([
             'usedAttributes' => [
@@ -75,8 +73,6 @@ final class Printer
         $this->parser = new Parser\Php7($this->lexer);
 
         $this->printer = new Standard();
-        $this->stubs = $stubs;
-        $this->schema = $schema;
     }
 
     /**
