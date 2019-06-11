@@ -18,7 +18,7 @@ final class Methods
         '__construct',
         '__destruct',
         '__call',
-        '__callstatic',
+        '__callStatic',
         '__get',
         '__set',
         '__isset',
@@ -28,7 +28,7 @@ final class Methods
         '__toString',
         '__invoke',
         '__set_state',
-        '__debuginfo',
+        '__debugInfo',
     ];
 
     public function getMethods(\ReflectionClass $reflection): array

@@ -13,7 +13,6 @@ use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\PromiseFactoryInterface;
-use Cycle\ORM\Schema;
 use Spiral\Core\Container\SingletonInterface;
 use Doctrine\Instantiator\Instantiator;
 
@@ -37,18 +36,23 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     /** @var array */
     private $resolved = [];
 
+    /** @var Schema */
+    private $schema;
+
     public function __construct(
         Printer $printer,
         MaterializerInterface $materializer,
         Names $names,
         Instantiator $instantiator,
-        Extractor $extractor
+        Extractor $extractor,
+        Schema $schema
     ) {
         $this->printer = $printer;
         $this->materializer = $materializer;
         $this->names = $names;
         $this->instantiator = $instantiator;
         $this->extractor = $extractor;
+        $this->schema = $schema;
     }
 
     /**
@@ -62,7 +66,7 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
      */
     public function promise(ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
-        $class = $orm->getSchema()->define($role, Schema::ENTITY);
+        $class = $orm->getSchema()->define($role, \Cycle\ORM\Schema::ENTITY);
         if (empty($class)) {
             return new PromiseOne($orm, $role, $scope);
         }
@@ -104,7 +108,7 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
 
         /** @var PromiseInterface $instance */
         $instance = $this->instantiator->instantiate($className);
-        $instance->{$this->printer->initMethodName($structure)}($orm, $role, $scope);
+        $instance->{$this->schema->initMethodName($structure)}($orm, $role, $scope);
 
         return $instance;
     }

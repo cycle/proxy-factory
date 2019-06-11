@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
-use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration;
 use PhpParser\Lexer;
 use PhpParser\Node;
@@ -19,27 +18,11 @@ use PhpParser\PrettyPrinterAbstract;
 
 final class Printer
 {
-    private const RESOLVER_PROPERTY      = '__resolver';
-    private const UNSET_PROPERTIES_CONST = 'UNSET_PROPERTIES';
-    private const INIT_METHOD            = '__init';
 
     private const LOADED_METHOD  = '__loaded';
     private const ROLE_METHOD    = '__role';
     private const SCOPE_METHOD   = '__scope';
     private const RESOLVE_METHOD = '__resolve';
-
-    private const DEPENDENCIES = [
-        'orm'   => ORMInterface::class,
-        'role'  => 'string',
-        'scope' => 'array'
-    ];
-
-    private const USE_STMTS = [
-        PromiseInterface::class,
-        Resolver::class,
-        ProxyFactoryException::class,
-        ORMInterface::class
-    ];
 
     private const PROMISE_METHODS = [
         self::LOADED_METHOD  => 'bool',
@@ -69,7 +52,10 @@ final class Printer
     /** @var Stubs */
     private $stubs;
 
-    public function __construct(ConflictResolver $resolver, Traverser $traverser, Declaration\Extractor $extractor, Stubs $stubs)
+    /** @var Schema */
+    private $schema;
+
+    public function __construct(ConflictResolver $resolver, Traverser $traverser, Declaration\Extractor $extractor, Stubs $stubs, Schema $schema)
     {
         $this->resolver = $resolver;
         $this->traverser = $traverser;
@@ -90,6 +76,7 @@ final class Printer
 
         $this->printer = new Standard();
         $this->stubs = $stubs;
+        $this->schema = $schema;
     }
 
     /**
@@ -109,8 +96,8 @@ final class Printer
             }
         }
 
-        $property = $this->resolverPropertyName($structure);
-        $unsetPropertiesConst = $this->unsetPropertiesConstName($structure);
+        $property = $this->schema->resolverPropertyName($structure);
+        $unsetPropertiesConst = $this->schema->unsetPropertiesConstName($structure);
 
         $visitors = [
             new Visitor\AddUseStmts($this->schema->useStmts($class, $parent)),
@@ -154,36 +141,6 @@ final class Printer
             $nodes,
             $this->lexer->getTokens()
         );
-    }
-
-    public function initMethodName(Declaration\Structure $structure): string
-    {
-        return $this->resolver->resolve($structure->methodNames(), self::INIT_METHOD)->fullName();
-    }
-
-    private function resolverPropertyName(Declaration\Structure $structure): string
-    {
-        return $this->resolver->resolve($structure->properties, self::RESOLVER_PROPERTY)->fullName();
-    }
-
-    private function unsetPropertiesConstName(Declaration\Structure $structure): string
-    {
-        return $this->resolver->resolve($structure->constants, self::UNSET_PROPERTIES_CONST)->fullName('_');
-    }
-
-    private function useStmts(Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): array
-    {
-        $useStmts = self::USE_STMTS;
-        if ($class->getNamespaceName() !== $parent->getNamespaceName()) {
-            $useStmts[] = $parent->getFullName();
-        }
-
-        return $useStmts;
-    }
-
-    private function propertyType(): string
-    {
-        return Utils::shortName(Resolver::class);
     }
 
     /**
