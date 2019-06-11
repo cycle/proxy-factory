@@ -1,4 +1,10 @@
 <?php
+/**
+ * Spiral Framework.
+ *
+ * @license MIT
+ * @author  Valentin V (Vvval)
+ */
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
@@ -107,17 +113,17 @@ final class Printer
         $unsetPropertiesConst = $this->unsetPropertiesConstName($structure);
 
         $visitors = [
-            new Visitor\AddUseStmts($this->useStmts($class, $parent)),
+            new Visitor\AddUseStmts($this->schema->useStmts($class, $parent)),
             new Visitor\UpdateNamespace($class->getNamespaceName()),
             new Visitor\DeclareClass($class->getShortName(), $parent->getShortName(), Utils::shortName(PromiseInterface::class)),
             new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
-            new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
+            new Visitor\AddResolverProperty($property, $this->schema->propertyType(), $parent->getShortName()),
             new Visitor\AddInitMethod(
                 $property,
-                $this->propertyType(),
-                self::DEPENDENCIES,
-                $this->unsetPropertiesConstName($structure),
-                $this->initMethodName($structure)
+                $this->schema->propertyType(),
+                Schema::INIT_DEPENDENCIES,
+                $this->schema->unsetPropertiesConstName($structure),
+                $this->schema->initMethodName($structure)
             ),
             new Visitor\AddMagicCloneMethod($property, $structure->hasClone),
             new Visitor\AddMagicGetMethod($property, self::RESOLVE_METHOD),
