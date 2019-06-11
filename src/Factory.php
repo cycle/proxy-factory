@@ -75,7 +75,7 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     public function promise(ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
         $class = $orm->getSchema()->define($role, \Cycle\ORM\Schema::ENTITY);
-        if (!empty($class)) {
+        if (empty($class)) {
             if (isset($this->resolved[$role])) {
                 return $this->instantiateNull($this->resolved[$role], $orm, $role, $scope);
             }
