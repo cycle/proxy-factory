@@ -11,5 +11,5 @@ namespace Cycle\ORM\Promise;
 
 interface MaterializerInterface
 {
-    public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void;
+    public function materialize(string $code, ?string $shortClassName, ?\ReflectionClass $reflection): void;
 }

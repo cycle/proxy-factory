@@ -7,18 +7,24 @@
  */
 declare(strict_types=1);
 
-namespace Cycle\ORM\Promise;
+namespace Cycle\ORM\Promise\Printers;
 
 use Cycle\ORM\Promise\Declaration;
+use Cycle\ORM\Promise\Declaration\Structure;
+use Cycle\ORM\Promise\PromiseInterface;
+use Cycle\ORM\Promise\Schema;
+use Cycle\ORM\Promise\Stubs;
+use Cycle\ORM\Promise\Traverser;
+use Cycle\ORM\Promise\Utils;
+use Cycle\ORM\Promise\Visitor;
 use PhpParser\Lexer;
 use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 
-final class Printer
+final class NullPromisePrinter
 {
-
     private const LOADED_METHOD  = '__loaded';
     private const ROLE_METHOD    = '__role';
     private const SCOPE_METHOD   = '__scope';
@@ -33,9 +39,6 @@ final class Printer
 
     /** @var Traverser */
     private $traverser;
-
-    /** @var Declaration\Extractor */
-    private $extractor;
 
     /** @var Stubs */
     private $stubs;
@@ -52,10 +55,9 @@ final class Printer
     /** @var PrettyPrinterAbstract */
     private $printer;
 
-    public function __construct(Traverser $traverser, Declaration\Extractor $extractor, Stubs $stubs, Schema $schema)
+    public function __construct(Traverser $traverser, Stubs $stubs, Schema $schema)
     {
         $this->traverser = $traverser;
-        $this->extractor = $extractor;
         $this->stubs = $stubs;
         $this->schema = $schema;
 
@@ -76,53 +78,34 @@ final class Printer
     }
 
     /**
-     * @param \ReflectionClass                 $reflection
+     * @param Declaration\Structure            $structure
      * @param Declaration\DeclarationInterface $class
      * @param Declaration\DeclarationInterface $parent
      * @return string
-     *
-     * @throws \Cycle\ORM\Promise\ProxyFactoryException
      */
-    public function make(\ReflectionClass $reflection, Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): string
+    public function make(Structure $structure, Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): string
     {
-        $structure = $this->extractor->extract($reflection);
-        foreach ($structure->methodNames() as $name) {
-            if (array_key_exists($name, self::PROMISE_METHODS)) {
-                throw new ProxyFactoryException("Promise method `$name` already defined.");
-            }
-        }
-
-        $property = $this->schema->resolverPropertyName($structure);
-        $unsetPropertiesConst = $this->schema->unsetPropertiesConstName($structure);
+        $property = $this->schema->resolverPropertyName(null);
 
         $visitors = [
             new Visitor\AddUseStmts($this->schema->useStmts($class, $parent)),
             new Visitor\UpdateNamespace($class->getNamespaceName()),
             new Visitor\DeclareClass($class->getShortName(), $parent->getShortName(), Utils::shortName(PromiseInterface::class)),
-            new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
             new Visitor\AddResolverProperty($property, $this->schema->propertyType(), $parent->getShortName()),
             new Visitor\AddInitMethod(
                 $property,
                 $this->schema->propertyType(),
                 Schema::INIT_DEPENDENCIES,
-                $this->schema->unsetPropertiesConstName($structure),
-                $this->schema->initMethodName($structure)
+                null,
+                $this->schema->initMethodName(null)
             ),
-            new Visitor\AddMagicCloneMethod($property, $structure->hasClone),
-            new Visitor\AddMagicGetMethod($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicSetMethod($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicIssetMethod($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
-            new Visitor\AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
-            new Visitor\AddMagicDebugInfoMethod(
-                $property,
-                self::RESOLVE_METHOD,
-                self::LOADED_METHOD,
-                self::ROLE_METHOD,
-                self::SCOPE_METHOD,
-                $structure->properties
-            ),
+            new Visitor\NullVisitor\ThrowExceptionOnMethodCall('__clone'),
+            new Visitor\NullVisitor\ThrowExceptionOnMethodCall('__get', ['name' => null]),
+            new Visitor\NullVisitor\ThrowExceptionOnMethodCall('__set', ['name' => null, 'value' => null]),
+            new Visitor\NullVisitor\ThrowExceptionOnMethodCall('__isset', ['name' => null]),
+            new Visitor\NullVisitor\ThrowExceptionOnMethodCall('__unset', ['name' => null]),
+            new Visitor\NullVisitor\ThrowExceptionOnMethodCall('__debugInfo'),
             new Visitor\UpdatePromiseMethods($property),
-            new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
         ];
 
         foreach (self::PROMISE_METHODS as $method => $returnType) {

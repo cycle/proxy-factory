@@ -11,8 +11,9 @@ final class EvalMaterializer implements MaterializerInterface
      * {@inheritdoc}
      * If class already exists - do nothing (prevent from memory leaking)
      */
-    public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void
+    public function materialize(string $code, ?string $shortClassName, ?\ReflectionClass $reflection): void
     {
+//        print_r(Utils::trimPHPOpenTag($code));
         eval(Utils::trimPHPOpenTag($code));
     }
 }

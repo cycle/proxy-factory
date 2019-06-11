@@ -10,16 +10,22 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 use Cycle\ORM\ORMInterface;
+use Cycle\ORM\Promise\Declaration\Declaration\NullDeclaration;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
+use Cycle\ORM\Promise\Declaration\Structure;
+use Cycle\ORM\Promise\Printers;
 use Cycle\ORM\PromiseFactoryInterface;
 use Doctrine\Instantiator\Instantiator;
 use Spiral\Core\Container\SingletonInterface;
 
 final class Factory implements PromiseFactoryInterface, SingletonInterface
 {
-    /** @var Printer */
+    /** @var Printers\ProxyPrinter */
     private $printer;
+
+    /** @var Printers\NullPromisePrinter */
+    private $nullEntityPrinter;
 
     /** @var MaterializerInterface */
     private $materializer;
@@ -40,7 +46,8 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     private $schema;
 
     public function __construct(
-        Printer $printer,
+        Printers\ProxyPrinter $printer,
+        Printers\NullPromisePrinter $nullEntityPrinter,
         MaterializerInterface $materializer,
         Names $names,
         Instantiator $instantiator,
@@ -48,6 +55,7 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
         Schema $schema
     ) {
         $this->printer = $printer;
+        $this->nullEntityPrinter = $nullEntityPrinter;
         $this->materializer = $materializer;
         $this->names = $names;
         $this->instantiator = $instantiator;
@@ -67,8 +75,22 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     public function promise(ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
         $class = $orm->getSchema()->define($role, \Cycle\ORM\Schema::ENTITY);
-        if (empty($class)) {
-            return new PromiseOne($orm, $role, $scope);
+        if (!empty($class)) {
+            if (isset($this->resolved[$role])) {
+                return $this->instantiateNull($this->resolved[$role], $orm, $role, $scope);
+            }
+
+            $name = '\Cycle\ORM\Promise\NullPromise';
+            $class = Declarations::createClass($name);
+            if (!class_exists($class->getFullName())) {
+                $structure = Structure::create([], [], [], false);
+                print_r($this->nullEntityPrinter->make($structure, $class, new NullDeclaration()));
+                $this->materializer->materialize($this->nullEntityPrinter->make($structure, $class, new NullDeclaration()), null, null);
+            }
+
+            $this->resolved[$role] = $class->getFullName();
+
+            return $this->instantiateNull($this->resolved[$role], $orm, $role, $scope);
         }
 
         try {
@@ -77,39 +99,52 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
             throw ProxyFactoryException::wrap($e);
         }
 
+        $structure = $this->extractor->extract($reflection);
         if (isset($this->resolved[$role])) {
-            return $this->instantiate($reflection, $this->resolved[$role], $orm, $role, $scope);
+            return $this->instantiate($structure, $this->resolved[$role], $orm, $role, $scope);
         }
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($this->names->make($reflection), $parent);
         if (!class_exists($class->getFullName())) {
-            $this->materializer->materialize($this->printer->make($reflection, $class, $parent), $class->getShortName(), $reflection);
+            $this->materializer->materialize($this->printer->make($structure, $class, $parent), $class->getShortName(), $reflection);
         }
 
         $this->resolved[$role] = $class->getFullName();
 
-        return $this->instantiate($reflection, $this->resolved[$role], $orm, $role, $scope);
+        return $this->instantiate($structure, $this->resolved[$role], $orm, $role, $scope);
     }
 
     /**
-     * @param \ReflectionClass $reflection
-     * @param string           $className
-     * @param ORMInterface     $orm
-     * @param string           $role
-     * @param array            $scope
+     * @param Structure    $structure
+     * @param string       $className
+     * @param ORMInterface $orm
+     * @param string       $role
+     * @param array        $scope
      * @return PromiseInterface
      *
      * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
      */
-    private function instantiate(\ReflectionClass $reflection, string $className, ORMInterface $orm, string $role, array $scope): PromiseInterface
+    private function instantiate(?Structure $structure, string $className, ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
-        $structure = $this->extractor->extract($reflection);
-
         /** @var PromiseInterface $instance */
         $instance = $this->instantiator->instantiate($className);
         $instance->{$this->schema->initMethodName($structure)}($orm, $role, $scope);
 
         return $instance;
+    }
+
+    /**
+     * @param string       $className
+     * @param ORMInterface $orm
+     * @param string       $role
+     * @param array        $scope
+     * @return PromiseInterface
+     *
+     * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
+     */
+    private function instantiateNull(string $className, ORMInterface $orm, string $role, array $scope): PromiseInterface
+    {
+        return $this->instantiate(null, $className, $orm, $role, $scope);
     }
 }

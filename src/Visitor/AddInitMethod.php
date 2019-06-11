@@ -26,7 +26,7 @@ final class AddInitMethod extends NodeVisitorAbstract
     /** @var array */
     private $dependencies;
 
-    /** @var string */
+    /** @var string|null */
     private $unsetPropertiesConst;
 
     /** @var string */
@@ -36,7 +36,7 @@ final class AddInitMethod extends NodeVisitorAbstract
         string $property,
         string $propertyType,
         array $dependencies,
-        string $unsetPropertiesConst,
+        ?string $unsetPropertiesConst,
         string $initMethod
     ) {
         $this->property = $property;
@@ -59,7 +59,9 @@ final class AddInitMethod extends NodeVisitorAbstract
                     $method->addParam((new Builder\Param($name))->setType(Utils::shortName($type)));
                 }
             }
-            $method->addStmt($this->unsetProperties());
+            if ($this->unsetPropertiesConst !== null) {
+                $method->addStmt($this->unsetProperties());
+            }
             $method->addStmt($this->assignResolverProperty());
 
             $node->stmts[] = $method->getNode();

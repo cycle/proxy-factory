@@ -11,9 +11,9 @@ namespace Cycle\ORM\Promise\Declaration;
 
 interface DeclarationInterface
 {
-    public function getShortName(): string;
+    public function getShortName(): ?string;
 
     public function getNamespaceName(): ?string;
 
-    public function getFullName(): string;
+    public function getFullName(): ?string;
 }

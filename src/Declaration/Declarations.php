@@ -20,4 +20,9 @@ final class Declarations
     {
         return new Declaration\ChildClassDeclaration($class, $parent);
     }
+
+    public static function createClass(string $class): DeclarationInterface
+    {
+        return new Declaration\ClassDeclaration($class);
+    }
 }

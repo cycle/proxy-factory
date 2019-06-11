@@ -8,7 +8,8 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
-use Cycle\ORM\Promise\Printer;
+use Cycle\ORM\Promise\Declaration\Extractor;
+use Cycle\ORM\Promise\Printers\ProxyPrinter;
 use Cycle\ORM\Promise\Tests\BaseTest;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
@@ -18,8 +19,8 @@ use Cycle\Schema;
 
 abstract class BaseProxyPrinterTest extends BaseTest
 {
-    protected const NS = 'Cycle\ORM\Promise\Tests\Promises';
-    public const DRIVER = 'sqlite';
+    protected const NS     = 'Cycle\ORM\Promise\Tests\Promises';
+    public const    DRIVER = 'sqlite';
 
     /** @var \Spiral\Core\Container */
     protected $container;
@@ -63,15 +64,25 @@ abstract class BaseProxyPrinterTest extends BaseTest
         return $this->withSchema(new \Cycle\ORM\Schema($schema));
     }
 
+    /**
+     * @param \ReflectionClass     $reflection
+     * @param DeclarationInterface $class
+     * @param DeclarationInterface $parent
+     * @return string
+     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     */
     protected function make(\ReflectionClass $reflection, DeclarationInterface $class, DeclarationInterface $parent): string
     {
-        return $this->proxyCreator()->make($reflection, $class, $parent);
+        /** @var Extractor $extractor */
+        $extractor = $this->container->get(Extractor::class);
+
+        return $this->proxyCreator()->make($extractor->extract($reflection), $class, $parent);
     }
 
-    private function proxyCreator(): Printer
+    private function proxyCreator(): ProxyPrinter
     {
         $this->container->bind(PrettyPrinterAbstract::class, Standard::class);
 
-        return $this->container->get(Printer::class);
+        return $this->container->get(ProxyPrinter::class);
     }
 }

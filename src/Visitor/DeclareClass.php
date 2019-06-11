@@ -20,13 +20,13 @@ final class DeclareClass extends NodeVisitorAbstract
     /** @var string */
     private $name;
 
-    /** @var string */
+    /** @var string|null */
     private $extends;
 
     /** @var string */
     private $implements;
 
-    public function __construct(string $name, string $extends, string $implements)
+    public function __construct(string $name, ?string $extends, string $implements)
     {
         $this->name = $name;
         $this->extends = $extends;
@@ -39,7 +39,10 @@ final class DeclareClass extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
-            $node->extends = new Node\Name($this->extends);
+            if ($this->extends !== null) {
+                $node->extends = new Node\Name($this->extends);
+            }
+
             $node->name->name = $this->name;
             if ($this->canBeImplemented($node)) {
                 $node->implements[] = new Node\Name($this->implements);

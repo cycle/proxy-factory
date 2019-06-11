@@ -26,14 +26,14 @@ final class AddResolverProperty extends NodeVisitorAbstract
     /** @var string */
     private $type;
 
-    /** @var string */
-    private $class;
+    /** @var string|null */
+    private $parent;
 
-    public function __construct(string $property, string $type, string $class)
+    public function __construct(string $property, string $type, ?string $parent)
     {
         $this->property = $property;
         $this->type = $type;
-        $this->class = $class;
+        $this->parent = $parent;
     }
 
     /**
@@ -63,7 +63,12 @@ final class AddResolverProperty extends NodeVisitorAbstract
     {
         $property = new Property($this->property);
         $property->makePrivate();
-        $property->setDocComment(PHPDoc::writeProperty("{$this->type}|{$this->class}"));
+
+        $type = $this->type;
+        if ($this->parent !== null) {
+            $type .= "|{$this->parent}";
+        }
+        $property->setDocComment(PHPDoc::writeProperty($type));
 
         return $property->getNode();
     }

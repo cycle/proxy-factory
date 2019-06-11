@@ -81,13 +81,13 @@ final class Expressions
         return new Node\Expr\BinaryOp\NotIdentical($expr, self::const('null'));
     }
 
+    public static function throwException(string $class, string $message): Node\Stmt\Throw_
+    {
+        return new Node\Stmt\Throw_(new Node\Expr\New_(new Node\Name($class), [new Node\Arg(new Node\Scalar\String_($message))]));
+    }
+
     private static function funcCall(string $name, array $args = [], array $attributes = []): Node\Expr\FuncCall
     {
         return new Node\Expr\FuncCall(new Node\Name($name), $args, $attributes);
-    }
-
-    private static function throwException(string $class, string $message): Node\Stmt\Throw_
-    {
-        return new Node\Stmt\Throw_(new Node\Expr\New_(new Node\Name($class), [new Node\Arg(new Node\Scalar\String_($message))]));
     }
 }

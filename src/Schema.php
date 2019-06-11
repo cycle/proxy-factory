@@ -38,28 +38,40 @@ final class Schema
         $this->resolver = $resolver;
     }
 
-    public function useStmts(Declaration\DeclarationInterface $class, Declaration\DeclarationInterface $parent): array
+    public function useStmts(Declaration\DeclarationInterface $class, ?Declaration\DeclarationInterface $parent): array
     {
         $useStmts = self::USE_STMTS;
-        if ($class->getNamespaceName() !== $parent->getNamespaceName()) {
+        if ($parent !== null && !empty($parent->getFullName()) && $class->getNamespaceName() !== $parent->getNamespaceName()) {
             $useStmts[] = $parent->getFullName();
         }
 
         return $useStmts;
     }
 
-    public function initMethodName(Declaration\Structure $structure): string
+    public function initMethodName(?Declaration\Structure $structure): string
     {
+        if ($structure === null) {
+            return $this->resolver->resolve([], Schema::INIT_METHOD)->fullName();
+        }
+
         return $this->resolver->resolve($structure->methodNames(), Schema::INIT_METHOD)->fullName();
     }
 
-    public function resolverPropertyName(Declaration\Structure $structure): string
+    public function resolverPropertyName(?Declaration\Structure $structure): string
     {
+        if ($structure === null) {
+            return $this->resolver->resolve([], Schema::RESOLVER_PROPERTY)->fullName();
+        }
+
         return $this->resolver->resolve($structure->properties, Schema::RESOLVER_PROPERTY)->fullName();
     }
 
-    public function unsetPropertiesConstName(Declaration\Structure $structure): string
+    public function unsetPropertiesConstName(?Declaration\Structure $structure): string
     {
+        if ($structure === null) {
+            return $this->resolver->resolve([], Schema::UNSET_PROPERTIES_CONST)->fullName('_');
+        }
+
         return $this->resolver->resolve($structure->constants, Schema::UNSET_PROPERTIES_CONST)->fullName('_');
     }
 

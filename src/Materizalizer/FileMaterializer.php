@@ -33,8 +33,16 @@ final class FileMaterializer implements MaterializerInterface, SingletonInterfac
     /**
      * {@inheritdoc}
      */
-    public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void
+    public function materialize(string $code, ?string $shortClassName, ?\ReflectionClass $reflection): void
     {
+        if ($shortClassName === null) {
+            throw new \LogicException('Class name should not be empty.');
+        }
+
+        if ($reflection === null) {
+            throw new \LogicException('Reflection Class should not be empty.');
+        }
+
         $modifiedDate = $this->inspector->getLastModifiedDate($reflection);
         $filename = $this->makeFilename($shortClassName);
 

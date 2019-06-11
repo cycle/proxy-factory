@@ -25,9 +25,9 @@ final class AddMagicIssetMethod extends NodeVisitorAbstract
     /** @var string */
     private $unsetPropertiesProperty;
 
-    public function __construct(string $resolverProperty, string $resolveMethod, string $unsetPropertiesProperty)
+    public function __construct(string $resolverProperty, string $resolveMethod, string $unsetPropertiesConst)
     {
-        $this->unsetPropertiesProperty = $unsetPropertiesProperty;
+        $this->unsetPropertiesProperty = $unsetPropertiesConst;
         $this->resolveMethod = $resolveMethod;
         $this->resolverProperty = $resolverProperty;
     }

@@ -17,10 +17,10 @@ class DeclarationTest extends BaseProxyPrinterTest
         $classname = Fixtures\Entity::class;
         $as = 'EntityProxy' . __LINE__;
 
-        $r = new \ReflectionClass($classname);
-        $parent = Declarations::createParentFromReflection($r);
+        $reflection = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
-        $output = $this->make($r, $class, $parent);
+        $output = $this->make($reflection, $class, $parent);
         $output = ltrim($output, '<?php');
 
         $this->assertFalse(class_exists($class->getFullName()));
@@ -52,10 +52,10 @@ class DeclarationTest extends BaseProxyPrinterTest
      */
     public function testTraits(string $classname, string $as): void
     {
-        $r = new \ReflectionClass($classname);
-        $parent = Declarations::createParentFromReflection($r);
+        $reflection = new \ReflectionClass($classname);
+        $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
-        $this->assertStringNotContainsString(' use ', $this->make($r, $class, $parent));
+        $this->assertStringNotContainsString(' use ', $this->make($reflection, $class, $parent));
     }
 
     public function traitsDataProvider(): array

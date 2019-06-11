@@ -164,7 +164,7 @@ class FactoryTest extends BaseTest
     public function dataProvider(): array
     {
         return [
-            [FileMaterializer::class, ['directory' => $this->filesDirectory()]],
+//            [FileMaterializer::class, ['directory' => $this->filesDirectory()]],
             [EvalMaterializer::class, []]
         ];
     }
