@@ -13,8 +13,8 @@ use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\PromiseFactoryInterface;
-use Spiral\Core\Container\SingletonInterface;
 use Doctrine\Instantiator\Instantiator;
+use Spiral\Core\Container\SingletonInterface;
 
 final class Factory implements PromiseFactoryInterface, SingletonInterface
 {
