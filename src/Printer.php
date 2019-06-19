@@ -21,7 +21,7 @@ use PhpParser\PrettyPrinterAbstract;
 final class Printer
 {
     private const RESOLVER_PROPERTY      = '__resolver';
-    private const UNSET_PROPERTIES_CONST = 'UNSET_PROPERTIES';
+    private const UNSET_PROPERTIES_CONST = '__UNSET_PROPERTIES';
     private const INIT_METHOD            = '__init';
 
     private const LOADED_METHOD  = '__loaded';

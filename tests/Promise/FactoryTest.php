@@ -5,10 +5,10 @@ namespace Cycle\ORM\Promise\Tests;
 
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\ProxyFactory;
 use Cycle\ORM\Promise\MaterializerInterface;
 use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\Promise\Materizalizer\FileMaterializer;
+use Cycle\ORM\Promise\ProxyFactory;
 use Cycle\ORM\Promise\Tests\Fixtures\SchematicEntity;
 use Cycle\ORM\Transaction;
 use Cycle\Schema;
@@ -63,7 +63,7 @@ class FactoryTest extends BaseTest
      * @param string $materializer
      * @param array  $params
      *
-     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
      * @throws \Throwable
      */
     public function testPromise(string $materializer, array $params): void
@@ -105,12 +105,12 @@ class FactoryTest extends BaseTest
 
     /**
      * @dataProvider dataProvider
-     * @expectedException \Cycle\ORM\Promise\ProxyFactoryException
+     * @expectedException \Cycle\ORM\Promise\Exception\ProxyFactoryException
      *
      * @param string $materializer
      * @param array  $params
      *
-     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
      * @throws \Throwable
      */
     public function testNullScope(string $materializer, array $params): void
@@ -134,12 +134,12 @@ class FactoryTest extends BaseTest
 
     /**
      * @dataProvider dataProvider
-     * @expectedException \Cycle\ORM\Promise\ProxyFactoryException
+     * @expectedException \Cycle\ORM\Promise\Exception\ProxyFactoryException
      *
      * @param string $materializer
      * @param array  $params
      *
-     * @throws \Cycle\ORM\Promise\ProxyFactoryException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
      * @throws \Throwable
      */
     public function testUnknownScope(string $materializer, array $params): void
