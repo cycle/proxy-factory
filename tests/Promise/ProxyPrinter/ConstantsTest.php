@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
-use Cycle\ORM\Promise\Schema;
+use Cycle\ORM\Promise\Printer;
 
 class ConstantsTest extends BaseProxyPrinterTest
 {
@@ -26,7 +26,7 @@ class ConstantsTest extends BaseProxyPrinterTest
         $this->assertStringNotContainsString('PUBLIC_CONST ', $output);
         $this->assertStringNotContainsString('PROTECTED_CONST ', $output);
         $this->assertStringNotContainsString('PRIVATE_CONST ', $output);
-        $this->assertStringContainsString(Schema::UNSET_PROPERTIES_CONST . ' ', $output);
+        $this->assertStringContainsString(Printer::UNSET_PROPERTIES_CONST . ' ', $output);
 
         $this->assertFalse(class_exists($class->getFullName()));
 
@@ -35,7 +35,7 @@ class ConstantsTest extends BaseProxyPrinterTest
         $reflection = new \ReflectionClass($as);
         $this->assertArrayHasKey('PUBLIC_CONST', $reflection->getConstants());
         $this->assertArrayHasKey('PROTECTED_CONST', $reflection->getConstants());
-        $this->assertArrayHasKey(Schema::UNSET_PROPERTIES_CONST, $reflection->getConstants());
+        $this->assertArrayHasKey(Printer::UNSET_PROPERTIES_CONST, $reflection->getConstants());
     }
 
     /**
@@ -56,8 +56,8 @@ class ConstantsTest extends BaseProxyPrinterTest
         $this->assertStringNotContainsString('PUBLIC_CONST ', $output);
         $this->assertStringNotContainsString('PROTECTED_CONST ', $output);
         $this->assertStringNotContainsString('PRIVATE_CONST ', $output);
-        $this->assertStringNotContainsString(Schema::UNSET_PROPERTIES_CONST . ' ', $output);
-        $this->assertStringContainsString(Schema::UNSET_PROPERTIES_CONST . '_2 ', $output);
+        $this->assertStringNotContainsString(Printer::UNSET_PROPERTIES_CONST . ' ', $output);
+        $this->assertStringContainsString(Printer::UNSET_PROPERTIES_CONST . '_2 ', $output);
 
         $this->assertFalse(class_exists($class->getFullName()));
 
@@ -66,7 +66,7 @@ class ConstantsTest extends BaseProxyPrinterTest
         $reflection = new \ReflectionClass($as);
         $this->assertArrayHasKey('PUBLIC_CONST', $reflection->getConstants());
         $this->assertArrayHasKey('PROTECTED_CONST', $reflection->getConstants());
-        $this->assertArrayHasKey(Schema::UNSET_PROPERTIES_CONST, $reflection->getConstants());
-        $this->assertArrayHasKey(Schema::UNSET_PROPERTIES_CONST . '_2', $reflection->getConstants());
+        $this->assertArrayHasKey(Printer::UNSET_PROPERTIES_CONST, $reflection->getConstants());
+        $this->assertArrayHasKey(Printer::UNSET_PROPERTIES_CONST . '_2', $reflection->getConstants());
     }
 }
