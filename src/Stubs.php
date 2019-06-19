@@ -11,6 +11,9 @@ namespace Cycle\ORM\Promise;
 
 final class Stubs
 {
+    /**
+     * @return string
+     */
     public function getContent(): string
     {
         $lines = [

@@ -13,6 +13,9 @@ use PhpParser\Comment\Doc;
 
 final class PHPDoc
 {
+    /**
+     * @return Doc
+     */
     public static function writeInheritdoc(): Doc
     {
         $lines = [
@@ -24,6 +27,10 @@ final class PHPDoc
         return self::makeComment(join("\n", $lines));
     }
 
+    /**
+     * @param string $type
+     * @return Doc
+     */
     public static function writeProperty(string $type): Doc
     {
         $lines = [
@@ -36,6 +43,10 @@ final class PHPDoc
         return self::makeComment(join("\n", $lines));
     }
 
+    /**
+     * @param string $comment
+     * @return Doc
+     */
     private static function makeComment(string $comment): Doc
     {
         return new Doc($comment);

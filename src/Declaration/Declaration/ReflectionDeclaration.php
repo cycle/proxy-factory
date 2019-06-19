@@ -16,21 +16,33 @@ final class ReflectionDeclaration implements DeclarationInterface
     /** @var \ReflectionClass */
     private $reflection;
 
+    /**
+     * @param \ReflectionClass $class
+     */
     public function __construct(\ReflectionClass $class)
     {
         $this->reflection = $class;
     }
 
+    /**
+     * @return string
+     */
     public function getShortName(): string
     {
         return $this->reflection->getShortName();
     }
 
+    /**
+     * @return string|null
+     */
     public function getNamespaceName(): ?string
     {
         return $this->reflection->inNamespace() ? $this->reflection->getNamespaceName() : null;
     }
 
+    /**
+     * @return string
+     */
     public function getFullName(): string
     {
         return $this->reflection->name;

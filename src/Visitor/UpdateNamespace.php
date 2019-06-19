@@ -17,11 +17,18 @@ final class UpdateNamespace extends NodeVisitorAbstract
     /** @var string|null */
     private $namespace;
 
+    /**
+     * @param string|null $namespace
+     */
     public function __construct(?string $namespace)
     {
         $this->namespace = $namespace;
     }
 
+    /**
+     * @param Node $node
+     * @return array|int|Node|Node[]|Node\Stmt[]|null
+     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Namespace_) {

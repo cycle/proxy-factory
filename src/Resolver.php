@@ -40,6 +40,9 @@ final class Resolver implements PromiseInterface
         $this->scope = $scope;
     }
 
+    /**
+     * Clone resolver and underlying entity.
+     */
     public function __clone()
     {
         if ($this->entity !== null) {

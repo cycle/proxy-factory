@@ -25,6 +25,11 @@ final class AddMagicIssetMethod extends NodeVisitorAbstract
     /** @var string */
     private $unsetPropertiesProperty;
 
+    /**
+     * @param string $resolverProperty
+     * @param string $resolveMethod
+     * @param string $unsetPropertiesProperty
+     */
     public function __construct(string $resolverProperty, string $resolveMethod, string $unsetPropertiesProperty)
     {
         $this->unsetPropertiesProperty = $unsetPropertiesProperty;
@@ -32,6 +37,10 @@ final class AddMagicIssetMethod extends NodeVisitorAbstract
         $this->resolverProperty = $resolverProperty;
     }
 
+    /**
+     * @param Node $node
+     * @return int|Node|Node[]|null
+     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
@@ -46,6 +55,9 @@ final class AddMagicIssetMethod extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @return Node\Stmt\If_
+     */
     private function buildIssetExpression(): Node\Stmt\If_
     {
         $if = new Node\Stmt\If_(Expressions::inConstArrayFunc('name', 'self', $this->unsetPropertiesProperty));

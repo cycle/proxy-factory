@@ -5,7 +5,7 @@ namespace Cycle\ORM\Promise\Tests;
 
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
-use Cycle\ORM\Promise\Factory;
+use Cycle\ORM\Promise\ProxyFactory;
 use Cycle\ORM\Promise\MaterializerInterface;
 use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\Promise\Materizalizer\FileMaterializer;
@@ -185,9 +185,9 @@ class FactoryTest extends BaseTest
         return $this->withSchema(new \Cycle\ORM\Schema($schema));
     }
 
-    private function factory(): Factory
+    private function factory(): ProxyFactory
     {
-        return $this->container->get(Factory::class);
+        return $this->container->get(ProxyFactory::class);
     }
 
     private function bindMaterializer(MaterializerInterface $materializer): void

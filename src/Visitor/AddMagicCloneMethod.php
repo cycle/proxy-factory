@@ -18,14 +18,24 @@ final class AddMagicCloneMethod extends NodeVisitorAbstract
 {
     /** @var string */
     private $resolverProperty;
+
+    /** @var bool */
     private $hasClone;
 
+    /**
+     * @param string $resolverProperty
+     * @param bool   $hasClone
+     */
     public function __construct(string $resolverProperty, bool $hasClone)
     {
         $this->resolverProperty = $resolverProperty;
         $this->hasClone = $hasClone;
     }
 
+    /**
+     * @param Node $node
+     * @return int|Node|Node[]|null
+     */
     public function leaveNode(Node $node)
     {
         if ($this->hasClone) {
@@ -43,6 +53,9 @@ final class AddMagicCloneMethod extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @return Node\Stmt\Expression
+     */
     private function buildCloneExpression(): Node\Stmt\Expression
     {
         return new Node\Stmt\Expression(

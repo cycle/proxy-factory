@@ -24,6 +24,10 @@ final class AddUnsetPropertiesConst extends NodeVisitorAbstract
     /** @var array */
     private $unsetPropertiesValues;
 
+    /**
+     * @param string $unsetPropertiesConst
+     * @param array  $unsetPropertiesValues
+     */
     public function __construct(string $unsetPropertiesConst, array $unsetPropertiesValues)
     {
         $this->unsetPropertyConst = $unsetPropertiesConst;
@@ -42,6 +46,10 @@ final class AddUnsetPropertiesConst extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @param Node\Stmt\Class_ $node
+     * @return int
+     */
     private function definePlacementID(Node\Stmt\Class_ $node): int
     {
         foreach ($node->stmts as $index => $child) {
@@ -53,6 +61,9 @@ final class AddUnsetPropertiesConst extends NodeVisitorAbstract
         return 0;
     }
 
+    /**
+     * @return Node\Stmt\ClassConst
+     */
     private function buildProperty(): Node\Stmt\ClassConst
     {
         $array = [];
@@ -61,7 +72,10 @@ final class AddUnsetPropertiesConst extends NodeVisitorAbstract
         }
 
         $const = new Node\Stmt\ClassConst([
-            new Node\Const_($this->unsetPropertyConst, new Node\Expr\Array_($array, ['kind' => Node\Expr\Array_::KIND_SHORT]))
+            new Node\Const_(
+                $this->unsetPropertyConst,
+                new Node\Expr\Array_($array, ['kind' => Node\Expr\Array_::KIND_SHORT])
+            )
         ], Node\Stmt\Class_::MODIFIER_PRIVATE);
 
         return $const;

@@ -26,6 +26,11 @@ final class DeclareClass extends NodeVisitorAbstract
     /** @var string */
     private $implements;
 
+    /**
+     * @param string $name
+     * @param string $extends
+     * @param string $implements
+     */
     public function __construct(string $name, string $extends, string $implements)
     {
         $this->name = $name;
@@ -49,6 +54,10 @@ final class DeclareClass extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @param Node\Stmt\Class_ $node
+     * @return bool
+     */
     private function canBeImplemented(Node\Stmt\Class_ $node): bool
     {
         foreach ($node->implements as $implement) {

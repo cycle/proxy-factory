@@ -12,11 +12,14 @@ namespace Cycle\ORM\Promise;
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
+use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\PromiseFactoryInterface;
+use Cycle\ORM\Schema;
 use Doctrine\Instantiator\Instantiator;
 use Spiral\Core\Container\SingletonInterface;
 
-final class Factory implements PromiseFactoryInterface, SingletonInterface
+final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
 {
     /** @var Printer */
     private $printer;
@@ -36,23 +39,25 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
     /** @var array */
     private $resolved = [];
 
-    /** @var Schema */
-    private $schema;
-
+    /**
+     * @param Printer|null               $printer
+     * @param MaterializerInterface|null $materializer
+     * @param Names|null                 $names
+     * @param Instantiator|null          $instantiator
+     * @param Extractor|null             $extractor
+     */
     public function __construct(
-        Printer $printer,
-        MaterializerInterface $materializer,
-        Names $names,
-        Instantiator $instantiator,
-        Extractor $extractor,
-        Schema $schema
+        Printer $printer = null,
+        MaterializerInterface $materializer = null,
+        Names $names = null,
+        Instantiator $instantiator = null,
+        Extractor $extractor = null
     ) {
-        $this->printer = $printer;
-        $this->materializer = $materializer;
-        $this->names = $names;
-        $this->instantiator = $instantiator;
-        $this->extractor = $extractor;
-        $this->schema = $schema;
+        $this->printer = $printer ?? new Printer();
+        $this->materializer = $materializer ?? new EvalMaterializer();
+        $this->names = $names ?? new Names();
+        $this->instantiator = $instantiator ?? new Instantiator();
+        $this->extractor = $extractor ?? new Extractor();
     }
 
     /**
@@ -66,7 +71,7 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
      */
     public function promise(ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
-        $class = $orm->getSchema()->define($role, \Cycle\ORM\Schema::ENTITY);
+        $class = $orm->getSchema()->define($role, Schema::ENTITY);
         if (empty($class)) {
             return new PromiseOne($orm, $role, $scope);
         }
@@ -83,8 +88,13 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($this->names->make($reflection), $parent);
+
         if (!class_exists($class->getFullName())) {
-            $this->materializer->materialize($this->printer->make($reflection, $class, $parent), $class->getShortName(), $reflection);
+            $this->materializer->materialize(
+                $this->printer->make($reflection, $class, $parent),
+                $class->getShortName(),
+                $reflection
+            );
         }
 
         $this->resolved[$role] = $class->getFullName();
@@ -102,13 +112,18 @@ final class Factory implements PromiseFactoryInterface, SingletonInterface
      *
      * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
      */
-    private function instantiate(\ReflectionClass $reflection, string $className, ORMInterface $orm, string $role, array $scope): PromiseInterface
-    {
+    private function instantiate(
+        \ReflectionClass $reflection,
+        string $className,
+        ORMInterface $orm,
+        string $role,
+        array $scope
+    ): PromiseInterface {
         $structure = $this->extractor->extract($reflection);
 
         /** @var PromiseInterface $instance */
         $instance = $this->instantiator->instantiate($className);
-        $instance->{$this->schema->initMethodName($structure)}($orm, $role, $scope);
+        $instance->{$this->printer->initMethodName($structure)}($orm, $role, $scope);
 
         return $instance;
     }

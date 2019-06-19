@@ -22,12 +22,20 @@ final class AddMagicSetMethod extends NodeVisitorAbstract
     /** @var string */
     private $resolveMethod;
 
+    /**
+     * @param string $resolverProperty
+     * @param string $resolveMethod
+     */
     public function __construct(string $resolverProperty, string $resolveMethod)
     {
         $this->resolverProperty = $resolverProperty;
         $this->resolveMethod = $resolveMethod;
     }
 
+    /**
+     * @param Node $node
+     * @return int|Node|Node[]|null
+     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
@@ -42,6 +50,9 @@ final class AddMagicSetMethod extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @return Node\Stmt\If_
+     */
     private function buildSetExpression(): Node\Stmt\If_
     {
         $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);

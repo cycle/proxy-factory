@@ -32,6 +32,13 @@ final class AddInitMethod extends NodeVisitorAbstract
     /** @var string */
     private $initMethod;
 
+    /**
+     * @param string $property
+     * @param string $propertyType
+     * @param array  $dependencies
+     * @param string $unsetPropertiesConst
+     * @param string $initMethod
+     */
     public function __construct(
         string $property,
         string $propertyType,
@@ -68,6 +75,9 @@ final class AddInitMethod extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @return Node\Stmt\Foreach_
+     */
     private function unsetProperties(): Node\Stmt\Foreach_
     {
         $prop = new Node\Expr\ClassConstFetch(new Node\Name('self'), $this->unsetPropertiesConst);
@@ -77,6 +87,9 @@ final class AddInitMethod extends NodeVisitorAbstract
         return $foreach;
     }
 
+    /**
+     * @return Node\Stmt\Expression
+     */
     private function assignResolverProperty(): Node\Stmt\Expression
     {
         $prop = new Node\Expr\PropertyFetch(new Node\Expr\Variable('this'), $this->property);
@@ -85,6 +98,9 @@ final class AddInitMethod extends NodeVisitorAbstract
         return new Node\Stmt\Expression(new Node\Expr\Assign($prop, $instance));
     }
 
+    /**
+     * @return array
+     */
     private function packResolverPropertyArgs(): array
     {
         $args = [];

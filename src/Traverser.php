@@ -34,6 +34,10 @@ final class Traverser
         return $this->makeTraverser(new NodeVisitor\CloningVisitor())->traverse($nodes);
     }
 
+    /**
+     * @param NodeVisitor ...$visitors
+     * @return NodeTraverser
+     */
     private function makeTraverser(NodeVisitor ...$visitors): NodeTraverser
     {
         $traverser = new NodeTraverser();

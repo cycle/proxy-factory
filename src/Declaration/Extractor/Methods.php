@@ -31,6 +31,10 @@ final class Methods
         '__debugInfo',
     ];
 
+    /**
+     * @param \ReflectionClass $reflection
+     * @return array
+     */
     public function getMethods(\ReflectionClass $reflection): array
     {
         $methods = [];
@@ -51,16 +55,28 @@ final class Methods
         return $methods;
     }
 
+    /**
+     * @param \ReflectionMethod $method
+     * @return bool
+     */
     private function isIgnoredMethod(\ReflectionMethod $method): bool
     {
         return $method->isPrivate() || $method->isStatic() || $method->isFinal() || $method->isAbstract() || $this->isMagicMethod($method->name);
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
     private function isMagicMethod(string $name): bool
     {
         return in_array($name, self::MAGIC_METHOD_NAMES, true);
     }
 
+    /**
+     * @param \ReflectionMethod $method
+     * @return int
+     */
     private function packFlags(\ReflectionMethod $method): int
     {
         $flags = [];
@@ -75,6 +91,10 @@ final class Methods
         }, 0);
     }
 
+    /**
+     * @param \ReflectionMethod $method
+     * @return Node|null
+     */
     private function defineReturnType(\ReflectionMethod $method): ?Node
     {
         if (!$method->hasReturnType()) {
@@ -100,6 +120,10 @@ final class Methods
         return new Node\Identifier($name);
     }
 
+    /**
+     * @param \ReflectionMethod $method
+     * @return array
+     */
     private function packParams(\ReflectionMethod $method): array
     {
         $params = [];
@@ -117,6 +141,10 @@ final class Methods
         return $params;
     }
 
+    /**
+     * @param \ReflectionParameter $parameter
+     * @return string|null
+     */
     private function defineParamReturnType(\ReflectionParameter $parameter): ?string
     {
         if (!$parameter->hasType()) {

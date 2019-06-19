@@ -19,22 +19,35 @@ final class ChildClassDeclaration implements DeclarationInterface
     /** @var string|null */
     private $namespace;
 
+    /**
+     * @param string               $name
+     * @param DeclarationInterface $parent
+     */
     public function __construct(string $name, DeclarationInterface $parent)
     {
         $this->shortName = $this->makeShortName($name);
         $this->namespace = $this->makeNamespaceName($name, $parent);
     }
 
+    /**
+     * @return string
+     */
     public function getShortName(): string
     {
         return $this->shortName;
     }
 
+    /**
+     * @return string|null
+     */
     public function getNamespaceName(): ?string
     {
         return $this->namespace;
     }
 
+    /**
+     * @return string
+     */
     public function getFullName(): string
     {
         if (empty($this->namespace)) {
@@ -44,6 +57,10 @@ final class ChildClassDeclaration implements DeclarationInterface
         return "{$this->namespace}\\{$this->shortName}";
     }
 
+    /**
+     * @param string $class
+     * @return string
+     */
     private function makeShortName(string $class): string
     {
         $class = rtrim($class, '\\');
@@ -55,6 +72,11 @@ final class ChildClassDeclaration implements DeclarationInterface
         return mb_substr($class, $lastPosition + 1);
     }
 
+    /**
+     * @param string               $class
+     * @param DeclarationInterface $parent
+     * @return string|null
+     */
     private function makeNamespaceName(string $class, DeclarationInterface $parent): ?string
     {
         $class = rtrim($class, '\\');

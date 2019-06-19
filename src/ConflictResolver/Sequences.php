@@ -46,6 +46,10 @@ final class Sequences
         return min($gaps);
     }
 
+    /**
+     * @param array $sequences
+     * @return array
+     */
     private function skippedSequences(array $sequences): array
     {
         $skipped = [];

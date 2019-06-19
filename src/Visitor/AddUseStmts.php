@@ -22,6 +22,9 @@ final class AddUseStmts extends NodeVisitorAbstract
     /** @var array */
     private $useStmts = [];
 
+    /**
+     * @param array $useStmts
+     */
     public function __construct(array $useStmts)
     {
         $this->useStmts = $useStmts;
@@ -40,6 +43,10 @@ final class AddUseStmts extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @param Node\Stmt\Namespace_ $node
+     * @return int
+     */
     private function definePlacementID(Node\Stmt\Namespace_ $node): int
     {
         foreach ($node->stmts as $index => $child) {

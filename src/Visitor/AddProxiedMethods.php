@@ -29,6 +29,11 @@ final class AddProxiedMethods extends NodeVisitorAbstract
     /** @var string */
     private $resolveMethod;
 
+    /**
+     * @param string $property
+     * @param array  $methods
+     * @param string $resolveMethod
+     */
     public function __construct(string $property, array $methods, string $resolveMethod)
     {
         $this->resolverProperty = $property;
@@ -59,6 +64,9 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         return $node;
     }
 
+    /**
+     * @return Node\Stmt\Expression
+     */
     private function buildCloneExpression(): Node\Stmt\Expression
     {
         return new Node\Stmt\Expression(
@@ -69,30 +77,44 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         );
     }
 
+    /**
+     * @param Node\Stmt\ClassMethod $method
+     * @return Node\Stmt\ClassMethod
+     */
     private function modifyReturnMethod(Node\Stmt\ClassMethod $method): Node\Stmt\ClassMethod
     {
         $method->setDocComment(PHPDoc::writeInheritdoc());
 
         $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
-        $stmt = new Node\Stmt\Return_(new Node\Expr\MethodCall($resolved, $method->name->name, $this->packMethodArgs($method)));
+        $stmt = new Node\Stmt\Return_(new Node\Expr\MethodCall($resolved, $method->name->name,
+            $this->packMethodArgs($method)));
 
         $method->stmts[] = Expressions::throwExceptionOnNull($resolved, $stmt);
 
         return $method;
     }
 
+    /**
+     * @param Node\Stmt\ClassMethod $method
+     * @return Node\Stmt\ClassMethod
+     */
     private function modifyExprMethod(Node\Stmt\ClassMethod $method): Node\Stmt\ClassMethod
     {
         $method->setDocComment(PHPDoc::writeInheritdoc());
 
         $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
-        $stmt = new Node\Stmt\Expression(new Node\Expr\MethodCall($resolved, $method->name->name, $this->packMethodArgs($method)));
+        $stmt = new Node\Stmt\Expression(new Node\Expr\MethodCall($resolved, $method->name->name,
+            $this->packMethodArgs($method)));
 
         $method->stmts[] = Expressions::throwExceptionOnNull($resolved, $stmt);
 
         return $method;
     }
 
+    /**
+     * @param Node\Stmt\ClassMethod $method
+     * @return array
+     */
     private function packMethodArgs(Node\Stmt\ClassMethod $method): array
     {
         $args = [];
@@ -104,6 +126,10 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         return $args;
     }
 
+    /**
+     * @param Node\Stmt\ClassMethod $method
+     * @return bool
+     */
     private function hasReturnStmt(Node\Stmt\ClassMethod $method): bool
     {
         if ($method->returnType === null || $method->returnType === 'void') {

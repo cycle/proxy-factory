@@ -25,6 +25,11 @@ final class AddMagicUnset extends NodeVisitorAbstract
     /** @var string */
     private $unsetPropertiesConst;
 
+    /**
+     * @param string $resolverProperty
+     * @param string $resolveMethod
+     * @param string $unsetPropertiesConst
+     */
     public function __construct(string $resolverProperty, string $resolveMethod, string $unsetPropertiesConst)
     {
         $this->resolveMethod = $resolveMethod;
@@ -32,6 +37,10 @@ final class AddMagicUnset extends NodeVisitorAbstract
         $this->unsetPropertiesConst = $unsetPropertiesConst;
     }
 
+    /**
+     * @param Node $node
+     * @return int|Node|Node[]|null
+     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
@@ -46,6 +55,9 @@ final class AddMagicUnset extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @return Node\Stmt\If_
+     */
     private function buildUnsetExpression(): Node\Stmt\If_
     {
         $if = new Node\Stmt\If_(Expressions::inConstArrayFunc('name', 'self', $this->unsetPropertiesConst));

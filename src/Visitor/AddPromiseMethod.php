@@ -26,6 +26,11 @@ final class AddPromiseMethod extends NodeVisitorAbstract
     /** @var string|null */
     private $returnType;
 
+    /**
+     * @param string      $resolverProperty
+     * @param string      $name
+     * @param string|null $returnType
+     */
     public function __construct(string $resolverProperty, string $name, string $returnType = null)
     {
         $this->resolverProperty = $resolverProperty;
@@ -33,6 +38,10 @@ final class AddPromiseMethod extends NodeVisitorAbstract
         $this->returnType = $returnType;
     }
 
+    /**
+     * @param Node $node
+     * @return int|Node|Node[]|null
+     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {

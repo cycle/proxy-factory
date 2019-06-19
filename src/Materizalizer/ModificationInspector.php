@@ -11,6 +11,12 @@ namespace Cycle\ORM\Promise\Materizalizer;
 
 final class ModificationInspector
 {
+    /**
+     * @param \ReflectionClass $reflection
+     * @return \DateTime
+     *
+     * @throws \Exception
+     */
     public function getLastModifiedDate(\ReflectionClass $reflection): \DateTime
     {
         $modifiedDate = $this->getLatestParentsModifiedDate($reflection);
@@ -34,6 +40,12 @@ final class ModificationInspector
         return $modifiedDate;
     }
 
+    /**
+     * @param \ReflectionClass $reflection
+     * @return \DateTime
+     *
+     * @throws \Exception
+     */
     private function getLatestParentsModifiedDate(\ReflectionClass $reflection): \DateTime
     {
         $modifiedDate = new \DateTime('@' . filemtime($reflection->getFileName()));

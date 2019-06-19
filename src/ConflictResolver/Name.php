@@ -17,6 +17,11 @@ final class Name
     /** @var int */
     public $sequence = 0;
 
+    /**
+     * @param string $name
+     * @param int    $sequence
+     * @return Name
+     */
     public static function createWithSequence(string $name, int $sequence): Name
     {
         $self = new self();
@@ -26,6 +31,10 @@ final class Name
         return $self;
     }
 
+    /**
+     * @param string $name
+     * @return Name
+     */
     public static function create(string $name): Name
     {
         $self = new self();
@@ -34,6 +43,10 @@ final class Name
         return $self;
     }
 
+    /**
+     * @param string|null $delimiter
+     * @return string
+     */
     public function fullName(string $delimiter = null): string
     {
         $name = $this->name;
@@ -48,6 +61,9 @@ final class Name
         return $name;
     }
 
+    /**
+     * Name constructor.
+     */
     protected function __construct()
     {
     }

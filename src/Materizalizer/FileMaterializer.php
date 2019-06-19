@@ -24,6 +24,10 @@ final class FileMaterializer implements MaterializerInterface, SingletonInterfac
     /** @var array */
     private $materialized = [];
 
+    /**
+     * @param ModificationInspector $inspector
+     * @param string                $directory
+     */
     public function __construct(ModificationInspector $inspector, string $directory)
     {
         $this->inspector = $inspector;
@@ -46,16 +50,28 @@ final class FileMaterializer implements MaterializerInterface, SingletonInterfac
         }
     }
 
+    /**
+     * @param string $className
+     * @return string
+     */
     private function makeFilename(string $className): string
     {
         return $this->directory . DIRECTORY_SEPARATOR . $className . '.php';
     }
 
+    /**
+     * @param string $code
+     * @return string
+     */
     private function prepareCode(string $code): string
     {
         return "<?php\n" . trim(Utils::trimPHPOpenTag($code));
     }
 
+    /**
+     * @param string $filename
+     * @param string $code
+     */
     private function create(string $filename, string $code): void
     {
         file_put_contents($filename, $code);

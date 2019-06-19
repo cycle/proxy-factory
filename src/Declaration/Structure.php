@@ -23,6 +23,13 @@ final class Structure
     /** @var bool */
     public $hasClone;
 
+    /**
+     * @param array $constants
+     * @param array $properties
+     * @param array $methods
+     * @param bool  $hasClone
+     * @return Structure
+     */
     public static function create(array $constants, array $properties, array $methods, bool $hasClone): Structure
     {
         $self = new self();
@@ -34,6 +41,9 @@ final class Structure
         return $self;
     }
 
+    /**
+     * @return array
+     */
     public function methodNames(): array
     {
         $names = [];
@@ -44,6 +54,9 @@ final class Structure
         return $names;
     }
 
+    /**
+     * Structure constructor.
+     */
     protected function __construct()
     {
     }

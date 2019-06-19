@@ -29,6 +29,11 @@ final class AddResolverProperty extends NodeVisitorAbstract
     /** @var string */
     private $class;
 
+    /**
+     * @param string $property
+     * @param string $type
+     * @param string $class
+     */
     public function __construct(string $property, string $type, string $class)
     {
         $this->property = $property;
@@ -48,6 +53,10 @@ final class AddResolverProperty extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @param Node\Stmt\Class_ $node
+     * @return int
+     */
     private function definePlacementID(Node\Stmt\Class_ $node): int
     {
         foreach ($node->stmts as $index => $child) {
@@ -59,6 +68,9 @@ final class AddResolverProperty extends NodeVisitorAbstract
         return 0;
     }
 
+    /**
+     * @return Node\Stmt\Property
+     */
     private function buildProperty(): Node\Stmt\Property
     {
         $property = new Property($this->property);

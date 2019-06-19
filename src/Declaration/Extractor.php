@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration;
 
+use Cycle\ORM\Promise\Declaration\Extractor\Constants;
+use Cycle\ORM\Promise\Declaration\Extractor\Methods;
+use Cycle\ORM\Promise\Declaration\Extractor\Properties;
+
 final class Extractor
 {
     /** @var Extractor\Methods */
@@ -20,13 +24,25 @@ final class Extractor
     /** @var Extractor\Constants */
     private $constants;
 
-    public function __construct(Extractor\Constants $constants, Extractor\Properties $properties, Extractor\Methods $methods)
-    {
-        $this->constants = $constants;
-        $this->properties = $properties;
-        $this->methods = $methods;
+    /**
+     * @param Constants|null  $constants
+     * @param Properties|null $properties
+     * @param Methods|null    $methods
+     */
+    public function __construct(
+        Extractor\Constants $constants = null,
+        Extractor\Properties $properties = null,
+        Extractor\Methods $methods = null
+    ) {
+        $this->constants = $constants ?? new Constants();
+        $this->properties = $properties ?? new Properties();
+        $this->methods = $methods ?? new Methods();
     }
 
+    /**
+     * @param \ReflectionClass $reflection
+     * @return Structure
+     */
     public function extract(\ReflectionClass $reflection): Structure
     {
         return Structure::create(
@@ -37,6 +53,10 @@ final class Extractor
         );
     }
 
+    /**
+     * @param \ReflectionClass $reflection
+     * @return bool
+     */
     private function hasCloneMethod(\ReflectionClass $reflection): bool
     {
         if (!$reflection->hasMethod('__clone')) {

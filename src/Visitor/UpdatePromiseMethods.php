@@ -21,6 +21,9 @@ final class UpdatePromiseMethods extends NodeVisitorAbstract
     /** @var string */
     private $property;
 
+    /**
+     * @param string $property
+     */
     public function __construct(string $property)
     {
         $this->property = $property;
@@ -38,11 +41,19 @@ final class UpdatePromiseMethods extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @param Node\Stmt\ClassMethod $node
+     * @return bool
+     */
     private function ignoreMethod(Node\Stmt\ClassMethod $node): bool
     {
         return $node->isPrivate() || $node->isStatic() || $node->isFinal() || $node->isAbstract() || $node->isMagic();
     }
 
+    /**
+     * @param Node\Stmt\ClassMethod $node
+     * @return Node\Expr\MethodCall
+     */
     private function resolvedParentMethodCall(Node\Stmt\ClassMethod $node): Node\Expr\MethodCall
     {
         return new Node\Expr\MethodCall(Expressions::resolvePropertyFetch('this', $this->property), $node->name->name);

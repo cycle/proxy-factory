@@ -11,6 +11,10 @@ namespace Cycle\ORM\Promise\Declaration\Extractor;
 
 final class Properties
 {
+    /**
+     * @param \ReflectionClass $reflection
+     * @return array
+     */
     public function getProperties(\ReflectionClass $reflection): array
     {
         $properties = [];
@@ -26,6 +30,10 @@ final class Properties
         return $properties;
     }
 
+    /**
+     * @param \ReflectionProperty $property
+     * @return bool
+     */
     private function isIgnoredProperty(\ReflectionProperty $property): bool
     {
         return $property->isPrivate() || $property->isStatic();

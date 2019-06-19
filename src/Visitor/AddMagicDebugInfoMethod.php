@@ -34,6 +34,14 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
     /** @var array */
     private $unsetPropertiesValues;
 
+    /**
+     * @param string $resolverProperty
+     * @param string $resolveMethod
+     * @param string $loadedMethod
+     * @param string $roleMethod
+     * @param string $scopeMethod
+     * @param array  $unsetPropertiesValues
+     */
     public function __construct(
         string $resolverProperty,
         string $resolveMethod,
@@ -50,6 +58,10 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         $this->unsetPropertiesValues = $unsetPropertiesValues;
     }
 
+    /**
+     * @param Node $node
+     * @return int|Node|Node[]|null
+     */
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
@@ -63,6 +75,9 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         return null;
     }
 
+    /**
+     * @return Node\Stmt\If_
+     */
     private function buildExpression(): Node\Stmt\If_
     {
         $loaded = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->loadedMethod);
@@ -81,6 +96,9 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         return $if;
     }
 
+    /**
+     * @return Node\Expr\Array_
+     */
     private function resolvedProperties(): Node\Expr\Array_
     {
         $array = [];
@@ -91,13 +109,19 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         return $this->array($array);
     }
 
+    /**
+     * @param string $loaded
+     * @return Node\Expr\Array_
+     */
     private function unresolvedProperties(string $loaded): Node\Expr\Array_
     {
         $array = [];
         $array[] = $this->arrayItem(Expressions::const($loaded), ':loaded');
         $array[] = $this->arrayItem(Expressions::const('false'), ':resolved');
-        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->roleMethod), ':role');
-        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->scopeMethod), ':scope');
+        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->roleMethod),
+            ':role');
+        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->scopeMethod),
+            ':scope');
         foreach ($this->unsetPropertiesValues as $value) {
             $array[] = $this->arrayItem(Expressions::const('null'), $value);
         }
@@ -105,11 +129,20 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         return $this->array($array);
     }
 
+    /**
+     * @param Node\Expr   $value
+     * @param string|null $key
+     * @return Node\Expr\ArrayItem
+     */
     private function arrayItem(Node\Expr $value, string $key = null): Node\Expr\ArrayItem
     {
         return new Node\Expr\ArrayItem($value, new Node\Scalar\String_($key));
     }
 
+    /**
+     * @param array $array
+     * @return Node\Expr\Array_
+     */
     private function array(array $array): Node\Expr\Array_
     {
         return new Node\Expr\Array_($array, ['kind' => Node\Expr\Array_::KIND_SHORT]);
