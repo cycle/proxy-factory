@@ -94,7 +94,7 @@ class FactoryTest extends BaseTest
         $tr->run();
 
         /** @var SchematicEntity $o */
-        $o = $this->orm()->get($role, 'id', 2);
+        $o = $this->orm()->get($role, ['id' => 2]);
         $this->assertEquals('my third name', $o->getName());
         $this->assertEquals('my second email', $o->email);
 

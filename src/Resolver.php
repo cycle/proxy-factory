@@ -98,10 +98,7 @@ final class Resolver implements PromiseInterface
             return null;
         }
 
-        $key = key($this->scope);
-        $value = $this->scope[$key];
-
-        return $this->orm->getHeap()->find($this->role, $key, $value);
+        return $this->orm->getHeap()->find($this->role, $this->scope);
     }
 
     /**
