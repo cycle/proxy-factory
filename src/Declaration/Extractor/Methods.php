@@ -130,7 +130,7 @@ final class Methods
      */
     private function replacedSelfReturnTypeName(\ReflectionMethod $method, string $name): string
     {
-        return $name === 'self' ? $method->getDeclaringClass()->getName() : $name;
+        return $name === 'self' ? $method->class : $name;
     }
 
     /**
