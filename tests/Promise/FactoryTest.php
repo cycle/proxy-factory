@@ -69,15 +69,19 @@ class FactoryTest extends BaseTest
     public function testPromise(string $materializer, array $params): void
     {
         $role = SchematicEntity::class;
-        $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
-        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
+        $orm = $this->orm();
+        $orm->make($role, ['id' => 1, 'name' => 'my name']);
+        $orm->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
+
+        $tr = new Transaction($orm);
+        $tr->run();
 
         $scope = ['id' => 2];
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
         /** @var SchematicEntity|\Cycle\ORM\Promise\Resolver $promise */
-        $promise = $this->factory()->promise($this->orm(), $role, $scope);
+        $promise = $this->factory()->promise($orm, $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
         $this->assertNotNull($promise->__resolve());
@@ -89,12 +93,12 @@ class FactoryTest extends BaseTest
 
         $promise->email = 'my second email';
 
-        $tr = new Transaction($this->orm());
+        $tr = new Transaction($orm);
         $tr->persist($promise);
         $tr->run();
 
         /** @var SchematicEntity $o */
-        $o = $this->orm()->get($role, ['id' => 2]);
+        $o = $orm->get($role, ['id' => 2]);
         $this->assertEquals('my third name', $o->getName());
         $this->assertEquals('my second email', $o->email);
 
@@ -116,15 +120,16 @@ class FactoryTest extends BaseTest
     public function testNullScope(string $materializer, array $params): void
     {
         $role = SchematicEntity::class;
-        $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
-        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
+        $orm = $this->orm();
+        $orm->make($role, ['id' => 1, 'name' => 'my name']);
+        $orm->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
 
         $scope = [];
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
         /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
-        $promise = $this->factory()->promise($this->orm(), $role, $scope);
+        $promise = $this->factory()->promise($orm, $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
         $this->assertNull($promise->__resolve());
@@ -145,15 +150,16 @@ class FactoryTest extends BaseTest
     public function testUnknownScope(string $materializer, array $params): void
     {
         $role = SchematicEntity::class;
-        $this->orm()->make($role, ['id' => 1, 'name' => 'my name']);
-        $this->orm()->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
+        $orm = $this->orm();
+        $orm->make($role, ['id' => 1, 'name' => 'my name']);
+        $orm->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
 
         $scope = ['id' => 3];
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
         /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
-        $promise = $this->factory()->promise($this->orm(), $role, $scope);
+        $promise = $this->factory()->promise($orm, $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
         $this->assertNull($promise->__resolve());

@@ -31,6 +31,8 @@ final class Methods
         '__debugInfo',
     ];
 
+    private const RESERVED_UNQUALIFIED_RETURN_TYPES = ['self', 'static'];
+
     /**
      * @param \ReflectionClass $reflection
      * @return array
@@ -109,7 +111,7 @@ final class Methods
 
         $name = $returnType->getName();
 
-        if (!$returnType->isBuiltin()) {
+        if ($this->returnTypeShouldBeQualified($returnType)) {
             $name = '\\' . $name;
         }
 
@@ -118,6 +120,19 @@ final class Methods
         }
 
         return new Node\Identifier($name);
+    }
+
+    /**
+     * @param \ReflectionType $returnType
+     * @return bool
+     */
+    private function returnTypeShouldBeQualified(\ReflectionType $returnType): bool
+    {
+        if (in_array($returnType->getName(), self::RESERVED_UNQUALIFIED_RETURN_TYPES, true)) {
+            return false;
+        }
+
+        return !$returnType->isBuiltin();
     }
 
     /**
