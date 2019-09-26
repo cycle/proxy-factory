@@ -8,6 +8,7 @@ use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\Entity;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\EntityWithConstructor;
 use Cycle\ORM\Promise\Tests\Fixtures\ChildEntity;
+use Cycle\ORM\Promise\Tests\Fixtures\ParentEntity;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
 
@@ -45,6 +46,18 @@ class ExtractorTest extends TestCase
 
         //__construct is not listed
         $this->assertSame(['public', 'protected'], $this->getDeclaration(EntityWithConstructor::class)->properties);
+    }
+
+    public function testSelfReturnTypes(): void
+    {
+        $extracted = [];
+        foreach ($this->getDeclaration(ChildEntity::class)->methods as $method) {
+            $extracted[$method->name->name] = $method->returnType->name;
+        }
+
+        $this->assertNotContains('self', $extracted);
+        $this->assertContains('\\' . ChildEntity::class, $extracted);
+        $this->assertContains('\\' . ParentEntity::class, $extracted);
     }
 
     private function getDeclaration(string $class): Structure

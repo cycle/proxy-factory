@@ -17,4 +17,9 @@ class ParentEntity
     {
         return 'childParentPropValue';
     }
+
+    public function parentSelf(): self
+    {
+        return $this;
+    }
 }
