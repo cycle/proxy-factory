@@ -15,6 +15,11 @@ class ChildEntity extends ParentEntity
         return 'childPropValue';
     }
 
+    public function childSelf(): self
+    {
+        return $this;
+    }
+
     protected function childProtectedProp(): \stdClass
     {
         return new \stdClass();

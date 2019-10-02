@@ -14,7 +14,7 @@ use PhpParser\Node;
 
 final class Methods
 {
-    private const MAGIC_METHOD_NAMES = [
+    private const MAGIC_METHODS = [
         '__construct',
         '__destruct',
         '__call',
@@ -30,6 +30,8 @@ final class Methods
         '__set_state',
         '__debugInfo',
     ];
+
+    private const RESERVED_UNQUALIFIED_RETURN_TYPES = ['self', 'static', 'object'];
 
     /**
      * @param \ReflectionClass $reflection
@@ -70,7 +72,7 @@ final class Methods
      */
     private function isMagicMethod(string $name): bool
     {
-        return in_array($name, self::MAGIC_METHOD_NAMES, true);
+        return in_array($name, self::MAGIC_METHODS, true);
     }
 
     /**
@@ -108,8 +110,9 @@ final class Methods
         }
 
         $name = $returnType->getName();
+        $name = $this->replacedSelfReturnTypeName($method, $name);
 
-        if (!$returnType->isBuiltin()) {
+        if ($this->returnTypeShouldBeQualified($returnType, $name)) {
             $name = '\\' . $name;
         }
 
@@ -118,6 +121,30 @@ final class Methods
         }
 
         return new Node\Identifier($name);
+    }
+
+    /**
+     * @param \ReflectionMethod $method
+     * @param string            $name
+     * @return string
+     */
+    private function replacedSelfReturnTypeName(\ReflectionMethod $method, string $name): string
+    {
+        return $name === 'self' ? $method->class : $name;
+    }
+
+    /**
+     * @param \ReflectionType $returnType
+     * @param string          $name
+     * @return bool
+     */
+    private function returnTypeShouldBeQualified(\ReflectionType $returnType, string $name): bool
+    {
+        if (in_array($name, self::RESERVED_UNQUALIFIED_RETURN_TYPES, true)) {
+            return false;
+        }
+
+        return !$returnType->isBuiltin();
     }
 
     /**
