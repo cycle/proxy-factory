@@ -1,30 +1,29 @@
 <?php
+
 declare(strict_types=1);
 
-
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
-
 
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Printer;
 use Cycle\ORM\Promise\Tests\BaseTest;
+use Cycle\Schema;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use Spiral\Core\Container;
 use Spiral\Database\Driver\SQLite\SQLiteDriver;
-use Cycle\Schema;
 
 abstract class BaseProxyPrinterTest extends BaseTest
 {
-    protected const NS = 'Cycle\ORM\Promise\Tests\Promises';
-    public const DRIVER = 'sqlite';
+    public const    DRIVER = 'sqlite';
+    protected const NS     = 'Cycle\ORM\Promise\Tests\Promises';
 
     /** @var \Spiral\Core\Container */
     protected $container;
 
-    public function setUp()
+    public function setUp(): void
     {
         self::$config = [
             'debug'     => false,
@@ -47,6 +46,14 @@ abstract class BaseProxyPrinterTest extends BaseTest
         $this->container->bind(ORMInterface::class, $this->orm());
     }
 
+    protected function make(
+        \ReflectionClass $reflection,
+        DeclarationInterface $class,
+        DeclarationInterface $parent
+    ): string {
+        return $this->proxyCreator()->make($reflection, $class, $parent);
+    }
+
     private function orm(): ORMInterface
     {
         $schema = (new Schema\Compiler())->compile(new Schema\Registry($this->dbal), [
@@ -61,11 +68,6 @@ abstract class BaseProxyPrinterTest extends BaseTest
         ]);
 
         return $this->withSchema(new \Cycle\ORM\Schema($schema));
-    }
-
-    protected function make(\ReflectionClass $reflection, DeclarationInterface $class, DeclarationInterface $parent): string
-    {
-        return $this->proxyCreator()->make($reflection, $class, $parent);
     }
 
     private function proxyCreator(): Printer

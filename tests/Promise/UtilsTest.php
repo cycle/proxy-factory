@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Cycle\ORM\Promise\Tests;
 
 use Cycle\ORM\Promise\Utils;

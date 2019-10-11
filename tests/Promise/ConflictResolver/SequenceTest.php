@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
@@ -16,7 +17,7 @@ class SequenceTest extends TestCase
      * @param int   $pos
      * @param int   $expected
      */
-    public function testFind(array $sequence, int $pos, int $expected)
+    public function testFind(array $sequence, int $pos, int $expected): void
     {
         $this->assertEquals($expected, $this->sequences()->find($sequence, $pos));
     }

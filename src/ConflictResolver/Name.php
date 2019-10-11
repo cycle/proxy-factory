@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -16,6 +17,13 @@ final class Name
 
     /** @var int */
     public $sequence = 0;
+
+    /**
+     * Name constructor.
+     */
+    protected function __construct()
+    {
+    }
 
     /**
      * @param string $name
@@ -59,12 +67,5 @@ final class Name
         }
 
         return $name;
-    }
-
-    /**
-     * Name constructor.
-     */
-    protected function __construct()
-    {
     }
 }

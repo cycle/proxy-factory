@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -12,6 +13,7 @@ namespace Cycle\ORM\Promise\Materizalizer;
 use Cycle\ORM\Promise\MaterializerInterface;
 use Cycle\ORM\Promise\Utils;
 use Spiral\Core\Container\SingletonInterface;
+use Spiral\Files\FilesInterface;
 
 final class FileMaterializer implements MaterializerInterface, SingletonInterface
 {

@@ -1,5 +1,7 @@
 <?php
+
 declare(strict_types=1);
+
 /**
  * Spiral Framework.
  *
@@ -28,11 +30,11 @@ use Spiral\Tokenizer\Tokenizer;
 
 abstract class BaseTest extends TestCase
 {
-    // tests configuration
-    public static $config;
 
     // currently active driver
     public const DRIVER = null;
+    // tests configuration
+    public static $config;
 
     // cross test driver cache
     public static $driverCache = [];
@@ -57,7 +59,7 @@ abstract class BaseTest extends TestCase
     /**
      * Init all we need.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -104,7 +106,7 @@ abstract class BaseTest extends TestCase
     /**
      * Cleanup.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->disableProfiling();
         $this->dropDatabase($this->dbal->database('default'));
@@ -163,7 +165,7 @@ abstract class BaseTest extends TestCase
     /**
      * @param Database|null $database
      */
-    protected function dropDatabase(Database $database = null)
+    protected function dropDatabase(Database $database = null): void
     {
         if (empty($database)) {
             return;
@@ -189,7 +191,7 @@ abstract class BaseTest extends TestCase
     /**
      * For debug purposes only.
      */
-    protected function enableProfiling()
+    protected function enableProfiling(): void
     {
         if (!is_null($this->logger)) {
             $this->logger->display();
@@ -199,7 +201,7 @@ abstract class BaseTest extends TestCase
     /**
      * For debug purposes only.
      */
-    protected function disableProfiling()
+    protected function disableProfiling(): void
     {
         if (!is_null($this->logger)) {
             $this->logger->hide();
@@ -232,7 +234,7 @@ class TestLogger implements LoggerInterface
         return $this->countReads;
     }
 
-    public function log($level, $message, array $context = [])
+    public function log($level, $message, array $context = []): void
     {
         if (!empty($context['query'])) {
             $sql = strtolower($context['query']);
@@ -276,12 +278,12 @@ class TestLogger implements LoggerInterface
         }
     }
 
-    public function display()
+    public function display(): void
     {
         $this->display = true;
     }
 
-    public function hide()
+    public function hide(): void
     {
         $this->display = false;
     }

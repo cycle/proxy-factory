@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -9,8 +10,13 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration\Extractor;
 
+use Cycle\ORM\Promise\Traverser;
+use Cycle\ORM\Promise\Visitor\Declaration\FetchMethods;
 use PhpParser\Builder\Param;
 use PhpParser\Node;
+use PhpParser\Parser;
+use PhpParser\ParserFactory;
+use Spiral\Files\FilesInterface;
 
 final class Methods
 {
@@ -34,11 +40,30 @@ final class Methods
     private const RESERVED_UNQUALIFIED_RETURN_TYPES = ['self', 'static', 'object'];
 
     /**
+     * @param Traverser      $traverser
+     * @param Parser|null    $parser
+     */
+    public function __construct(
+        Traverser $traverser,
+        Parser $parser = null
+    ) {
+        $this->traverser = $traverser;
+        $this->parser = $parser ?? (new ParserFactory())->create(ParserFactory::ONLY_PHP7);
+    }
+
+    /**
      * @param \ReflectionClass $reflection
      * @return array
      */
     public function getMethods(\ReflectionClass $reflection): array
     {
+        $parents = [$reflection->name => $reflection];
+        foreach ($reflection->getMethods() as $method) {
+            $class = $method->getDeclaringClass();
+            $parents[$class->name] = $class;
+        }
+
+        $methodNodes = $this->getExtendedMethodNodes($parents);
         $methods = [];
 
         foreach ($reflection->getMethods() as $method) {
@@ -50,7 +75,8 @@ final class Methods
                 'flags'      => $this->packFlags($method),
                 'returnType' => $this->defineReturnType($method),
                 'params'     => $this->packParams($method),
-                'byRef'      => $method->returnsReference()
+                'byRef'      => $method->returnsReference(),
+                'stmts'      => !empty($methodNodes[$method->name]) ? $methodNodes[$method->name]->stmts : []
             ]);
         }
 
@@ -189,5 +215,30 @@ final class Methods
         }
 
         return $type;
+    }
+
+    /**
+     * @param \ReflectionClass[] $reflections
+     * @return Node\Stmt\ClassMethod[]
+     */
+    private function getExtendedMethodNodes(array $reflections): array
+    {
+        $nodes = [];
+        foreach ($reflections as $reflection) {
+            if (file_exists($reflection->getFileName())) {
+                $methods = new FetchMethods();
+                $this->traverser->traverse($this->parser->parse(
+                    file_get_contents($reflection->getFileName())
+                ), $methods);
+
+                foreach ($methods->getMethods() as $name => $method) {
+                    if (!isset($nodes[$name])) {
+                        $nodes[$name] = $method;
+                    }
+                }
+            }
+        }
+
+        return $nodes;
     }
 }

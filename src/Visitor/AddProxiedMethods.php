@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -51,6 +52,9 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         }
 
         foreach ($this->methods as $method) {
+            if ($method->name->name === 'undefinedReturn') {
+//                print_r([__METHOD__ => $method->stmts]);
+            }
             if ($method->name->name === '__clone') {
                 $method->stmts = [$this->buildCloneExpression()];
                 $node->stmts[] = $method;
@@ -79,6 +83,50 @@ final class AddProxiedMethods extends NodeVisitorAbstract
 
     /**
      * @param Node\Stmt\ClassMethod $method
+     * @return bool
+     */
+    private function hasReturnStmt(Node\Stmt\ClassMethod $method): bool
+    {
+        if ($method->returnType === 'void') {
+            return false;
+        }
+
+        if ($method->returnType === null) {
+            return $this->findReturnStmt($method);
+        }
+
+        if ($method->returnType instanceof Node\NullableType) {
+            return true;
+        }
+
+        return $method->returnType instanceof Node\Identifier && $method->returnType->name !== 'void';
+    }
+
+    /**
+     * @param Node\Stmt|Node\Stmt\ClassMethod $node
+     * @return bool
+     */
+    private function findReturnStmt(Node\Stmt $node): bool
+    {
+        if (!property_exists($node, 'stmts') || !is_array($node->stmts)) {
+            return false;
+        }
+
+        foreach ($node->stmts as $stmt) {
+            if ($stmt instanceof Node\Stmt\Return_) {
+                return true;
+            }
+
+            if ($this->findReturnStmt($stmt) === true) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Node\Stmt\ClassMethod $method
      * @return Node\Stmt\ClassMethod
      */
     private function modifyReturnMethod(Node\Stmt\ClassMethod $method): Node\Stmt\ClassMethod
@@ -86,10 +134,13 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         $method->setDocComment(PHPDoc::writeInheritdoc());
 
         $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
-        $stmt = new Node\Stmt\Return_(new Node\Expr\MethodCall($resolved, $method->name->name,
-            $this->packMethodArgs($method)));
+        $stmt = new Node\Stmt\Return_(new Node\Expr\MethodCall(
+            $resolved,
+            $method->name->name,
+            $this->packMethodArgs($method)
+        ));
 
-        $method->stmts[] = Expressions::throwExceptionOnNull($resolved, $stmt);
+        $method->stmts = [Expressions::throwExceptionOnNull($resolved, $stmt)];
 
         return $method;
     }
@@ -103,10 +154,11 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         $method->setDocComment(PHPDoc::writeInheritdoc());
 
         $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
-        $stmt = new Node\Stmt\Expression(new Node\Expr\MethodCall($resolved, $method->name->name,
-            $this->packMethodArgs($method)));
+        $stmt = new Node\Stmt\Expression(
+            new Node\Expr\MethodCall($resolved, $method->name->name, $this->packMethodArgs($method))
+        );
 
-        $method->stmts[] = Expressions::throwExceptionOnNull($resolved, $stmt);
+        $method->stmts = [Expressions::throwExceptionOnNull($resolved, $stmt)];
 
         return $method;
     }
@@ -124,22 +176,5 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         }
 
         return $args;
-    }
-
-    /**
-     * @param Node\Stmt\ClassMethod $method
-     * @return bool
-     */
-    private function hasReturnStmt(Node\Stmt\ClassMethod $method): bool
-    {
-        if ($method->returnType === null || $method->returnType === 'void') {
-            return false;
-        }
-
-        if ($method->returnType instanceof Node\NullableType) {
-            return true;
-        }
-
-        return $method->returnType instanceof Node\Identifier && $method->returnType->name !== 'void';
     }
 }

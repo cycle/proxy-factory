@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
@@ -15,7 +16,7 @@ class NameTest extends TestCase
      * @param int    $sequence
      * @param string $expected
      */
-    public function testName(string $name, int $sequence, string $expected)
+    public function testName(string $name, int $sequence, string $expected): void
     {
         $this->assertEquals($expected, Name::createWithSequence($name, $sequence)->fullName());
     }

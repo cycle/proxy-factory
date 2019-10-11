@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -71,20 +72,20 @@ final class Printer
     private $stubs;
 
     /**
+     * @param Declaration\Extractor $extractor
      * @param ConflictResolver      $resolver
      * @param Traverser             $traverser
-     * @param Declaration\Extractor $extractor
      * @param Stubs                 $stubs
      */
     public function __construct(
-        ConflictResolver $resolver = null,
-        Traverser $traverser = null,
-        Declaration\Extractor $extractor = null,
-        Stubs $stubs = null
+        Declaration\Extractor $extractor,
+        Traverser $traverser,
+        ConflictResolver $resolver,
+        Stubs $stubs
     ) {
-        $this->resolver = $resolver ?? new ConflictResolver();
-        $this->traverser = $traverser ?? new Traverser();
-        $this->extractor = $extractor ?? new Declaration\Extractor();
+        $this->resolver = $resolver;
+        $this->traverser = $traverser;
+        $this->extractor = $extractor;
 
         $lexer = new Lexer\Emulative([
             'usedAttributes' => [
@@ -129,8 +130,11 @@ final class Printer
         $visitors = [
             new Visitor\AddUseStmts($this->useStmts($class, $parent)),
             new Visitor\UpdateNamespace($class->getNamespaceName()),
-            new Visitor\DeclareClass($class->getShortName(), $parent->getShortName(),
-                Utils::shortName(PromiseInterface::class)),
+            new Visitor\DeclareClass(
+                $class->getShortName(),
+                $parent->getShortName(),
+                Utils::shortName(PromiseInterface::class)
+            ),
             new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
             new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
             new Visitor\AddInitMethod(

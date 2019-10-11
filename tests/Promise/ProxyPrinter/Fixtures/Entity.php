@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter\Fixtures;
@@ -6,7 +7,8 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter\Fixtures;
 abstract class Entity
 {
     use TestTrait;
-    const MY_CONST = 'value';
+
+    public const MY_CONST = 'value';
 
     public $public;
     public static $publicStatic;
@@ -19,12 +21,25 @@ abstract class Entity
         //have some body
     }
 
+    public function __resolver(): void
+    {
+    }
+
+    public function __toString()
+    {
+        return '';
+    }
+
     public function public(): ?string
     {
         return 'pub';
     }
 
-    public function __resolver()
+    public static function publicStatic(): void
+    {
+    }
+
+    final public function publicFinal(): void
     {
     }
 
@@ -35,20 +50,7 @@ abstract class Entity
     {
     }
 
-    private function private()
+    private function private(): void
     {
-    }
-
-    public static function publicStatic()
-    {
-    }
-
-    public final function publicFinal()
-    {
-    }
-
-    public function __toString()
-    {
-        return '';
     }
 }

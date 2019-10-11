@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -80,8 +81,10 @@ final class ConflictResolver
         if (preg_match("/\d+$/", $name, $match)) {
             $sequence = (int)$match[0];
             if ($sequence > 0) {
-                return ConflictResolver\Name::createWithSequence(Utils::trimTrailingDigits($name, $sequence),
-                    $sequence);
+                return ConflictResolver\Name::createWithSequence(
+                    Utils::trimTrailingDigits($name, $sequence),
+                    $sequence
+                );
             }
         }
 

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -23,6 +24,15 @@ final class Traverser
     public function traverseClonedNodes(array $nodes, NodeVisitor ...$visitors): array
     {
         return $this->makeTraverser(...$visitors)->traverse($this->cloneNodes($nodes));
+    }
+
+    /**
+     * @param array       $nodes
+     * @param NodeVisitor ...$visitors
+     */
+    public function traverse(array $nodes, NodeVisitor ...$visitors): void
+    {
+        $this->makeTraverser(...$visitors)->traverse($nodes);
     }
 
     /**

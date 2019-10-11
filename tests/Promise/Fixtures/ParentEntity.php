@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Fixtures;
@@ -13,13 +14,13 @@ class ParentEntity
         return 'parentPropValue';
     }
 
-    protected function parentProtectedProp(): string
-    {
-        return 'childParentPropValue';
-    }
-
     public function parentSelf(): self
     {
         return $this;
+    }
+
+    protected function parentProtectedProp(): string
+    {
+        return 'childParentPropValue';
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration\Fixtures;
@@ -10,7 +11,20 @@ class Entity
     protected $protected;
     private $private = null;
 
-    public function public()
+    public function __toString()
+    {
+        return '';
+    }
+
+    public function public(): void
+    {
+    }
+
+    public static function publicStatic(): void
+    {
+    }
+
+    final public function publicFinal(): void
     {
     }
 
@@ -21,20 +35,7 @@ class Entity
     {
     }
 
-    private function private()
+    private function private(): void
     {
-    }
-
-    public static function publicStatic()
-    {
-    }
-
-    public final function publicFinal()
-    {
-    }
-
-    public function __toString()
-    {
-        return '';
     }
 }

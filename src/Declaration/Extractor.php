@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -25,18 +26,18 @@ final class Extractor
     private $constants;
 
     /**
-     * @param Constants|null  $constants
-     * @param Properties|null $properties
-     * @param Methods|null    $methods
+     * @param Constants $constants
+     * @param Properties $properties
+     * @param Methods $methods
      */
     public function __construct(
-        Extractor\Constants $constants = null,
-        Extractor\Properties $properties = null,
-        Extractor\Methods $methods = null
+        Extractor\Constants $constants,
+        Extractor\Properties $properties,
+        Extractor\Methods $methods
     ) {
-        $this->constants = $constants ?? new Constants();
-        $this->properties = $properties ?? new Properties();
-        $this->methods = $methods ?? new Methods();
+        $this->constants = $constants;
+        $this->properties = $properties;
+        $this->methods = $methods;
     }
 
     /**

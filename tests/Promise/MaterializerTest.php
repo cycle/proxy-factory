@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests;
@@ -13,7 +14,7 @@ class MaterializerTest extends TestCase
 {
     private const NS = 'Cycle\ORM\Promise\Tests\Promises';
 
-    public function setUp()
+    public function setUp(): void
     {
         $files = glob($this->filesDirectory() . DIRECTORY_SEPARATOR . '*');
         foreach ($files as $file) {

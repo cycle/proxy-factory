@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -22,6 +23,13 @@ final class Structure
 
     /** @var bool */
     public $hasClone;
+
+    /**
+     * Structure constructor.
+     */
+    protected function __construct()
+    {
+    }
 
     /**
      * @param array $constants
@@ -52,12 +60,5 @@ final class Structure
         }
 
         return $names;
-    }
-
-    /**
-     * Structure constructor.
-     */
-    protected function __construct()
-    {
     }
 }

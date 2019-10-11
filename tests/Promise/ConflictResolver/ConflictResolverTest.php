@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
@@ -25,13 +26,6 @@ class ConflictResolverTest extends TestCase
         }
     }
 
-    private function conflictResolver(): ConflictResolver
-    {
-        $container = new Container();
-
-        return $container->get(ConflictResolver::class);
-    }
-
     public function cdProvider(): array
     {
         return [
@@ -46,5 +40,12 @@ class ConflictResolverTest extends TestCase
                 ['v3', 'v3', 'v1', 'vv', 't1', 't2']
             ],
         ];
+    }
+
+    private function conflictResolver(): ConflictResolver
+    {
+        $container = new Container();
+
+        return $container->get(ConflictResolver::class);
     }
 }

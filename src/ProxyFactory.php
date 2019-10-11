@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -21,6 +22,9 @@ use Spiral\Core\Container\SingletonInterface;
 
 final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
 {
+    /** @var Extractor */
+    private $extractor;
+
     /** @var Printer */
     private $printer;
 
@@ -33,31 +37,29 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
     /** @var Instantiator */
     private $instantiator;
 
-    /** @var Extractor */
-    private $extractor;
 
     /** @var array */
     private $resolved = [];
 
     /**
-     * @param Printer|null               $printer
+     * @param Extractor                  $extractor
+     * @param Printer                    $printer
+     * @param Instantiator               $instantiator
      * @param MaterializerInterface|null $materializer
      * @param Names|null                 $names
-     * @param Instantiator|null          $instantiator
-     * @param Extractor|null             $extractor
      */
     public function __construct(
-        Printer $printer = null,
-        MaterializerInterface $materializer = null,
-        Names $names = null,
+        Extractor $extractor,
+        Printer $printer,
         Instantiator $instantiator = null,
-        Extractor $extractor = null
+        MaterializerInterface $materializer = null,
+        Names $names = null
     ) {
-        $this->printer = $printer ?? new Printer();
+        $this->extractor = $extractor;
+        $this->printer = $printer;
+        $this->instantiator = $instantiator;
         $this->materializer = $materializer ?? new EvalMaterializer();
         $this->names = $names ?? new Names();
-        $this->instantiator = $instantiator ?? new Instantiator();
-        $this->extractor = $extractor ?? new Extractor();
     }
 
     /**

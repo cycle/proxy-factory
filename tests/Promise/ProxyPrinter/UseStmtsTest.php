@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
@@ -36,7 +37,8 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output), $this->fetchExternalDependencies($class->getFullName(), self::USE_STMTS));
+        $this->assertSame($this->fetchUseStatements($output),
+            $this->fetchExternalDependencies($class->getFullName(), self::USE_STMTS));
     }
 
     /**
@@ -57,8 +59,10 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output),
-            $this->fetchExternalDependencies($class->getFullName(), array_merge(self::USE_STMTS, [$classname])));
+        $this->assertSame(
+            $this->fetchUseStatements($output),
+            $this->fetchExternalDependencies($class->getFullName(), array_merge(self::USE_STMTS, [$classname]))
+        );
     }
 
     private function fetchUseStatements(string $code): array

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Fixtures;
@@ -8,6 +9,12 @@ namespace Cycle\ORM\Promise\Tests\Fixtures;
  */
 class SchematicEntity
 {
+
+    /**
+     * @column(type=string)
+     * @var string
+     */
+    public $email;
     /**
      * @column(type=primary)
      * @var int
@@ -19,12 +26,6 @@ class SchematicEntity
      * @var string
      */
     protected $name;
-
-    /**
-     * @column(type=string)
-     * @var string
-     */
-    public $email;
 
     public function getId(): int
     {

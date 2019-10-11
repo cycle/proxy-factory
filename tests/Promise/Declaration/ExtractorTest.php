@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration;
@@ -14,6 +15,9 @@ use Spiral\Core\Container;
 
 class ExtractorTest extends TestCase
 {
+    /**
+     * @throws \ReflectionException
+     */
     public function testExtractProperties(): void
     {
         $extracted = $this->getDeclaration(ChildEntity::class)->properties;
@@ -25,6 +29,9 @@ class ExtractorTest extends TestCase
         $this->assertSame($expected, $extracted);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testExtractParentMethods(): void
     {
         $extracted = [];
@@ -36,6 +43,9 @@ class ExtractorTest extends TestCase
         $this->assertArrayHasKey('parentProtectedProp', $extracted);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testExtractMethods(): void
     {
         $methods = [];
@@ -48,6 +58,9 @@ class ExtractorTest extends TestCase
         $this->assertSame(['public', 'protected'], $this->getDeclaration(EntityWithConstructor::class)->properties);
     }
 
+    /**
+     * @throws \ReflectionException
+     */
     public function testSelfReturnTypes(): void
     {
         $extracted = [];
@@ -60,6 +73,11 @@ class ExtractorTest extends TestCase
         $this->assertContains('\\' . ParentEntity::class, $extracted);
     }
 
+    /**
+     * @param string $class
+     * @return \Cycle\ORM\Promise\Declaration\Structure
+     * @throws \ReflectionException
+     */
     private function getDeclaration(string $class): Structure
     {
         return $this->extractor()->extract(new \ReflectionClass($class));

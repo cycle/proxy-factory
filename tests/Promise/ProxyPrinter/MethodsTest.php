@@ -1,11 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
+use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
-use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\PromiseInterface;
 use Spiral\Core\Container;
 
@@ -35,6 +36,9 @@ class MethodsTest extends BaseProxyPrinterTest
         foreach ($reflection->getMethods() as $method) {
             $methods[$method->name] = $method->name;
         }
+
+        $this->assertArrayHasKey('undefinedReturn', $methods);
+        $this->assertRegExp('/return\s.*undefinedReturn\(/', $output);
 
         foreach ($this->interfaceMethods() as $method) {
             $this->assertArrayHasKey($method, $methods);
@@ -71,6 +75,11 @@ class MethodsTest extends BaseProxyPrinterTest
         }
 
         $methods = $this->promiseMethods($class->getFullName());
+        $this->assertArrayHasKey('undefinedReturn', $methods);
+        $this->assertRegExp('/return\s.*undefinedReturn\(/', $output);
+
+        $this->assertArrayHasKey('undefinedReturn2', $methods);
+        $this->assertRegExp('/return\s.*undefinedReturn2\(/', $output);
 
         foreach ($originMethods as $name => $accessor) {
             $this->assertArrayHasKey($name, $methods, "Proxy class does not contain expected `{$name}` method");
@@ -93,7 +102,11 @@ class MethodsTest extends BaseProxyPrinterTest
             if ($method->isPublic()) {
                 $this->assertEquals('public', $originMethods[$name], "Proxied method `{$name}` expected to be public");
             } elseif ($method->isProtected()) {
-                $this->assertEquals('protected', $originMethods[$name], "Proxied method `{$name}` expected to be public");
+                $this->assertEquals(
+                    'protected',
+                    $originMethods[$name],
+                    "Proxied method `{$name}` expected to be public"
+                );
             } else {
                 throw new \UnexpectedValueException("\"{$method->name->toString()}\" method not found");
             }

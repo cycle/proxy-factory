@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Spiral Framework.
  *
@@ -118,10 +119,14 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
         $array = [];
         $array[] = $this->arrayItem(Expressions::const($loaded), ':loaded');
         $array[] = $this->arrayItem(Expressions::const('false'), ':resolved');
-        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->roleMethod),
-            ':role');
-        $array[] = $this->arrayItem(Expressions::resolveMethodCall('this', $this->resolverProperty, $this->scopeMethod),
-            ':scope');
+        $array[] = $this->arrayItem(
+            Expressions::resolveMethodCall('this', $this->resolverProperty, $this->roleMethod),
+            ':role'
+        );
+        $array[] = $this->arrayItem(
+            Expressions::resolveMethodCall('this', $this->resolverProperty, $this->scopeMethod),
+            ':scope'
+        );
         foreach ($this->unsetPropertiesValues as $value) {
             $array[] = $this->arrayItem(Expressions::const('null'), $value);
         }

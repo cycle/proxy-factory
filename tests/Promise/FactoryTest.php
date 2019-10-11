@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests;
@@ -22,7 +23,7 @@ class FactoryTest extends BaseTest
     /** @var \Spiral\Core\Container */
     private $container;
 
-    public function setUp()
+    public function setUp(): void
     {
         self::$config = [
             'debug'     => false,
@@ -50,11 +51,6 @@ class FactoryTest extends BaseTest
 
         $this->container = new Container();
         $this->container->bind(ORMInterface::class, $this->orm());
-    }
-
-    private function filesDirectory(): string
-    {
-        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'promises';
     }
 
     /**
@@ -173,6 +169,11 @@ class FactoryTest extends BaseTest
             [FileMaterializer::class, ['directory' => $this->filesDirectory()]],
             [EvalMaterializer::class, []]
         ];
+    }
+
+    private function filesDirectory(): string
+    {
+        return dirname(__DIR__) . DIRECTORY_SEPARATOR . 'fixtures' . DIRECTORY_SEPARATOR . 'promises';
     }
 
     private function orm(): ORMInterface
