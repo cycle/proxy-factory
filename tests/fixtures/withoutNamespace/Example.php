@@ -1,5 +1,5 @@
 <?php
-
+// phpcs:ignoreFile
 /**
  * Spiral Framework. Cycle ProxyFactory
  *
@@ -8,9 +8,6 @@
  */
 declare(strict_types=1);
 
-namespace {
-
-    class Example
-    {
-    }
+class Example
+{
 }
