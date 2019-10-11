@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Spiral Framework. Cycle ProxyFactory
+ *
+ * @license MIT
+ * @author  Valentin V (vvval)
+ */
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\Declaration;
@@ -23,7 +29,7 @@ class ExtractorTest extends TestCase
         $extracted = $this->getDeclaration(ChildEntity::class)->properties;
         sort($extracted);
 
-        $expected = ['public', 'protected', 'ownProperty', '__resolver'];
+        $expected = ['public', 'protected', 'ownProperty', 'resolver'];
         sort($expected);
 
         $this->assertSame($expected, $extracted);

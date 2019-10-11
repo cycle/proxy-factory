@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Spiral Framework. Cycle ProxyFactory
+ *
+ * @license MIT
+ * @author  Valentin V (Vvval)
+ */
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
@@ -7,6 +13,8 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\PromiseInterface;
 use Cycle\ORM\Promise\Utils;
+
+use function Cycle\ORM\Promise\shortName;
 
 class DeclarationTest extends BaseProxyPrinterTest
 {
@@ -32,8 +40,8 @@ class DeclarationTest extends BaseProxyPrinterTest
         $this->assertStringContainsString(sprintf(
             'class %s extends %s implements %s',
             $as,
-            Utils::shortName($classname),
-            Utils::shortName(PromiseInterface::class)
+            shortName($classname),
+            shortName(PromiseInterface::class)
         ), $output);
 
         $proxy = $this->makeProxyObject($classname, $class->getFullName());

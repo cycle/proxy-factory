@@ -1,13 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
 /**
- * Spiral Framework.
+ * Spiral Framework. Cycle ProxyFactory
  *
- * @license   MIT
- * @author    Anton Titov (Wolfy-J)
+ * @license MIT
+ * @author  Valentin V (Vvval)
  */
+declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests;
 
@@ -16,9 +15,6 @@ use Cycle\ORM\Factory;
 use Cycle\ORM\ORM;
 use Cycle\ORM\SchemaInterface;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Psr\Log\LoggerTrait;
-use Psr\Log\LogLevel;
 use Spiral\Database\Config\DatabaseConfig;
 use Spiral\Database\Database;
 use Spiral\Database\DatabaseManager;
@@ -30,9 +26,9 @@ use Spiral\Tokenizer\Tokenizer;
 
 abstract class BaseTest extends TestCase
 {
-
     // currently active driver
     public const DRIVER = null;
+
     // tests configuration
     public static $config;
 
@@ -85,10 +81,6 @@ abstract class BaseTest extends TestCase
 
         $this->logger = new TestLogger();
         $this->getDriver()->setLogger($this->logger);
-
-        if (self::$config['debug']) {
-            $this->logger->display();
-        }
 
         $this->orm = new ORM(new Factory(
             $this->dbal,
@@ -167,7 +159,7 @@ abstract class BaseTest extends TestCase
      */
     protected function dropDatabase(Database $database = null): void
     {
-        if (empty($database)) {
+        if ($database === null) {
             return;
         }
 
@@ -193,7 +185,7 @@ abstract class BaseTest extends TestCase
      */
     protected function enableProfiling(): void
     {
-        if (!is_null($this->logger)) {
+        if ($this->logger !== null) {
             $this->logger->display();
         }
     }
@@ -203,105 +195,8 @@ abstract class BaseTest extends TestCase
      */
     protected function disableProfiling(): void
     {
-        if (!is_null($this->logger)) {
+        if ($this->logger !== null) {
             $this->logger->hide();
         }
-    }
-}
-
-class TestLogger implements LoggerInterface
-{
-    use LoggerTrait;
-
-    private $display;
-
-    private $countWrites;
-    private $countReads;
-
-    public function __construct()
-    {
-        $this->countWrites = 0;
-        $this->countReads = 0;
-    }
-
-    public function countWriteQueries(): int
-    {
-        return $this->countWrites;
-    }
-
-    public function countReadQueries(): int
-    {
-        return $this->countReads;
-    }
-
-    public function log($level, $message, array $context = []): void
-    {
-        if (!empty($context['query'])) {
-            $sql = strtolower($context['query']);
-            if (
-                strpos($sql, 'insert') === 0
-                || strpos($sql, 'update') === 0
-                || strpos($sql, 'delete') === 0
-            ) {
-                $this->countWrites++;
-            } else {
-                if (!$this->isPostgresSystemQuery($sql)) {
-                    $this->countReads++;
-                }
-            }
-        }
-
-        if (!$this->display) {
-            return;
-        }
-
-        if ($level == LogLevel::ERROR) {
-            echo " \n! \033[31m" . $message . "\033[0m";
-        } elseif ($level == LogLevel::ALERT) {
-            echo " \n! \033[35m" . $message . "\033[0m";
-        } elseif (strpos($message, 'SHOW') === 0) {
-            echo " \n> \033[34m" . $message . "\033[0m";
-        } else {
-            if ($this->isPostgresSystemQuery($message)) {
-                echo " \n> \033[90m" . $message . "\033[0m";
-
-                return;
-            }
-
-            if (strpos($message, 'SELECT') === 0) {
-                echo " \n> \033[32m" . $message . "\033[0m";
-            } elseif (strpos($message, 'INSERT') === 0) {
-                echo " \n> \033[36m" . $message . "\033[0m";
-            } else {
-                echo " \n> \033[33m" . $message . "\033[0m";
-            }
-        }
-    }
-
-    public function display(): void
-    {
-        $this->display = true;
-    }
-
-    public function hide(): void
-    {
-        $this->display = false;
-    }
-
-    protected function isPostgresSystemQuery(string $query): bool
-    {
-        $query = strtolower($query);
-        if (
-            strpos($query, 'tc.constraint_name')
-            || strpos($query, 'pg_indexes')
-            || strpos($query, 'tc.constraint_name')
-            || strpos($query, 'pg_constraint')
-            || strpos($query, 'information_schema')
-            || strpos($query, 'pg_class')
-        ) {
-            return true;
-        }
-
-        return false;
     }
 }

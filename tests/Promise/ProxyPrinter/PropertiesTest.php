@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Spiral Framework. Cycle ProxyFactory
+ *
+ * @license MIT
+ * @author  Valentin V (Vvval)
+ */
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
@@ -28,7 +34,7 @@ class PropertiesTest extends BaseProxyPrinterTest
         $this->assertStringNotContainsString('$publicStatic;', $output);
         $this->assertStringNotContainsString('$protected;', $output);
         $this->assertStringNotContainsString('$private;', $output);
-        $this->assertStringContainsString('$__resolver;', $output);
+        $this->assertStringContainsString('$resolver;', $output);
 
         $this->assertFalse(class_exists($class->getFullName()));
 
@@ -45,9 +51,9 @@ class PropertiesTest extends BaseProxyPrinterTest
         $this->assertArrayHasKey('public', $properties);
         $this->assertArrayHasKey('publicStatic', $properties);
         $this->assertArrayHasKey('protected', $properties);
-        $this->assertArrayHasKey('__resolver', $properties);
+        $this->assertArrayHasKey('resolver', $properties);
 
-        $property = $properties['__resolver'];
+        $property = $properties['resolver'];
         $this->assertTrue($property->isPrivate());
         $this->assertFalse($property->isStatic());
     }
@@ -71,8 +77,8 @@ class PropertiesTest extends BaseProxyPrinterTest
         $this->assertStringNotContainsString('$publicStatic;', $output);
         $this->assertStringNotContainsString('$protected;', $output);
         $this->assertStringNotContainsString('$private;', $output);
-        $this->assertStringNotContainsString('$__resolver;', $output);
-        $this->assertStringContainsString('$__resolver2;', $output);
+        $this->assertStringNotContainsString('$resolver;', $output);
+        $this->assertStringContainsString('$resolver2;', $output);
 
         $this->assertFalse(class_exists($class->getFullName()));
 
@@ -89,10 +95,10 @@ class PropertiesTest extends BaseProxyPrinterTest
         $this->assertArrayHasKey('public', $properties);
         $this->assertArrayHasKey('publicStatic', $properties);
         $this->assertArrayHasKey('protected', $properties);
-        $this->assertArrayHasKey('__resolver', $properties);
-        $this->assertArrayHasKey('__resolver2', $properties);
+        $this->assertArrayHasKey('resolver', $properties);
+        $this->assertArrayHasKey('resolver2', $properties);
 
-        $property = $properties['__resolver2'];
+        $property = $properties['resolver2'];
         $this->assertTrue($property->isPrivate());
         $this->assertFalse($property->isStatic());
     }
