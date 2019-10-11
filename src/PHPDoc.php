@@ -19,13 +19,11 @@ final class PHPDoc
      */
     public static function writeInheritdoc(): Doc
     {
-        $lines = [
+        return self::makeComment([
             '/**',
             ' * {@inheritdoc}',
             ' */'
-        ];
-
-        return self::makeComment(join("\n", $lines));
+        ]);
     }
 
     /**
@@ -34,22 +32,20 @@ final class PHPDoc
      */
     public static function writeProperty(string $type): Doc
     {
-        $lines = [
+        return self::makeComment([
             '/**',
             ' * @internal',
             " * @var $type",
             ' */'
-        ];
-
-        return self::makeComment(join("\n", $lines));
+        ]);
     }
 
     /**
-     * @param string $comment
+     * @param array|string $comment
      * @return Doc
      */
-    private static function makeComment(string $comment): Doc
+    private static function makeComment($comment): Doc
     {
-        return new Doc($comment);
+        return new Doc(is_array($comment) ? join("\n", $comment) : $comment);
     }
 }

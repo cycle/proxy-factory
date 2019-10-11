@@ -52,33 +52,18 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         }
 
         foreach ($this->methods as $method) {
-            if ($method->name->name === 'undefinedReturn') {
-//                print_r([__METHOD__ => $method->stmts]);
-            }
             if ($method->name->name === '__clone') {
-                $method->stmts = [$this->buildCloneExpression()];
+                $method->stmts = [Expressions::buildCloneExpression($this->resolverProperty)];
                 $node->stmts[] = $method;
-            } elseif ($this->hasReturnStmt($method)) {
-                $node->stmts[] = $this->modifyReturnMethod($method);
             } else {
-                $node->stmts[] = $this->modifyExprMethod($method);
+                $node->stmts[] = $this->modifyMethodMethod(
+                    $method,
+                    $this->hasReturnStmt($method) ? Node\Stmt\Return_::class : Node\Stmt\Expression::class
+                );
             }
         }
 
         return $node;
-    }
-
-    /**
-     * @return Node\Stmt\Expression
-     */
-    private function buildCloneExpression(): Node\Stmt\Expression
-    {
-        return new Node\Stmt\Expression(
-            new Node\Expr\Assign(
-                Expressions::resolvePropertyFetch('this', $this->resolverProperty),
-                new Node\Expr\Clone_(Expressions::resolvePropertyFetch('this', $this->resolverProperty))
-            )
-        );
     }
 
     /**
@@ -127,38 +112,16 @@ final class AddProxiedMethods extends NodeVisitorAbstract
 
     /**
      * @param Node\Stmt\ClassMethod $method
+     * @param string                $stmtWrapper
      * @return Node\Stmt\ClassMethod
      */
-    private function modifyReturnMethod(Node\Stmt\ClassMethod $method): Node\Stmt\ClassMethod
+    private function modifyMethodMethod(Node\Stmt\ClassMethod $method, string $stmtWrapper): Node\Stmt\ClassMethod
     {
-        $method->setDocComment(PHPDoc::writeInheritdoc());
-
         $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
-        $stmt = new Node\Stmt\Return_(new Node\Expr\MethodCall(
-            $resolved,
-            $method->name->name,
-            $this->packMethodArgs($method)
-        ));
+        $methodCall = new Node\Expr\MethodCall($resolved, $method->name->name, $this->packMethodArgs($method));
 
-        $method->stmts = [Expressions::throwExceptionOnNull($resolved, $stmt)];
-
-        return $method;
-    }
-
-    /**
-     * @param Node\Stmt\ClassMethod $method
-     * @return Node\Stmt\ClassMethod
-     */
-    private function modifyExprMethod(Node\Stmt\ClassMethod $method): Node\Stmt\ClassMethod
-    {
         $method->setDocComment(PHPDoc::writeInheritdoc());
-
-        $resolved = Expressions::resolveMethodCall('this', $this->resolverProperty, $this->resolveMethod);
-        $stmt = new Node\Stmt\Expression(
-            new Node\Expr\MethodCall($resolved, $method->name->name, $this->packMethodArgs($method))
-        );
-
-        $method->stmts = [Expressions::throwExceptionOnNull($resolved, $stmt)];
+        $method->stmts = [Expressions::throwExceptionOnNull($resolved, new $stmtWrapper($methodCall))];
 
         return $method;
     }

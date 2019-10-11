@@ -146,6 +146,19 @@ final class Expressions
     }
 
     /**
+     * @param string $property
+     * @return \PhpParser\Node\Stmt\Expression
+     */
+    public static function buildCloneExpression(string $property): Node\Stmt\Expression
+    {
+        $fetchedProperty = self::resolvePropertyFetch('this', $property);
+
+        return new Node\Stmt\Expression(
+            new Node\Expr\Assign($fetchedProperty, new Node\Expr\Clone_($fetchedProperty))
+        );
+    }
+
+    /**
      * @param string $class
      * @param string $message
      * @return Node\Stmt\Throw_

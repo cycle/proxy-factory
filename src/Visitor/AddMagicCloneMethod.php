@@ -46,24 +46,11 @@ final class AddMagicCloneMethod extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             $method = new Builder\Method('__clone');
             $method->makePublic();
-            $method->addStmt($this->buildCloneExpression());
+            $method->addStmt(Expressions::buildCloneExpression($this->resolverProperty));
 
             $node->stmts[] = $method->getNode();
         }
 
         return null;
-    }
-
-    /**
-     * @return Node\Stmt\Expression
-     */
-    private function buildCloneExpression(): Node\Stmt\Expression
-    {
-        return new Node\Stmt\Expression(
-            new Node\Expr\Assign(
-                Expressions::resolvePropertyFetch('this', $this->resolverProperty),
-                new Node\Expr\Clone_(Expressions::resolvePropertyFetch('this', $this->resolverProperty))
-            )
-        );
     }
 }

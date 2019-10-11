@@ -16,7 +16,6 @@ use PhpParser\Builder\Param;
 use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
-use Spiral\Files\FilesInterface;
 
 final class Methods
 {
@@ -39,9 +38,15 @@ final class Methods
 
     private const RESERVED_UNQUALIFIED_RETURN_TYPES = ['self', 'static', 'object'];
 
+    /** @varTraverser */
+    private $traverser;
+
+    /** @var Parser */
+    private $parser;
+
     /**
-     * @param Traverser      $traverser
-     * @param Parser|null    $parser
+     * @param Traverser   $traverser
+     * @param Parser|null $parser
      */
     public function __construct(
         Traverser $traverser,
