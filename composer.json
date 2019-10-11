@@ -19,7 +19,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Cycle\\ORM\\Promise\\": "src/ProxyFactory"
+      "Cycle\\ORM\\Promise\\": "src/Promise"
     },
     "files": [
       "src/functions/utils.php",
