@@ -10,13 +10,12 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Visitor;
 
-use Cycle\ORM\Promise\Utils;
 use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 use function Cycle\ORM\Promise\shortName;
-use function Cycle\ORM\Promise\unsetFuncExpr;
+use function Cycle\ORM\Promise\exprUnsetFunc;
 
 final class AddInitMethod extends NodeVisitorAbstract
 {
@@ -85,7 +84,7 @@ final class AddInitMethod extends NodeVisitorAbstract
     {
         $prop = new Node\Expr\ClassConstFetch(new Node\Name('self'), $this->unsetPropertiesConst);
         $foreach = new Node\Stmt\Foreach_($prop, new Node\Expr\Variable('property'));
-        $foreach->stmts[] = new Node\Stmt\Expression(unsetFuncExpr('this', '{$property}'));
+        $foreach->stmts[] = exprUnsetFunc('this', '{$property}');
 
         return $foreach;
     }

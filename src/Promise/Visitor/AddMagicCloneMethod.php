@@ -14,7 +14,7 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-use function Cycle\ORM\Promise\buildCloneExpression;
+use function Cycle\ORM\Promise\exprClone;
 
 final class AddMagicCloneMethod extends NodeVisitorAbstract
 {
@@ -47,7 +47,7 @@ final class AddMagicCloneMethod extends NodeVisitorAbstract
         if ($node instanceof Node\Stmt\Class_) {
             $method = new Builder\Method('__clone');
             $method->makePublic();
-            $method->addStmt(buildCloneExpression($this->resolverProperty));
+            $method->addStmt(exprClone($this->resolverProperty));
 
             $node->stmts[] = $method->getNode();
         }

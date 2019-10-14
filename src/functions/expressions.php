@@ -16,40 +16,40 @@ use PhpParser\Node;
 /**
  * @param string $object
  * @param string $property
- * @return Node\Expr\FuncCall
+ * @return Node\Stmt\Expression
  */
-function unsetFuncExpr(string $object, string $property): Node\Expr\FuncCall
+function exprUnsetFunc(string $object, string $property): Node\Stmt\Expression
 {
-    return funcCall('unset', [
+    return new Node\Stmt\Expression(funcCall('unset', [
         new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))
-    ]);
+    ]));
 }
 
 /**
  * @param string $object
  * @param string $property
- * @return Node\Expr\FuncCall
+ * @return Node\Stmt\Return_
  */
-function issetFuncExpr(string $object, string $property): Node\Expr\FuncCall
+function returnIssetFunc(string $object, string $property): Node\Stmt\Return_
 {
-    return funcCall('isset', [
+    return new Node\Stmt\Return_(funcCall('isset', [
         new Node\Arg(new Node\Expr\PropertyFetch(new Node\Expr\Variable($object), $property))
-    ]);
+    ]));
 }
 
 /**
  * @param string $name
  * @param string $object
  * @param string $haystackConst
- * @return Node\Expr\FuncCall
+ * @return Node\Stmt\If_
  */
-function inConstArrayFunc(string $name, string $object, string $haystackConst): Node\Expr\FuncCall
+function ifInConstArray(string $name, string $object, string $haystackConst): Node\Stmt\If_
 {
-    return funcCall('in_array', [
+    return new Node\Stmt\If_(funcCall('in_array', [
         new Node\Arg(new Node\Expr\Variable($name)),
         new Node\Arg(new Node\Expr\ClassConstFetch(new Node\Name($object), $haystackConst)),
         new Node\Arg(constFetch('true'))
-    ]);
+    ]));
 }
 
 /**
@@ -59,7 +59,7 @@ function inConstArrayFunc(string $name, string $object, string $haystackConst): 
  */
 function throwExceptionOnNull(Node\Expr $condition, Node\Stmt $stmt): Node\Stmt\If_
 {
-    $if = new Node\Stmt\If_(notNull($condition));
+    $if = ifNotNull($condition);
     $if->stmts[] = $stmt;
     $if->else = new Node\Stmt\Else_();
     $if->else->stmts[] = throwException(
@@ -72,11 +72,12 @@ function throwExceptionOnNull(Node\Expr $condition, Node\Stmt $stmt): Node\Stmt\
 
 /**
  * @param Node\Expr $expr
- * @return Node\Expr\BinaryOp\NotIdentical
+ * @param array     $subNodes
+ * @return  Node\Stmt\If_
  */
-function notNull(Node\Expr $expr): Node\Expr\BinaryOp\NotIdentical
+function ifNotNull(Node\Expr $expr, array $subNodes = []): Node\Stmt\If_
 {
-    return new Node\Expr\BinaryOp\NotIdentical($expr, constFetch('null'));
+    return new Node\Stmt\If_(new Node\Expr\BinaryOp\NotIdentical($expr, constFetch('null')), $subNodes);
 }
 
 /**
@@ -113,11 +114,11 @@ function resolveMethodCall(string $object, string $property, string $method): No
 
 /**
  * @param Node\Expr $expr
- * @return Node\Expr\BinaryOp\Identical
+ * @return Node\Stmt\If_
  */
-function equalsFalse(Node\Expr $expr): Node\Expr\BinaryOp\Identical
+function ifEqualsFalse(Node\Expr $expr): Node\Stmt\If_
 {
-    return new Node\Expr\BinaryOp\Identical($expr, constFetch('false'));
+    return new Node\Stmt\If_(new Node\Expr\BinaryOp\Identical($expr, constFetch('false')));
 }
 
 /**
@@ -133,7 +134,7 @@ function constFetch(string $name): Node\Expr\ConstFetch
  * @param string $property
  * @return Node\Stmt\Expression
  */
-function buildCloneExpression(string $property): Node\Stmt\Expression
+function exprClone(string $property): Node\Stmt\Expression
 {
     $fetchedProperty = resolvePropertyFetch('this', $property);
 

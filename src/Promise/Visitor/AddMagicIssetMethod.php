@@ -14,8 +14,8 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-use function Cycle\ORM\Promise\inConstArrayFunc;
-use function Cycle\ORM\Promise\issetFuncExpr;
+use function Cycle\ORM\Promise\ifInConstArray;
+use function Cycle\ORM\Promise\returnIssetFunc;
 use function Cycle\ORM\Promise\resolveIntoVar;
 use function Cycle\ORM\Promise\throwExceptionOnNull;
 
@@ -65,14 +65,14 @@ final class AddMagicIssetMethod extends NodeVisitorAbstract
      */
     private function buildIssetExpression(): Node\Stmt\If_
     {
-        $if = new Node\Stmt\If_(inConstArrayFunc('name', 'self', $this->unsetPropertiesProperty));
+        $if = ifInConstArray('name', 'self', $this->unsetPropertiesProperty);
         $if->stmts[] = resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod);
         $if->stmts[] = throwExceptionOnNull(
             new Node\Expr\Variable('entity'),
-            new Node\Stmt\Return_(issetFuncExpr('entity', '{$name}'))
+            returnIssetFunc('entity', '{$name}')
         );
         $if->else = new Node\Stmt\Else_([
-            new Node\Stmt\Return_(issetFuncExpr('this', '{$name}'))
+            returnIssetFunc('this', '{$name}')
         ]);
 
         return $if;

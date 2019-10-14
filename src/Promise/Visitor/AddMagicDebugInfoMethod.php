@@ -15,8 +15,8 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 use function Cycle\ORM\Promise\constFetch;
-use function Cycle\ORM\Promise\equalsFalse;
-use function Cycle\ORM\Promise\notNull;
+use function Cycle\ORM\Promise\ifEqualsFalse;
+use function Cycle\ORM\Promise\ifNotNull;
 use function Cycle\ORM\Promise\resolveIntoVar;
 use function Cycle\ORM\Promise\resolveMethodCall;
 
@@ -87,11 +87,11 @@ final class AddMagicDebugInfoMethod extends NodeVisitorAbstract
     private function buildExpression(): Node\Stmt\If_
     {
         $loaded = resolveMethodCall('this', $this->resolverProperty, $this->loadedMethod);
-        $if = new Node\Stmt\If_(equalsFalse($loaded));
+        $if = ifEqualsFalse($loaded);
         $if->stmts[] = new Node\Stmt\Return_($this->unresolvedProperties('false'));
         $if->else = new Node\Stmt\Else_([
             resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod),
-            new Node\Stmt\If_(notNull(new Node\Expr\Variable('entity')), [
+            ifNotNull(new Node\Expr\Variable('entity'), [
                 'stmts' => [new Node\Stmt\Return_($this->resolvedProperties())],
                 'else'  => new Node\Stmt\Else_([
                     new Node\Stmt\Return_($this->unresolvedProperties('true'))

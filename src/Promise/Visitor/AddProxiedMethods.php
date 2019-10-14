@@ -15,7 +15,7 @@ use PhpParser\Builder\Param;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-use function Cycle\ORM\Promise\buildCloneExpression;
+use function Cycle\ORM\Promise\exprClone;
 use function Cycle\ORM\Promise\resolveMethodCall;
 use function Cycle\ORM\Promise\throwExceptionOnNull;
 
@@ -56,7 +56,7 @@ final class AddProxiedMethods extends NodeVisitorAbstract
 
         foreach ($this->methods as $method) {
             if ($method->name->name === '__clone') {
-                $method->stmts = [buildCloneExpression($this->resolverProperty)];
+                $method->stmts = [exprClone($this->resolverProperty)];
                 $node->stmts[] = $method;
             } else {
                 $node->stmts[] = $this->modifyMethodMethod(

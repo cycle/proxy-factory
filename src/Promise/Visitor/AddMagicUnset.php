@@ -14,10 +14,10 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-use function Cycle\ORM\Promise\inConstArrayFunc;
+use function Cycle\ORM\Promise\ifInConstArray;
 use function Cycle\ORM\Promise\resolveIntoVar;
 use function Cycle\ORM\Promise\throwExceptionOnNull;
-use function Cycle\ORM\Promise\unsetFuncExpr;
+use function Cycle\ORM\Promise\exprUnsetFunc;
 
 final class AddMagicUnset extends NodeVisitorAbstract
 {
@@ -65,14 +65,14 @@ final class AddMagicUnset extends NodeVisitorAbstract
      */
     private function buildUnsetExpression(): Node\Stmt\If_
     {
-        $if = new Node\Stmt\If_(inConstArrayFunc('name', 'self', $this->unsetPropertiesConst));
+        $if = ifInConstArray('name', 'self', $this->unsetPropertiesConst);
         $if->stmts[] = resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod);
         $if->stmts[] = throwExceptionOnNull(
             new Node\Expr\Variable('entity'),
-            new Node\Stmt\Expression(unsetFuncExpr('entity', '{$name}'))
+            exprUnsetFunc('entity', '{$name}')
         );
         $if->else = new Node\Stmt\Else_([
-            new Node\Stmt\Expression(unsetFuncExpr('this', '{$name}'))
+            exprUnsetFunc('this', '{$name}')
         ]);
 
         return $if;
