@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Spiral Framework. Cycle ProxyFactory
+ *
+ * @license MIT
+ * @author  Valentin V (Vvval)
+ */
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
@@ -37,8 +43,10 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $this->assertSame($this->fetchUseStatements($output),
-            $this->fetchExternalDependencies($class->getFullName(), self::USE_STMTS));
+        $this->assertSame(
+            $this->fetchUseStatements($output),
+            $this->fetchExternalDependencies($class->getFullName(), self::USE_STMTS)
+        );
     }
 
     /**

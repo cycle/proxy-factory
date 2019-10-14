@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Spiral Framework, SpiralScout LLC.
+ * Spiral Framework. Cycle ProxyFactory
  *
  * @author    Anton Titov (Wolfy-J)
  */
