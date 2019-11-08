@@ -186,12 +186,17 @@ final class Methods
     /**
      * @param \ReflectionMethod $method
      * @return array
+     * @throws \ReflectionException
      */
     private function packParams(\ReflectionMethod $method): array
     {
         $params = [];
         foreach ($method->getParameters() as $parameter) {
             $param = new Param($parameter->name);
+
+            if ($parameter->isDefaultValueAvailable()) {
+                $param->setDefault($parameter->getDefaultValue());
+            }
 
             $type = $this->defineParamReturnType($parameter);
             if ($type !== null) {

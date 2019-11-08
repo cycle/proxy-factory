@@ -30,6 +30,10 @@ class ChildFixture
     {
     }
 
+    public function typedSetter(string $a, $b, int $c): void
+    {
+    }
+
     public function getter()
     {
         return 'value';
