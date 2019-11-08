@@ -6,14 +6,16 @@
  * @license MIT
  * @author  Valentin V (Vvval)
  */
+
 declare(strict_types=1);
 
-namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
+namespace Cycle\ORM\Promise\Tests\ProxyPrinter\Methods;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
 use Cycle\ORM\Promise\PromiseInterface;
+use Cycle\ORM\Promise\Tests\ProxyPrinter\BaseProxyPrinterTest;
 use Spiral\Core\Container;
 
 class MethodsTest extends BaseProxyPrinterTest
@@ -44,7 +46,6 @@ class MethodsTest extends BaseProxyPrinterTest
         }
 
         $this->assertArrayHasKey('undefinedReturn', $methods);
-        $this->assertRegExp('/return\s.*undefinedReturn\(/', $output);
 
         foreach ($this->interfaceMethods() as $method) {
             $this->assertArrayHasKey($method, $methods);
@@ -82,10 +83,7 @@ class MethodsTest extends BaseProxyPrinterTest
 
         $methods = $this->promiseMethods($class->getFullName());
         $this->assertArrayHasKey('undefinedReturn', $methods);
-        $this->assertRegExp('/return\s.*undefinedReturn\(/', $output);
-
         $this->assertArrayHasKey('undefinedReturn2', $methods);
-        $this->assertRegExp('/return\s.*undefinedReturn2\(/', $output);
 
         foreach ($originMethods as $name => $accessor) {
             $this->assertArrayHasKey($name, $methods, "Proxy class does not contain expected `{$name}` method");

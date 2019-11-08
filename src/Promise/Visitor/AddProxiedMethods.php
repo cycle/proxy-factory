@@ -6,6 +6,7 @@
  * @license MIT
  * @author  Valentin V (Vvval)
  */
+
 declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Visitor;
@@ -102,7 +103,7 @@ final class AddProxiedMethods extends NodeVisitorAbstract
 
         foreach ($node->stmts as $stmt) {
             if ($stmt instanceof Node\Stmt\Return_) {
-                return true;
+                return $stmt->expr !== null;
             }
 
             if ($this->findReturnStmt($stmt) === true) {
