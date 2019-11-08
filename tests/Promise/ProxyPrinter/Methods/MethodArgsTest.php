@@ -14,19 +14,7 @@ class MethodArgsTest extends BaseProxyPrinterTest
      */
     public function testHasArgType(): void
     {
-        $classname = Fixtures\ArgsFixture::class;
-        $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
-
-        $parent = Declarations::createParentFromReflection($reflection);
-        $class = Declarations::createClassFromName($as, $parent);
-
-        $output = $this->make($reflection, $class, $parent);
-        $output = ltrim($output, '<?php');
-
-        $this->assertFalse(class_exists($class->getFullName()));
-
-        eval($output);
+        $output = $this->makeOutput(Fixtures\ArgsFixture::class, self::NS . __CLASS__ . __LINE__);
 
         $this->assertStringContainsString('typedSetter(string $a, $b, int $c)', $output);
     }
@@ -36,8 +24,40 @@ class MethodArgsTest extends BaseProxyPrinterTest
      */
     public function testArgDefaults(): void
     {
-        $classname = Fixtures\ArgsFixture::class;
-        $as = self::NS . __CLASS__ . __LINE__;
+        $output = $this->makeOutput(Fixtures\ArgsFixture::class, self::NS . __CLASS__ . __LINE__);
+
+        //Long syntax by default
+        $this->assertStringContainsString('defaultsSetter(string $a, $b = array(), int $c = 3, bool $d)', $output);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testVariadicArg(): void
+    {
+        $output = $this->makeOutput(Fixtures\ArgsFixture::class, self::NS . __CLASS__ . __LINE__);
+
+        $this->assertStringContainsString('public function variadicSetter($a, string ...$b)', $output);
+    }
+
+    /**
+     * @throws \ReflectionException
+     */
+    public function testReferencedArg(): void
+    {
+        $output = $this->makeOutput(Fixtures\ArgsFixture::class, self::NS . __CLASS__ . __LINE__);
+
+        $this->assertStringContainsString('public function referencedSetter(string $a, &$b, int $c)', $output);
+    }
+
+    /**
+     * @param string $classname
+     * @param string $as
+     * @return string
+     * @throws \ReflectionException
+     */
+    private function makeOutput(string $classname, string $as): string
+    {
         $reflection = new \ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
@@ -50,12 +70,6 @@ class MethodArgsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        //Long syntax by default
-        $this->assertStringContainsString('defaultsSetter(string $a, $b = array(), int $c = 3, bool $d)', $output);
-    }
-
-    public function testArgVariadic(): void
-    {
-        $this->assertTrue(true);
+        return $output;
     }
 }

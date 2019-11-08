@@ -60,6 +60,7 @@ final class Methods
     /**
      * @param \ReflectionClass $reflection
      * @return array
+     * @throws \ReflectionException
      */
     public function getMethods(\ReflectionClass $reflection): array
     {
@@ -196,6 +197,14 @@ final class Methods
 
             if ($parameter->isDefaultValueAvailable()) {
                 $param->setDefault($parameter->getDefaultValue());
+            }
+
+            if ($parameter->isVariadic()) {
+                $param->makeVariadic();
+            }
+
+            if ($parameter->isPassedByReference()) {
+                $param->makeByRef();
             }
 
             $type = $this->defineParamReturnType($parameter);
