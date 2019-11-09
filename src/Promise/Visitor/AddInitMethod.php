@@ -69,8 +69,8 @@ final class AddInitMethod extends NodeVisitorAbstract
                     $method->addParam((new Builder\Param($name))->setType(shortName($type)));
                 }
             }
-            $method->addStmt($this->unsetProperties());
             $method->addStmt($this->assignResolverProperty());
+            $method->addStmt($this->unsetProperties());
 
             $node->stmts[] = $method->getNode();
         }
