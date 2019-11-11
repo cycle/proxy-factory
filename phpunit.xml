@@ -13,8 +13,11 @@
 >
 
     <testsuites>
-        <testsuite name="Proxy Creator">
+        <testsuite name="Proxy Factory">
             <directory>./tests/</directory>
+        </testsuite>
+        <testsuite name="Proxy Factory 74">
+            <file phpVersion="7.4.0" phpVersionOperator=">=">./tests/Promise/ProxyPrinter/ConstantsTest74.php</file>
         </testsuite>
     </testsuites>
 
