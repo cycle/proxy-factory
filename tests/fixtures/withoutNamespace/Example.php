@@ -1,4 +1,5 @@
 <?php
+
 // phpcs:ignoreFile
 /**
  * Spiral Framework. Cycle ProxyFactory
