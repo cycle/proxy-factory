@@ -32,6 +32,7 @@
   "autoload-dev": {
     "psr-4": {
       "Cycle\\ORM\\Promise\\Tests\\": "tests/Promise/",
+      "Cycle\\ORM\\Promise\\Tests74\\": "tests/php74/",
       "Cycle\\ORM\\Promise\\Tests\\Promises\\": "tests/fixtures/promises/",
       "": "tests/fixtures/withoutNamespace/"
     }
