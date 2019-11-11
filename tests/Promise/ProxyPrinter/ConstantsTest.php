@@ -13,7 +13,6 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Printer;
-
 use function Cycle\ORM\Promise\php74;
 
 class ConstantsTest extends BaseProxyPrinterTest
@@ -40,6 +39,10 @@ class ConstantsTest extends BaseProxyPrinterTest
             $output
         );
 
+        print_r([
+            \Cycle\ORM\Promise\phpVersion(),
+            php74()
+        ]);
         if (php74()) {
             $this->assertStringContainsString(
                 'UNSET_PROPERTIES = [\'publicPropertyWithDefaults\'];',
