@@ -32,7 +32,7 @@ class ConstantsTest extends BaseProxyPrinterTest
 
         $output = $this->make($reflection, $class, $parent);
         $output = ltrim($output, '<?php');
-        print_r(PHP_EOL . '73 version' . PHP_EOL);
+
         $this->assertStringContainsString(
             'PUBLIC_PROPERTIES = [\'publicProperty\', \'publicPropertyWithDefaults\'];',
             $output
