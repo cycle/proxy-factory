@@ -19,7 +19,7 @@ use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
 
-class ConstantsTest74 extends TestCase
+class ConstantsPHP74Test extends TestCase
 {
     protected const NS = 'Cycle\ORM\Promise\Tests74\Promises';
 
