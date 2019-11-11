@@ -17,6 +17,8 @@ class NamespaceTest extends BaseProxyPrinterTest
 {
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testSameNamespace(): void
     {
@@ -40,6 +42,8 @@ class NamespaceTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testDistinctNamespace(): void
     {

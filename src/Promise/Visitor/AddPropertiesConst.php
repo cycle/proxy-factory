@@ -11,33 +11,30 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Visitor;
 
-use Cycle\ORM\Promise\StatementsInjector;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+
+use function Cycle\ORM\Promise\inject;
 
 /**
  * Add "unset properties" property
  */
-final class AddUnsetPropertiesConst extends NodeVisitorAbstract
+final class AddPropertiesConst extends NodeVisitorAbstract
 {
     /** @var string */
-    private $unsetPropertyConst;
+    private $name;
 
     /** @var array */
-    private $unsetPropertiesValues;
-
-    /** @var StatementsInjector */
-    private $injector;
+    private $values;
 
     /**
-     * @param string $unsetPropertiesConst
-     * @param array  $unsetPropertiesValues
+     * @param string $name
+     * @param array  $values
      */
-    public function __construct(string $unsetPropertiesConst, array $unsetPropertiesValues)
+    public function __construct(string $name, array $values)
     {
-        $this->unsetPropertyConst = $unsetPropertiesConst;
-        $this->unsetPropertiesValues = $unsetPropertiesValues;
-        $this->injector = new StatementsInjector();
+        $this->name = $name;
+        $this->values = $values;
     }
 
     /**
@@ -46,7 +43,7 @@ final class AddUnsetPropertiesConst extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
-            $node->stmts = $this->injector->inject(
+            $node->stmts = inject(
                 $node->stmts,
                 Node\Stmt\ClassMethod::class,
                 [$this->buildProperty()]
@@ -62,13 +59,13 @@ final class AddUnsetPropertiesConst extends NodeVisitorAbstract
     private function buildProperty(): Node\Stmt\ClassConst
     {
         $array = [];
-        foreach ($this->unsetPropertiesValues as $value) {
+        foreach ($this->values as $value) {
             $array[] = new Node\Expr\ArrayItem(new Node\Scalar\String_($value));
         }
 
         $const = new Node\Stmt\ClassConst([
             new Node\Const_(
-                $this->unsetPropertyConst,
+                $this->name,
                 new Node\Expr\Array_($array, ['kind' => Node\Expr\Array_::KIND_SHORT])
             )
         ], Node\Stmt\Class_::MODIFIER_PRIVATE);

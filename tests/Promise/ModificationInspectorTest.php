@@ -21,6 +21,9 @@ class ModificationInspectorTest extends TestCase
 
     /**
      * @throws \ReflectionException
+     * @throws \Exception
+     * @throws \Exception
+     * @throws \Throwable
      */
     public function testDate(): void
     {
@@ -46,6 +49,7 @@ class ModificationInspectorTest extends TestCase
 
     /**
      * @return \Cycle\ORM\Promise\Materizalizer\ModificationInspector
+     * @throws \Throwable
      */
     private function inspector(): ModificationInspector
     {

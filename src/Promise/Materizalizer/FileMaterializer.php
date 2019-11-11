@@ -39,6 +39,7 @@ final class FileMaterializer implements MaterializerInterface, SingletonInterfac
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void
     {

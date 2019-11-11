@@ -111,7 +111,6 @@ abstract class BaseTest extends TestCase
      * Calculates missing parameters for typecasting.
      *
      * @param SchemaInterface $schema
-     *
      * @return ORM|\Cycle\ORM\ORMInterface
      */
     public function withSchema(SchemaInterface $schema)

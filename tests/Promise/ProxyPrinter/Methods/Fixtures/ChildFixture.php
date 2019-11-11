@@ -42,4 +42,8 @@ class ChildFixture
     public function childMethod(): void
     {
     }
+
+    public function &refReturn(): void
+    {
+    }
 }

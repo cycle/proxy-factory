@@ -12,10 +12,11 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Visitor;
 
 use Cycle\ORM\Promise\PHPDoc;
-use Cycle\ORM\Promise\StatementsInjector;
 use PhpParser\Builder\Property;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+
+use function Cycle\ORM\Promise\inject;
 
 /**
  * Add resolver property
@@ -31,9 +32,6 @@ final class AddResolverProperty extends NodeVisitorAbstract
     /** @var string */
     private $class;
 
-    /** @var StatementsInjector */
-    private $injector;
-
     /**
      * @param string $property
      * @param string $type
@@ -44,7 +42,6 @@ final class AddResolverProperty extends NodeVisitorAbstract
         $this->property = $property;
         $this->type = $type;
         $this->class = $class;
-        $this->injector = new StatementsInjector();
     }
 
     /**
@@ -53,7 +50,7 @@ final class AddResolverProperty extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Class_) {
-            $node->stmts = $this->injector->inject(
+            $node->stmts = inject(
                 $node->stmts,
                 Node\Stmt\ClassMethod::class,
                 [$this->buildProperty()]

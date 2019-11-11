@@ -11,6 +11,8 @@ class MethodArgsTest extends BaseProxyPrinterTest
 {
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testHasArgType(): void
     {
@@ -21,6 +23,8 @@ class MethodArgsTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testArgDefaults(): void
     {
@@ -32,6 +36,8 @@ class MethodArgsTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testVariadicArg(): void
     {
@@ -42,6 +48,8 @@ class MethodArgsTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testReferencedArg(): void
     {
@@ -55,6 +63,8 @@ class MethodArgsTest extends BaseProxyPrinterTest
      * @param string $as
      * @return string
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     private function makeOutput(string $classname, string $as): string
     {

@@ -15,18 +15,19 @@ final class Properties
 {
     /**
      * @param \ReflectionClass $reflection
-     * @return array
+     * @return \SplObjectStorage
      */
-    public function getProperties(\ReflectionClass $reflection): array
+    public function getProperties(\ReflectionClass $reflection): \SplObjectStorage
     {
-        $properties = [];
+        $properties = new \SplObjectStorage();
+        $defaults = $reflection->getDefaultProperties();
 
         foreach ($reflection->getProperties() as $property) {
             if ($this->isIgnoredProperty($property)) {
                 continue;
             }
 
-            $properties[] = $property->name;
+            $properties->attach($property, array_key_exists($property->getName(), $defaults));
         }
 
         return $properties;

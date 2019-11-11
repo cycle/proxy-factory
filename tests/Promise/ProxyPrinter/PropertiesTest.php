@@ -17,7 +17,9 @@ use Cycle\ORM\Promise\Tests\ProxyPrinter\Fixtures;
 class PropertiesTest extends BaseProxyPrinterTest
 {
     /**
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
      * @throws \ReflectionException
+     * @throws \Throwable
      */
     public function testWithoutConflicts(): void
     {
@@ -60,7 +62,9 @@ class PropertiesTest extends BaseProxyPrinterTest
     }
 
     /**
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
      * @throws \ReflectionException
+     * @throws \Throwable
      */
     public function testWithConflicts(): void
     {

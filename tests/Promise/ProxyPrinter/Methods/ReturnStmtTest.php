@@ -18,6 +18,8 @@ class ReturnStmtTest extends BaseProxyPrinterTest
 {
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testSetter(): void
     {
@@ -40,6 +42,8 @@ class ReturnStmtTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testGetter(): void
     {
@@ -62,6 +66,8 @@ class ReturnStmtTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testConditionalReturn(): void
     {
@@ -83,6 +89,8 @@ class ReturnStmtTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testVoidReturn(): void
     {
@@ -101,5 +109,28 @@ class ReturnStmtTest extends BaseProxyPrinterTest
         eval($output);
         $this->assertRegExp('/\s.*voidReturn\(/', $output);
         $this->assertNotRegExp('/return\s.*voidReturn\(/', $output);
+    }
+
+    /**
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \ReflectionException
+     * @throws \Throwable
+     */
+    public function testRefReturn(): void
+    {
+        $classname = Fixtures\ChildFixture::class;
+        $as = self::NS . __CLASS__ . __LINE__;
+        $reflection = new \ReflectionClass($classname);
+
+        $parent = Declarations::createParentFromReflection($reflection);
+        $class = Declarations::createClassFromName($as, $parent);
+
+        $output = $this->make($reflection, $class, $parent);
+        $output = ltrim($output, '<?php');
+
+        $this->assertFalse(class_exists($class->getFullName()));
+
+        eval($output);
+        $this->assertRegExp('/\s.*\&refReturn\(/', $output);
     }
 }

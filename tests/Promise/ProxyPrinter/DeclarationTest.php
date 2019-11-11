@@ -13,7 +13,6 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\PromiseInterface;
-use Cycle\ORM\Promise\Utils;
 
 use function Cycle\ORM\Promise\shortName;
 
@@ -21,6 +20,8 @@ class DeclarationTest extends BaseProxyPrinterTest
 {
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testDeclaration(): void
     {
@@ -59,6 +60,8 @@ class DeclarationTest extends BaseProxyPrinterTest
      * @param string $as
      *
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testTraits(string $classname, string $as): void
     {
@@ -79,8 +82,8 @@ class DeclarationTest extends BaseProxyPrinterTest
     /**
      * @param string $className
      * @param string $proxyFullName
-     *
      * @return object
+     * @throws \Throwable
      */
     private function makeProxyObject(string $className, string $proxyFullName)
     {

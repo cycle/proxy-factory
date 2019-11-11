@@ -68,9 +68,9 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
      * @param string       $role
      * @param array        $scope
      * @return PromiseInterface
-     *
      * @throws ProxyFactoryException
      * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
+     * @throws \ReflectionException
      */
     public function promise(ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
@@ -112,8 +112,8 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
      * @param string           $role
      * @param array            $scope
      * @return PromiseInterface
-     *
      * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
+     * @throws \ReflectionException
      */
     private function instantiate(
         \ReflectionClass $reflection,

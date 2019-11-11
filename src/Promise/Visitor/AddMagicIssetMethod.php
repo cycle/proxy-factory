@@ -16,8 +16,8 @@ use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
 use function Cycle\ORM\Promise\ifInConstArray;
-use function Cycle\ORM\Promise\returnIssetFunc;
 use function Cycle\ORM\Promise\resolveIntoVar;
+use function Cycle\ORM\Promise\returnIssetFunc;
 use function Cycle\ORM\Promise\throwExceptionOnNull;
 
 final class AddMagicIssetMethod extends NodeVisitorAbstract

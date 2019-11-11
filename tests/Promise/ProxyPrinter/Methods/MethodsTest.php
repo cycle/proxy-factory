@@ -22,6 +22,8 @@ class MethodsTest extends BaseProxyPrinterTest
 {
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testPromiseMethods(): void
     {
@@ -54,6 +56,9 @@ class MethodsTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
+     * @throws \Throwable
      */
     public function testInheritedMethods(): void
     {
@@ -117,11 +122,21 @@ class MethodsTest extends BaseProxyPrinterTest
         }
     }
 
+    /**
+     * @param \ReflectionClass $class
+     * @return \Cycle\ORM\Promise\Declaration\Structure
+     * @throws \ReflectionException
+     * @throws \Throwable
+     */
     private function getStructure(\ReflectionClass $class): Structure
     {
         return $this->extractor()->extract($class);
     }
 
+    /**
+     * @return \Cycle\ORM\Promise\Declaration\Extractor
+     * @throws \Throwable
+     */
     private function extractor(): Extractor
     {
         $container = new Container();
@@ -131,9 +146,9 @@ class MethodsTest extends BaseProxyPrinterTest
 
     /**
      * @param string $classname
-     *
      * @return \PhpParser\Node\Stmt\ClassMethod[]
      * @throws \ReflectionException
+     * @throws \Throwable
      */
     private function promiseMethods(string $classname): array
     {

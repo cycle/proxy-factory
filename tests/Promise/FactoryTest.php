@@ -199,6 +199,10 @@ class FactoryTest extends BaseTest
         return $this->withSchema(new \Cycle\ORM\Schema($schema));
     }
 
+    /**
+     * @return \Cycle\ORM\Promise\ProxyFactory
+     * @throws \Throwable
+     */
     private function factory(): ProxyFactory
     {
         return $this->container->get(ProxyFactory::class);

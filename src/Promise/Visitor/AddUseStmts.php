@@ -11,10 +11,11 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Visitor;
 
-use Cycle\ORM\Promise\StatementsInjector;
 use PhpParser\Builder\Use_;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
+
+use function Cycle\ORM\Promise\inject;
 
 /**
  * Add use statement to the code.
@@ -22,10 +23,7 @@ use PhpParser\NodeVisitorAbstract;
 final class AddUseStmts extends NodeVisitorAbstract
 {
     /** @var array */
-    private $useStmts = [];
-
-    /** @var StatementsInjector */
-    private $injector;
+    private $useStmts;
 
     /**
      * @param array $useStmts
@@ -33,7 +31,6 @@ final class AddUseStmts extends NodeVisitorAbstract
     public function __construct(array $useStmts)
     {
         $this->useStmts = $useStmts;
-        $this->injector = new StatementsInjector();
     }
 
     /**
@@ -42,7 +39,7 @@ final class AddUseStmts extends NodeVisitorAbstract
     public function leaveNode(Node $node)
     {
         if ($node instanceof Node\Stmt\Namespace_) {
-            $node->stmts = $this->injector->inject(
+            $node->stmts = inject(
                 $node->stmts,
                 Node\Stmt\Class_::class,
                 $this->removeDuplicates($node->stmts, $this->buildUseStmts())

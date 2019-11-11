@@ -44,14 +44,15 @@ final class Extractor
     /**
      * @param \ReflectionClass $reflection
      * @return Structure
+     * @throws \ReflectionException
      */
     public function extract(\ReflectionClass $reflection): Structure
     {
         return Structure::create(
             $this->constants->getConstants($reflection),
             $this->properties->getProperties($reflection),
-            $this->methods->getMethods($reflection),
-            $this->hasCloneMethod($reflection)
+            $this->hasCloneMethod($reflection),
+            ...$this->methods->getMethods($reflection)
         );
     }
 

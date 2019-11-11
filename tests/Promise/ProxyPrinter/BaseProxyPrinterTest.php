@@ -53,6 +53,15 @@ abstract class BaseProxyPrinterTest extends BaseTest
         $this->container->bind(ORMInterface::class, $this->orm());
     }
 
+    /**
+     * @param \ReflectionClass     $reflection
+     * @param DeclarationInterface $class
+     * @param DeclarationInterface $parent
+     * @return string
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \ReflectionException
+     * @throws \Throwable
+     */
     protected function make(
         \ReflectionClass $reflection,
         DeclarationInterface $class,
@@ -77,6 +86,10 @@ abstract class BaseProxyPrinterTest extends BaseTest
         return $this->withSchema(new \Cycle\ORM\Schema($schema));
     }
 
+    /**
+     * @return \Cycle\ORM\Promise\Printer
+     * @throws \Throwable
+     */
     private function proxyCreator(): Printer
     {
         $this->container->bind(PrettyPrinterAbstract::class, Standard::class);

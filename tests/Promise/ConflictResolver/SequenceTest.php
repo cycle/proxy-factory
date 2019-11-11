@@ -23,6 +23,7 @@ class SequenceTest extends TestCase
      * @param array $sequence
      * @param int   $pos
      * @param int   $expected
+     * @throws \Throwable
      */
     public function testFind(array $sequence, int $pos, int $expected): void
     {
@@ -48,6 +49,10 @@ class SequenceTest extends TestCase
         ];
     }
 
+    /**
+     * @return \Cycle\ORM\Promise\ConflictResolver\Sequences
+     * @throws \Throwable
+     */
     private function sequences(): Sequences
     {
         $container = new Container();

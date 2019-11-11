@@ -12,19 +12,18 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 /**
- * Inject values to array at given index.
- *
- * @param array $stmts
- * @param int   $index
- * @param array $values
- * @return array
+ * @return string
  */
-function injectValues(array $stmts, int $index, array $values): array
+function getStubContent(): string
 {
-    $before = array_slice($stmts, 0, $index);
-    $after = array_slice($stmts, $index);
+    $lines = [
+        '<?php',
+        'declare(strict_types=1);',
+        'namespace StubNamespace;',
+        'class ProxyStub {}'
+    ];
 
-    return array_merge($before, $values, $after);
+    return join("\n", $lines);
 }
 
 /**

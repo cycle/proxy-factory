@@ -28,6 +28,8 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testSameNamespace(): void
     {
@@ -52,6 +54,8 @@ class UseStmtsTest extends BaseProxyPrinterTest
 
     /**
      * @throws \ReflectionException
+     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws \Throwable
      */
     public function testDistinctNamespace(): void
     {
@@ -93,7 +97,6 @@ class UseStmtsTest extends BaseProxyPrinterTest
     /**
      * @param string $class
      * @param array  $types
-     *
      * @return array
      * @throws \ReflectionException
      */

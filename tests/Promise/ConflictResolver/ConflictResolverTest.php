@@ -23,6 +23,7 @@ class ConflictResolverTest extends TestCase
      * @param array $reserved
      * @param array $input
      * @param array $expected
+     * @throws \Throwable
      */
     public function testFind(array $reserved, array $input, array $expected): void
     {
@@ -49,6 +50,10 @@ class ConflictResolverTest extends TestCase
         ];
     }
 
+    /**
+     * @return \Cycle\ORM\Promise\ConflictResolver
+     * @throws \Throwable
+     */
     private function conflictResolver(): ConflictResolver
     {
         $container = new Container();

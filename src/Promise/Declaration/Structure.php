@@ -11,19 +11,21 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration;
 
+use PhpParser\Node\Stmt\ClassMethod;
+
 final class Structure
 {
     /** @var string[] */
-    public $properties = [];
-
-    /** @var string[] */
     public $constants = [];
 
-    /** @var \PhpParser\Node\Stmt\ClassMethod[] */
+    /** @var ClassMethod[] */
     public $methods = [];
 
     /** @var bool */
     public $hasClone;
+
+    /** @var \SplObjectStorage */
+    private $properties;
 
     /**
      * Structure constructor.
@@ -33,14 +35,18 @@ final class Structure
     }
 
     /**
-     * @param array $constants
-     * @param array $properties
-     * @param array $methods
-     * @param bool  $hasClone
+     * @param array             $constants
+     * @param \SplObjectStorage $properties
+     * @param bool              $hasClone
+     * @param ClassMethod       ...$methods
      * @return Structure
      */
-    public static function create(array $constants, array $properties, array $methods, bool $hasClone): Structure
-    {
+    public static function create(
+        array $constants,
+        \SplObjectStorage $properties,
+        bool $hasClone,
+        ClassMethod ...$methods
+    ): Structure {
         $self = new self();
         $self->constants = $constants;
         $self->properties = $properties;
@@ -48,6 +54,52 @@ final class Structure
         $self->hasClone = $hasClone;
 
         return $self;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function toBeUnsetProperties(): array
+    {
+        $names = [];
+        /** @var \ReflectionProperty $property */
+        foreach ($this->properties as $property) {
+            if ($this->properties[$property] === true && $property->isPublic()) {
+                $names[] = $property->getName();
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function publicProperties(): array
+    {
+        $names = [];
+        /** @var \ReflectionProperty $property */
+        foreach ($this->properties as $property) {
+            if ($property->isPublic()) {
+                $names[] = $property->getName();
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function properties(): array
+    {
+        $names = [];
+        /** @var \ReflectionProperty $property */
+        foreach ($this->properties as $property) {
+            $names[] = $property->getName();
+        }
+
+        return $names;
     }
 
     /**

@@ -15,8 +15,8 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-use function Cycle\ORM\Promise\shortName;
 use function Cycle\ORM\Promise\exprUnsetFunc;
+use function Cycle\ORM\Promise\shortName;
 
 final class AddInitMethod extends NodeVisitorAbstract
 {
@@ -69,8 +69,8 @@ final class AddInitMethod extends NodeVisitorAbstract
                     $method->addParam((new Builder\Param($name))->setType(shortName($type)));
                 }
             }
-            $method->addStmt($this->assignResolverProperty());
             $method->addStmt($this->unsetProperties());
+            $method->addStmt($this->assignResolverProperty());
 
             $node->stmts[] = $method->getNode();
         }

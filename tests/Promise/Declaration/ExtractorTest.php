@@ -24,10 +24,11 @@ class ExtractorTest extends TestCase
 {
     /**
      * @throws \ReflectionException
+     * @throws \Throwable
      */
     public function testExtractProperties(): void
     {
-        $extracted = $this->getDeclaration(ChildEntity::class)->properties;
+        $extracted = $this->getDeclaration(ChildEntity::class)->properties();
         sort($extracted);
 
         $expected = ['public', 'protected', 'ownProperty', 'resolver'];
@@ -38,6 +39,7 @@ class ExtractorTest extends TestCase
 
     /**
      * @throws \ReflectionException
+     * @throws \Throwable
      */
     public function testExtractParentMethods(): void
     {
@@ -52,6 +54,8 @@ class ExtractorTest extends TestCase
 
     /**
      * @throws \ReflectionException
+     * @throws \Throwable
+     * @throws \Throwable
      */
     public function testExtractMethods(): void
     {
@@ -62,11 +66,12 @@ class ExtractorTest extends TestCase
         $this->assertSame(['public', 'protected'], $methods);
 
         //__construct is not listed
-        $this->assertSame(['public', 'protected'], $this->getDeclaration(EntityWithConstructor::class)->properties);
+        $this->assertSame(['public', 'protected'], $this->getDeclaration(EntityWithConstructor::class)->properties());
     }
 
     /**
      * @throws \ReflectionException
+     * @throws \Throwable
      */
     public function testSelfReturnTypes(): void
     {
@@ -84,12 +89,17 @@ class ExtractorTest extends TestCase
      * @param string $class
      * @return \Cycle\ORM\Promise\Declaration\Structure
      * @throws \ReflectionException
+     * @throws \Throwable
      */
     private function getDeclaration(string $class): Structure
     {
         return $this->extractor()->extract(new \ReflectionClass($class));
     }
 
+    /**
+     * @return \Cycle\ORM\Promise\Declaration\Extractor
+     * @throws \Throwable
+     */
     private function extractor(): Extractor
     {
         $container = new Container();

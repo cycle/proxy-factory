@@ -65,6 +65,8 @@ class MaterializerTest extends TestCase
      * @param string $code
      *
      * @throws \ReflectionException
+     * @throws \Exception
+     * @throws \Throwable
      */
     public function testFileMaterializer(string $className, string $code): void
     {

@@ -22,9 +22,10 @@ use PhpParser\PrettyPrinterAbstract;
 
 final class Printer
 {
-    public const RESOLVER_PROPERTY      = 'resolver';
-    public const UNSET_PROPERTIES_CONST = 'UNSET_PROPERTIES';
-    public const INIT_METHOD            = '__init';
+    public const RESOLVER_PROPERTY       = 'resolver';
+    public const UNSET_PROPERTIES_CONST  = 'UNSET_PROPERTIES';
+    public const PUBLIC_PROPERTIES_CONST = 'PUBLIC_PROPERTIES';
+    public const INIT_METHOD             = '__init';
 
     private const LOADED_METHOD  = '__loaded';
     private const ROLE_METHOD    = '__role';
@@ -69,20 +70,15 @@ final class Printer
     /** @var PrettyPrinterAbstract */
     private $printer;
 
-    /** @var Stubs */
-    private $stubs;
-
     /**
      * @param Declaration\Extractor $extractor
      * @param ConflictResolver      $resolver
      * @param Traverser             $traverser
-     * @param Stubs                 $stubs
      */
     public function __construct(
         Declaration\Extractor $extractor,
         Traverser $traverser,
-        ConflictResolver $resolver,
-        Stubs $stubs
+        ConflictResolver $resolver
     ) {
         $this->resolver = $resolver;
         $this->traverser = $traverser;
@@ -102,7 +98,6 @@ final class Printer
         $this->parser = new Parser\Php7($this->lexer);
 
         $this->printer = new Standard();
-        $this->stubs = $stubs ?? new Stubs();
     }
 
     /**
@@ -110,8 +105,8 @@ final class Printer
      * @param Declaration\DeclarationInterface $class
      * @param Declaration\DeclarationInterface $parent
      * @return string
-     *
      * @throws ProxyFactoryException
+     * @throws \ReflectionException
      */
     public function make(
         \ReflectionClass $reflection,
@@ -125,7 +120,8 @@ final class Printer
             }
         }
 
-        $property = $this->resolverPropertyName($structure);
+        $resolverProperty = $this->resolverPropertyName($structure);
+        $publicPropertiesConst = $this->publicPropertiesConstName($structure);
         $unsetPropertiesConst = $this->unsetPropertiesConstName($structure);
 
         $visitors = [
@@ -136,34 +132,35 @@ final class Printer
                 $parent->getShortName(),
                 shortName(PromiseInterface::class)
             ),
-            new Visitor\AddUnsetPropertiesConst($unsetPropertiesConst, $structure->properties),
-            new Visitor\AddResolverProperty($property, $this->propertyType(), $parent->getShortName()),
+            new Visitor\AddPropertiesConst($unsetPropertiesConst, $structure->toBeUnsetProperties()),
+            new Visitor\AddPropertiesConst($publicPropertiesConst, $structure->publicProperties()),
+            new Visitor\AddResolverProperty($resolverProperty, $this->propertyType(), $parent->getShortName()),
             new Visitor\AddInitMethod(
-                $property,
+                $resolverProperty,
                 $this->propertyType(),
                 self::DEPENDENCIES,
-                $this->unsetPropertiesConstName($structure),
+                $unsetPropertiesConst,
                 $this->initMethodName($structure)
             ),
-            new Visitor\AddMagicCloneMethod($property, $structure->hasClone),
-            new Visitor\AddMagicGetMethod($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicSetMethod($property, self::RESOLVE_METHOD),
-            new Visitor\AddMagicIssetMethod($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
-            new Visitor\AddMagicUnset($property, self::RESOLVE_METHOD, $unsetPropertiesConst),
+            new Visitor\AddMagicCloneMethod($resolverProperty, $structure->hasClone),
+            new Visitor\AddMagicGetMethod($resolverProperty, self::RESOLVE_METHOD),
+            new Visitor\AddMagicSetMethod($resolverProperty, self::RESOLVE_METHOD),
+            new Visitor\AddMagicIssetMethod($resolverProperty, self::RESOLVE_METHOD, $publicPropertiesConst),
+            new Visitor\AddMagicUnset($resolverProperty, self::RESOLVE_METHOD, $publicPropertiesConst),
             new Visitor\AddMagicDebugInfoMethod(
-                $property,
+                $resolverProperty,
                 self::RESOLVE_METHOD,
                 self::LOADED_METHOD,
                 self::ROLE_METHOD,
                 self::SCOPE_METHOD,
-                $structure->properties
+                $structure->properties()
             ),
-            new Visitor\UpdatePromiseMethods($property),
-            new Visitor\AddProxiedMethods($property, $structure->methods, self::RESOLVE_METHOD),
+            new Visitor\UpdatePromiseMethods($resolverProperty),
+            new Visitor\AddProxiedMethods($resolverProperty, $structure->methods, self::RESOLVE_METHOD),
         ];
 
         foreach (self::PROMISE_METHODS as $method => $returnType) {
-            $visitors[] = new Visitor\AddPromiseMethod($property, $method, $returnType);
+            $visitors[] = new Visitor\AddPromiseMethod($resolverProperty, $method, $returnType);
         }
 
         $nodes = $this->getNodesFromStub();
@@ -191,7 +188,7 @@ final class Printer
      */
     private function resolverPropertyName(Declaration\Structure $structure): string
     {
-        return $this->resolver->resolve($structure->properties, self::RESOLVER_PROPERTY)->fullName();
+        return $this->resolver->resolve($structure->properties(), self::RESOLVER_PROPERTY)->fullName();
     }
 
     /**
@@ -201,6 +198,15 @@ final class Printer
     private function unsetPropertiesConstName(Declaration\Structure $structure): string
     {
         return $this->resolver->resolve($structure->constants, self::UNSET_PROPERTIES_CONST)->fullName('_');
+    }
+
+    /**
+     * @param Declaration\Structure $structure
+     * @return string
+     */
+    private function publicPropertiesConstName(Declaration\Structure $structure): string
+    {
+        return $this->resolver->resolve($structure->constants, self::PUBLIC_PROPERTIES_CONST)->fullName('_');
     }
 
     /**
@@ -231,6 +237,6 @@ final class Printer
      */
     private function getNodesFromStub(): array
     {
-        return $this->parser->parse($this->stubs->getContent()) ?? [];
+        return $this->parser->parse(getStubContent()) ?? [];
     }
 }

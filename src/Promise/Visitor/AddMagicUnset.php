@@ -15,10 +15,10 @@ use PhpParser\Builder;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
+use function Cycle\ORM\Promise\exprUnsetFunc;
 use function Cycle\ORM\Promise\ifInConstArray;
 use function Cycle\ORM\Promise\resolveIntoVar;
 use function Cycle\ORM\Promise\throwExceptionOnNull;
-use function Cycle\ORM\Promise\exprUnsetFunc;
 
 final class AddMagicUnset extends NodeVisitorAbstract
 {
