@@ -42,14 +42,14 @@ class ConstantsPHP74Test extends TestCase
 
         $output = $this->make($reflection, $class, $parent);
         $output = ltrim($output, '<?php');
-        print_r(PHP_EOL . '74 version' . PHP_EOL);
+
         $this->assertStringContainsString(
-            'PUBLIC_PROPERTIES = [\'publicProperty\', \'publicPropertyWithDefaults\'];',
+            "PUBLIC_PROPERTIES = ['publicProperty', 'publicTypedProperty', 'publicPropertyWithDefaults'];",
             $output
         );
 
         $this->assertStringContainsString(
-            'UNSET_PROPERTIES = [\'publicProperty\', \'publicPropertyWithDefaults\'];',
+            "UNSET_PROPERTIES = ['publicProperty', 'publicPropertyWithDefaults'];",
             $output
         );
     }

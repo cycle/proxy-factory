@@ -34,12 +34,12 @@ class ConstantsTest extends BaseProxyPrinterTest
         $output = ltrim($output, '<?php');
 
         $this->assertStringContainsString(
-            'PUBLIC_PROPERTIES = [\'publicProperty\', \'publicPropertyWithDefaults\'];',
+            "PUBLIC_PROPERTIES = ['publicProperty', 'publicPropertyWithDefaults'];",
             $output
         );
 
         $this->assertStringContainsString(
-            'UNSET_PROPERTIES = [\'publicProperty\', \'publicPropertyWithDefaults\'];',
+            "UNSET_PROPERTIES = ['publicProperty', 'publicPropertyWithDefaults'];",
             $output
         );
     }
