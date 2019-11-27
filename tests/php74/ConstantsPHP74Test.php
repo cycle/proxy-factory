@@ -26,6 +26,13 @@ class ConstantsPHP74Test extends TestCase
     /** @var \Spiral\Core\Container */
     protected $container;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->container = new Container();
+    }
+
     /**
      * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
      * @throws \ReflectionException
@@ -52,13 +59,6 @@ class ConstantsPHP74Test extends TestCase
             "UNSET_PROPERTIES = ['publicProperty', 'publicPropertyWithDefaults'];",
             $output
         );
-    }
-
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->container = new Container();
     }
 
     /**

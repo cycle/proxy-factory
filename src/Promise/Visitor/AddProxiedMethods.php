@@ -26,6 +26,9 @@ use function Cycle\ORM\Promise\throwExceptionOnNull;
 final class AddProxiedMethods extends NodeVisitorAbstract
 {
     /** @var string */
+    private $class;
+
+    /** @var string */
     private $resolverProperty;
 
     /** @var Node\Stmt\ClassMethod[] */
@@ -35,12 +38,14 @@ final class AddProxiedMethods extends NodeVisitorAbstract
     private $resolveMethod;
 
     /**
+     * @param string $class
      * @param string $property
      * @param array  $methods
      * @param string $resolveMethod
      */
-    public function __construct(string $property, array $methods, string $resolveMethod)
+    public function __construct(string $class, string $property, array $methods, string $resolveMethod)
     {
+        $this->class = $class;
         $this->resolverProperty = $property;
         $this->methods = $methods;
         $this->resolveMethod = $resolveMethod;
@@ -125,7 +130,17 @@ final class AddProxiedMethods extends NodeVisitorAbstract
         $methodCall = new Node\Expr\MethodCall($resolved, $method->name->name, $this->packMethodArgs($method));
 
         $method->setDocComment(PHPDoc::writeInheritdoc());
-        $method->stmts = [throwExceptionOnNull($resolved, new $stmtWrapper($methodCall))];
+        $method->stmts = [
+            throwExceptionOnNull(
+                $resolved,
+                new $stmtWrapper($methodCall),
+                'Method `%s()` not loaded for `%s`',
+                [
+                    $method->name->name,
+                    $this->class
+                ]
+            )
+        ];
 
         return $method;
     }

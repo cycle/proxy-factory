@@ -56,17 +56,20 @@ function ifInConstArray(string $name, string $object, string $haystackConst): No
 /**
  * @param Node\Expr $condition
  * @param Node\Stmt $stmt
+ * @param string    $message
+ * @param array     $args
  * @return Node\Stmt\If_
  */
-function throwExceptionOnNull(Node\Expr $condition, Node\Stmt $stmt): Node\Stmt\If_
-{
+function throwExceptionOnNull(
+    Node\Expr $condition,
+    Node\Stmt $stmt,
+    string $message = 'Promise not loaded',
+    array $args = []
+): Node\Stmt\If_ {
     $if = ifNotNull($condition);
     $if->stmts[] = $stmt;
     $if->else = new Node\Stmt\Else_();
-    $if->else->stmts[] = throwException(
-        shortName(ProxyFactoryException::class),
-        'Promise not loaded'
-    );
+    $if->else->stmts[] = throwException(shortName(ProxyFactoryException::class), $message, $args);
 
     return $if;
 }
@@ -169,12 +172,30 @@ function funcCall(string $name, array $args = [], array $attributes = []): Node\
 /**
  * @param string $class
  * @param string $message
+ * @param array  $args
  * @return Node\Stmt\Throw_
  * @internal
  */
-function throwException(string $class, string $message): Node\Stmt\Throw_
+function throwException(string $class, string $message, array $args = []): Node\Stmt\Throw_
 {
+    $normalizedArgs = [];
+    foreach ($args as $arg) {
+        if (is_scalar($arg)) {
+            $normalizedArgs[] = new Node\Arg(new Node\Scalar\String_($arg));
+        } elseif ($arg instanceof Node\Arg) {
+            $normalizedArgs[] = $arg;
+        }
+    }
+
     return new Node\Stmt\Throw_(
-        new Node\Expr\New_(new Node\Name($class), [new Node\Arg(new Node\Scalar\String_($message))])
+        new Node\Expr\New_(new Node\Name($class), [
+            new Node\Arg(funcCall(
+                'sprintf',
+                array_merge(
+                    [new Node\Arg(new Node\Scalar\String_($message))],
+                    $normalizedArgs
+                )
+            ))
+        ])
     );
 }

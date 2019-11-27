@@ -143,10 +143,28 @@ final class Printer
                 $this->initMethodName($structure)
             ),
             new Visitor\AddMagicCloneMethod($resolverProperty, $structure->hasClone),
-            new Visitor\AddMagicGetMethod($resolverProperty, self::RESOLVE_METHOD),
-            new Visitor\AddMagicSetMethod($resolverProperty, self::RESOLVE_METHOD),
-            new Visitor\AddMagicIssetMethod($resolverProperty, self::RESOLVE_METHOD, $publicPropertiesConst),
-            new Visitor\AddMagicUnset($resolverProperty, self::RESOLVE_METHOD, $publicPropertiesConst),
+            new Visitor\AddMagicGetMethod(
+                $parent->getFullName(),
+                $resolverProperty,
+                self::RESOLVE_METHOD
+            ),
+            new Visitor\AddMagicSetMethod(
+                $parent->getFullName(),
+                $resolverProperty,
+                self::RESOLVE_METHOD
+            ),
+            new Visitor\AddMagicIssetMethod(
+                $parent->getFullName(),
+                $resolverProperty,
+                self::RESOLVE_METHOD,
+                $publicPropertiesConst
+            ),
+            new Visitor\AddMagicUnset(
+                $parent->getFullName(),
+                $resolverProperty,
+                self::RESOLVE_METHOD,
+                $publicPropertiesConst
+            ),
             new Visitor\AddMagicDebugInfoMethod(
                 $resolverProperty,
                 self::RESOLVE_METHOD,
@@ -156,7 +174,12 @@ final class Printer
                 $structure->properties()
             ),
             new Visitor\UpdatePromiseMethods($resolverProperty),
-            new Visitor\AddProxiedMethods($resolverProperty, $structure->methods, self::RESOLVE_METHOD),
+            new Visitor\AddProxiedMethods(
+                $parent->getFullName(),
+                $resolverProperty,
+                $structure->methods,
+                self::RESOLVE_METHOD
+            ),
         ];
 
         foreach (self::PROMISE_METHODS as $method => $returnType) {

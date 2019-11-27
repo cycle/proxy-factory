@@ -23,6 +23,9 @@ use function Cycle\ORM\Promise\throwExceptionOnNull;
 final class AddMagicIssetMethod extends NodeVisitorAbstract
 {
     /** @var string */
+    private $class;
+
+    /** @var string */
     private $resolverProperty;
 
     /** @var string */
@@ -32,12 +35,18 @@ final class AddMagicIssetMethod extends NodeVisitorAbstract
     private $unsetPropertiesProperty;
 
     /**
+     * @param string $class
      * @param string $resolverProperty
      * @param string $resolveMethod
      * @param string $unsetPropertiesProperty
      */
-    public function __construct(string $resolverProperty, string $resolveMethod, string $unsetPropertiesProperty)
-    {
+    public function __construct(
+        string $class,
+        string $resolverProperty,
+        string $resolveMethod,
+        string $unsetPropertiesProperty
+    ) {
+        $this->class = $class;
         $this->unsetPropertiesProperty = $unsetPropertiesProperty;
         $this->resolveMethod = $resolveMethod;
         $this->resolverProperty = $resolverProperty;
@@ -70,7 +79,12 @@ final class AddMagicIssetMethod extends NodeVisitorAbstract
         $if->stmts[] = resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod);
         $if->stmts[] = throwExceptionOnNull(
             new Node\Expr\Variable('entity'),
-            returnIssetFunc('entity', '{$name}')
+            returnIssetFunc('entity', '{$name}'),
+            'Property `%s` not loaded in `__isset()` method for `%s`',
+            [
+                new Node\Arg(new Node\Expr\Variable('name')),
+                $this->class
+            ]
         );
         $if->else = new Node\Stmt\Else_([
             returnIssetFunc('this', '{$name}')

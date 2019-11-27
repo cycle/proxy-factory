@@ -23,6 +23,9 @@ use function Cycle\ORM\Promise\throwExceptionOnNull;
 final class AddMagicUnset extends NodeVisitorAbstract
 {
     /** @var string */
+    private $class;
+
+    /** @var string */
     private $resolverProperty;
 
     /** @var string */
@@ -32,12 +35,18 @@ final class AddMagicUnset extends NodeVisitorAbstract
     private $unsetPropertiesConst;
 
     /**
+     * @param string $class
      * @param string $resolverProperty
      * @param string $resolveMethod
      * @param string $unsetPropertiesConst
      */
-    public function __construct(string $resolverProperty, string $resolveMethod, string $unsetPropertiesConst)
-    {
+    public function __construct(
+        string $class,
+        string $resolverProperty,
+        string $resolveMethod,
+        string $unsetPropertiesConst
+    ) {
+        $this->class = $class;
         $this->resolveMethod = $resolveMethod;
         $this->resolverProperty = $resolverProperty;
         $this->unsetPropertiesConst = $unsetPropertiesConst;
@@ -70,7 +79,12 @@ final class AddMagicUnset extends NodeVisitorAbstract
         $if->stmts[] = resolveIntoVar('entity', 'this', $this->resolverProperty, $this->resolveMethod);
         $if->stmts[] = throwExceptionOnNull(
             new Node\Expr\Variable('entity'),
-            exprUnsetFunc('entity', '{$name}')
+            exprUnsetFunc('entity', '{$name}'),
+            'Property `%s` not loaded in `__unset()` method for `%s`',
+            [
+                new Node\Arg(new Node\Expr\Variable('name')),
+                $this->class
+            ]
         );
         $if->else = new Node\Stmt\Else_([
             exprUnsetFunc('this', '{$name}')

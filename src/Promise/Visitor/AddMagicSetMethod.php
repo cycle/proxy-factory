@@ -21,17 +21,22 @@ use function Cycle\ORM\Promise\throwExceptionOnNull;
 final class AddMagicSetMethod extends NodeVisitorAbstract
 {
     /** @var string */
+    private $class;
+
+    /** @var string */
     private $resolverProperty;
 
     /** @var string */
     private $resolveMethod;
 
     /**
+     * @param string $class
      * @param string $resolverProperty
      * @param string $resolveMethod
      */
-    public function __construct(string $resolverProperty, string $resolveMethod)
+    public function __construct(string $class, string $resolverProperty, string $resolveMethod)
     {
+        $this->class = $class;
         $this->resolverProperty = $resolverProperty;
         $this->resolveMethod = $resolveMethod;
     }
@@ -67,6 +72,14 @@ final class AddMagicSetMethod extends NodeVisitorAbstract
             )
         );
 
-        return throwExceptionOnNull($resolved, $stmt);
+        return throwExceptionOnNull(
+            $resolved,
+            $stmt,
+            'Property `%s` not loaded in `__set()` method for `%s`',
+            [
+                new Node\Arg(new Node\Expr\Variable('name')),
+                $this->class
+            ]
+        );
     }
 }
