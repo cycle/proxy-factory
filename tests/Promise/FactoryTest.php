@@ -13,6 +13,7 @@ namespace Cycle\ORM\Promise\Tests;
 
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\MaterializerInterface;
 use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\Promise\Materizalizer\FileMaterializer;
@@ -112,16 +113,18 @@ class FactoryTest extends BaseTest
 
     /**
      * @dataProvider dataProvider
-     * @expectedException \Cycle\ORM\Promise\Exception\ProxyFactoryException
      *
      * @param string $materializer
      * @param array  $params
      *
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws ProxyFactoryException
      * @throws \Throwable
      */
     public function testNullScope(string $materializer, array $params): void
     {
+        $this->expectException(ProxyFactoryException::class);
+        $this->expectExceptionMessageRegExp('/Method `\w+\(\)` not loaded for/');
+
         $role = SchematicEntity::class;
         $orm = $this->orm();
         $orm->make($role, ['id' => 1, 'name' => 'my name']);
@@ -142,16 +145,18 @@ class FactoryTest extends BaseTest
 
     /**
      * @dataProvider dataProvider
-     * @expectedException \Cycle\ORM\Promise\Exception\ProxyFactoryException
      *
      * @param string $materializer
      * @param array  $params
      *
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
+     * @throws ProxyFactoryException
      * @throws \Throwable
      */
     public function testUnknownScope(string $materializer, array $params): void
     {
+        $this->expectException(ProxyFactoryException::class);
+        $this->expectExceptionMessageRegExp('/Method `\w+\(\)` not loaded for/');
+
         $role = SchematicEntity::class;
         $orm = $this->orm();
         $orm->make($role, ['id' => 1, 'name' => 'my name']);
@@ -168,6 +173,37 @@ class FactoryTest extends BaseTest
         $this->assertNull($promise->__resolve());
 
         $this->assertSame('my second name', $promise->getName());
+    }
+
+    /**
+     * @dataProvider dataProvider
+     *
+     * @param string $materializer
+     * @param array  $params
+     *
+     * @throws ProxyFactoryException
+     * @throws \Throwable
+     */
+    public function testUnknownProperty(string $materializer, array $params): void
+    {
+        $this->expectException(ProxyFactoryException::class);
+        $this->expectExceptionMessageRegExp('/Property `\w+` not loaded in `[_a-z]+\(\)` method for/');
+
+        $role = SchematicEntity::class;
+        $orm = $this->orm();
+        $orm->make($role, ['id' => 1, 'name' => 'my name']);
+        $orm->make($role, ['id' => 2, 'name' => 'my second name', 'email' => 'my email']);
+
+        $scope = ['id' => 3];
+
+        $this->bindMaterializer($this->container->make($materializer, $params));
+
+        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
+        $promise = $this->factory()->promise($orm, $role, $scope);
+
+        $this->assertInstanceOf($role, $promise);
+
+        $promise->email = 'example@test.com';
     }
 
     public function dataProvider(): array
