@@ -14,20 +14,25 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 use Cycle\Annotated\Entities;
 use Cycle\ORM\ORMInterface;
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\Printer;
 use Cycle\ORM\Promise\Tests\BaseTest;
 use Cycle\Schema;
+use PDO;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use ReflectionClass;
+use ReflectionException;
 use Spiral\Core\Container;
 use Spiral\Database\Driver\SQLite\SQLiteDriver;
+use Throwable;
 
 abstract class BaseProxyPrinterTest extends BaseTest
 {
     public const    DRIVER = 'sqlite';
     protected const NS     = 'Cycle\ORM\Promise\Tests\Promises';
 
-    /** @var \Spiral\Core\Container */
+    /** @var Container */
     protected $container;
 
     public function setUp(): void
@@ -39,7 +44,7 @@ abstract class BaseProxyPrinterTest extends BaseTest
             'sqlite'    => [
                 'driver' => SQLiteDriver::class,
                 'check'  => static function () {
-                    return !in_array('sqlite', \PDO::getAvailableDrivers(), true);
+                    return !in_array('sqlite', PDO::getAvailableDrivers(), true);
                 },
                 'conn'   => 'sqlite::memory:',
                 'user'   => 'sqlite',
@@ -54,16 +59,16 @@ abstract class BaseProxyPrinterTest extends BaseTest
     }
 
     /**
-     * @param \ReflectionClass     $reflection
+     * @param ReflectionClass      $reflection
      * @param DeclarationInterface $class
      * @param DeclarationInterface $parent
      * @return string
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     protected function make(
-        \ReflectionClass $reflection,
+        ReflectionClass $reflection,
         DeclarationInterface $class,
         DeclarationInterface $parent
     ): string {
@@ -87,8 +92,8 @@ abstract class BaseProxyPrinterTest extends BaseTest
     }
 
     /**
-     * @return \Cycle\ORM\Promise\Printer
-     * @throws \Throwable
+     * @return Printer
+     * @throws Throwable
      */
     private function proxyCreator(): Printer
     {

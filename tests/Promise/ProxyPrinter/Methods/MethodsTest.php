@@ -14,22 +14,29 @@ namespace Cycle\ORM\Promise\Tests\ProxyPrinter\Methods;
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Declaration\Extractor;
 use Cycle\ORM\Promise\Declaration\Structure;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\PromiseInterface;
 use Cycle\ORM\Promise\Tests\ProxyPrinter\BaseProxyPrinterTest;
+use PhpParser\Node\Stmt\ClassMethod;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
 use Spiral\Core\Container;
+use Throwable;
+use UnexpectedValueException;
 
 class MethodsTest extends BaseProxyPrinterTest
 {
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testPromiseMethods(): void
     {
         $classname = Fixtures\EntityWithMethods::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -42,7 +49,7 @@ class MethodsTest extends BaseProxyPrinterTest
         eval($output);
 
         $methods = [];
-        $reflection = new \ReflectionClass($as);
+        $reflection = new ReflectionClass($as);
         foreach ($reflection->getMethods() as $method) {
             $methods[$method->name] = $method->name;
         }
@@ -55,16 +62,16 @@ class MethodsTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
+     * @throws Throwable
      */
     public function testInheritedMethods(): void
     {
         $classname = Fixtures\ChildEntityWithMethods::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -78,7 +85,7 @@ class MethodsTest extends BaseProxyPrinterTest
 
         //There're only public and protected methods inside (not static and not final)
         $originMethods = [];
-        foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC | \ReflectionMethod::IS_PROTECTED) as $method) {
+        foreach ($reflection->getMethods(ReflectionMethod::IS_PUBLIC | ReflectionMethod::IS_PROTECTED) as $method) {
             if ($method->isStatic() || $method->isFinal()) {
                 continue;
             }
@@ -117,25 +124,25 @@ class MethodsTest extends BaseProxyPrinterTest
                     "Proxied method `{$name}` expected to be public"
                 );
             } else {
-                throw new \UnexpectedValueException("\"{$method->name->toString()}\" method not found");
+                throw new UnexpectedValueException("\"{$method->name->toString()}\" method not found");
             }
         }
     }
 
     /**
-     * @param \ReflectionClass $class
-     * @return \Cycle\ORM\Promise\Declaration\Structure
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @param ReflectionClass $class
+     * @return Structure
+     * @throws ReflectionException
+     * @throws Throwable
      */
-    private function getStructure(\ReflectionClass $class): Structure
+    private function getStructure(ReflectionClass $class): Structure
     {
         return $this->extractor()->extract($class);
     }
 
     /**
-     * @return \Cycle\ORM\Promise\Declaration\Extractor
-     * @throws \Throwable
+     * @return Extractor
+     * @throws Throwable
      */
     private function extractor(): Extractor
     {
@@ -146,15 +153,15 @@ class MethodsTest extends BaseProxyPrinterTest
 
     /**
      * @param string $classname
-     * @return \PhpParser\Node\Stmt\ClassMethod[]
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @return ClassMethod[]
+     * @throws ReflectionException
+     * @throws Throwable
      */
     private function promiseMethods(string $classname): array
     {
         $interfaceMethods = $this->interfaceMethods();
         $methods = [];
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
         foreach ($this->getStructure($reflection)->methods as $method) {
             if (isset($interfaceMethods[$method->name->name]) || $method->isMagic()) {
                 continue;
@@ -169,7 +176,7 @@ class MethodsTest extends BaseProxyPrinterTest
     private function interfaceMethods(): array
     {
         $methods = [];
-        $reflection = new \ReflectionClass(PromiseInterface::class);
+        $reflection = new ReflectionClass(PromiseInterface::class);
         foreach ($reflection->getMethods() as $method) {
             $methods[$method->name] = $method->name;
         }

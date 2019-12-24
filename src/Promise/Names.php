@@ -11,14 +11,16 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
+use ReflectionClass;
+
 final class Names
 {
     /**
-     * @param \ReflectionClass $reflection
-     * @param string|null      $namespace
+     * @param ReflectionClass $reflection
+     * @param string|null     $namespace
      * @return string
      */
-    public function make(\ReflectionClass $reflection, ?string $namespace = null): string
+    public function make(ReflectionClass $reflection, ?string $namespace = null): string
     {
         $hash = hash('sha256', $reflection->name . $reflection->getFileName());
 

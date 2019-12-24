@@ -12,20 +12,24 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter\Methods;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\Tests\ProxyPrinter\BaseProxyPrinterTest;
+use ReflectionClass;
+use ReflectionException;
+use Throwable;
 
 class ReturnStmtTest extends BaseProxyPrinterTest
 {
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testSetter(): void
     {
         $classname = Fixtures\ChildFixture::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -41,15 +45,15 @@ class ReturnStmtTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testGetter(): void
     {
         $classname = Fixtures\ChildFixture::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -65,15 +69,15 @@ class ReturnStmtTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testConditionalReturn(): void
     {
         $classname = Fixtures\ChildFixture::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -88,15 +92,15 @@ class ReturnStmtTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testVoidReturn(): void
     {
         $classname = Fixtures\ChildFixture::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -112,15 +116,15 @@ class ReturnStmtTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testRefReturn(): void
     {
         $classname = Fixtures\ChildFixture::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);

@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise;
 
 /**
+ * @param string $v1
+ * @param string $v2
  * @return bool
  */
-function php74(): bool
+function phpVersionBetween(string $v1, string $v2): bool
 {
-    return version_compare(phpVersion(), '7.4.0', '>=');
+    return version_compare(phpVersion(), $v1, '>=') && version_compare(phpVersion(), $v2, '<');
 }
 
 /**

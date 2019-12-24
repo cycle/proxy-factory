@@ -11,13 +11,15 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration\Extractor;
 
+use ReflectionClass;
+
 final class Constants
 {
     /**
-     * @param \ReflectionClass $reflection
+     * @param ReflectionClass $reflection
      * @return array
      */
-    public function getConstants(\ReflectionClass $reflection): array
+    public function getConstants(ReflectionClass $reflection): array
     {
         $properties = [];
 

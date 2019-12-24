@@ -12,19 +12,23 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
+use ReflectionClass;
+use ReflectionException;
+use Throwable;
 
 class NamespaceTest extends BaseProxyPrinterTest
 {
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testSameNamespace(): void
     {
         $classname = Fixtures\EntityInNamespace::class;
         $as = 'EntityProxy' . str_replace('\\', '', __CLASS__) . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -36,20 +40,20 @@ class NamespaceTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $proxyReflection = new \ReflectionClass($class->getFullName());
+        $proxyReflection = new ReflectionClass($class->getFullName());
         $this->assertSame($reflection->getNamespaceName(), $proxyReflection->getNamespaceName());
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testDistinctNamespace(): void
     {
         $classname = Fixtures\EntityInNamespace::class;
         $as = '\\EntityProxy' . str_replace('\\', '', __CLASS__) . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -61,7 +65,7 @@ class NamespaceTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $proxyReflection = new \ReflectionClass($class->getFullName());
+        $proxyReflection = new ReflectionClass($class->getFullName());
         $this->assertSame('', (string)$proxyReflection->getNamespaceName());
         $this->assertStringNotContainsString('namespace ', $output);
     }

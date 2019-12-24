@@ -11,15 +11,19 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Materizalizer;
 
+use DateTime;
+use Exception;
+use ReflectionClass;
+
 final class ModificationInspector
 {
     /**
-     * @param \ReflectionClass $reflection
-     * @return \DateTime
+     * @param ReflectionClass $reflection
+     * @return DateTime
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getLastModifiedDate(\ReflectionClass $reflection): \DateTime
+    public function getLastModifiedDate(ReflectionClass $reflection): DateTime
     {
         $modifiedDate = $this->getLatestParentsModifiedDate($reflection);
 
@@ -43,18 +47,18 @@ final class ModificationInspector
     }
 
     /**
-     * @param \ReflectionClass $reflection
-     * @return \DateTime
+     * @param ReflectionClass $reflection
+     * @return DateTime
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    private function getLatestParentsModifiedDate(\ReflectionClass $reflection): \DateTime
+    private function getLatestParentsModifiedDate(ReflectionClass $reflection): DateTime
     {
-        $modifiedDate = new \DateTime('@' . filemtime($reflection->getFileName()));
+        $modifiedDate = new DateTime('@' . filemtime($reflection->getFileName()));
 
         $parent = $reflection->getParentClass();
         while ($parent !== false) {
-            $parentsModifiedDate = new \DateTime('@' . filemtime($parent->getFileName()));
+            $parentsModifiedDate = new DateTime('@' . filemtime($parent->getFileName()));
 
             if ($parentsModifiedDate > $modifiedDate) {
                 $modifiedDate = $parentsModifiedDate;

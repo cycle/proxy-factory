@@ -63,7 +63,7 @@ final class DeclareClass extends NodeVisitorAbstract
     private function canBeImplemented(Node\Stmt\Class_ $node): bool
     {
         foreach ($node->implements as $implement) {
-            $name = join('\\', $implement->parts);
+            $name = implode('\\', $implement->parts);
             if ($name === $this->implements) {
                 return false;
             }

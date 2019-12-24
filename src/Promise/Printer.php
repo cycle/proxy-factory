@@ -19,6 +19,8 @@ use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
+use ReflectionClass;
+use ReflectionException;
 
 final class Printer
 {
@@ -101,15 +103,15 @@ final class Printer
     }
 
     /**
-     * @param \ReflectionClass                 $reflection
+     * @param ReflectionClass                  $reflection
      * @param Declaration\DeclarationInterface $class
      * @param Declaration\DeclarationInterface $parent
      * @return string
      * @throws ProxyFactoryException
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function make(
-        \ReflectionClass $reflection,
+        ReflectionClass $reflection,
         Declaration\DeclarationInterface $class,
         Declaration\DeclarationInterface $parent
     ): string {

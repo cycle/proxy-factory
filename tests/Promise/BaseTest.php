@@ -14,6 +14,7 @@ namespace Cycle\ORM\Promise\Tests;
 use Cycle\ORM\Config\RelationConfig;
 use Cycle\ORM\Factory;
 use Cycle\ORM\ORM;
+use Cycle\ORM\ORMInterface;
 use Cycle\ORM\SchemaInterface;
 use PHPUnit\Framework\TestCase;
 use Spiral\Database\Config\DatabaseConfig;
@@ -111,7 +112,7 @@ abstract class BaseTest extends TestCase
      * Calculates missing parameters for typecasting.
      *
      * @param SchemaInterface $schema
-     * @return ORM|\Cycle\ORM\ORMInterface
+     * @return ORM|ORMInterface
      */
     public function withSchema(SchemaInterface $schema)
     {

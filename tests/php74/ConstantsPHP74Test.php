@@ -13,17 +13,23 @@ namespace Cycle\ORM\Promise\Tests74;
 
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
 use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\Printer;
 use PhpParser\PrettyPrinter\Standard;
 use PhpParser\PrettyPrinterAbstract;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionException;
 use Spiral\Core\Container;
+use Throwable;
+
+use function Cycle\ORM\Promise\phpVersionBetween;
 
 class ConstantsPHP74Test extends TestCase
 {
     protected const NS = 'Cycle\ORM\Promise\Tests74\Promises';
 
-    /** @var \Spiral\Core\Container */
+    /** @var Container */
     protected $container;
 
     public function setUp(): void
@@ -34,15 +40,15 @@ class ConstantsPHP74Test extends TestCase
     }
 
     /**
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testConstValues(): void
     {
         $classname = Fixtures\EntityWithProperties74::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -55,23 +61,29 @@ class ConstantsPHP74Test extends TestCase
             $output
         );
 
+        /**
+         * Since php7.4.1 the behaviour changed as it was before php7.4.0. All properties should be unset.
+         * @see https://github.com/php/php-src/pull/4974
+         */
         $this->assertStringContainsString(
-            "UNSET_PROPERTIES = ['publicProperty', 'publicPropertyWithDefaults'];",
+            phpVersionBetween('7.4.0', '7.4.1')
+                ? "UNSET_PROPERTIES = ['publicProperty', 'publicPropertyWithDefaults'];"
+                : "UNSET_PROPERTIES = ['publicProperty', 'publicTypedProperty', 'publicPropertyWithDefaults'];",
             $output
         );
     }
 
     /**
-     * @param \ReflectionClass     $reflection
+     * @param ReflectionClass      $reflection
      * @param DeclarationInterface $class
      * @param DeclarationInterface $parent
      * @return string
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     protected function make(
-        \ReflectionClass $reflection,
+        ReflectionClass $reflection,
         DeclarationInterface $class,
         DeclarationInterface $parent
     ): string {
@@ -79,8 +91,8 @@ class ConstantsPHP74Test extends TestCase
     }
 
     /**
-     * @return \Cycle\ORM\Promise\Printer
-     * @throws \Throwable
+     * @return Printer
+     * @throws Throwable
      */
     private function proxyCreator(): Printer
     {

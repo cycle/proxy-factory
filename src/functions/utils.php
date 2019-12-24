@@ -23,7 +23,7 @@ function getStubContent(): string
         'class ProxyStub {}'
     ];
 
-    return join("\n", $lines);
+    return implode("\n", $lines);
 }
 
 /**

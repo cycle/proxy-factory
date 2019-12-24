@@ -17,6 +17,11 @@ use PhpParser\Builder\Param;
 use PhpParser\Node;
 use PhpParser\Parser;
 use PhpParser\ParserFactory;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
+use ReflectionParameter;
+use ReflectionType;
 
 final class Methods
 {
@@ -58,11 +63,11 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionClass $reflection
+     * @param ReflectionClass $reflection
      * @return array
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    public function getMethods(\ReflectionClass $reflection): array
+    public function getMethods(ReflectionClass $reflection): array
     {
         $parents = [$reflection->name => $reflection];
         foreach ($reflection->getMethods() as $method) {
@@ -91,10 +96,10 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return bool
      */
-    private function isIgnoredMethod(\ReflectionMethod $method): bool
+    private function isIgnoredMethod(ReflectionMethod $method): bool
     {
         return $method->isPrivate()
             || $method->isStatic()
@@ -113,10 +118,10 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return int
      */
-    private function packFlags(\ReflectionMethod $method): int
+    private function packFlags(ReflectionMethod $method): int
     {
         $flags = [];
         if ($method->isPublic()) {
@@ -131,10 +136,10 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return Node|null
      */
-    private function defineReturnType(\ReflectionMethod $method): ?Node
+    private function defineReturnType(ReflectionMethod $method): ?Node
     {
         if (!$method->hasReturnType()) {
             return null;
@@ -161,21 +166,21 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionMethod $method
-     * @param string            $name
+     * @param ReflectionMethod $method
+     * @param string           $name
      * @return string
      */
-    private function replacedSelfReturnTypeName(\ReflectionMethod $method, string $name): string
+    private function replacedSelfReturnTypeName(ReflectionMethod $method, string $name): string
     {
         return $name === 'self' ? $method->class : $name;
     }
 
     /**
-     * @param \ReflectionType $returnType
-     * @param string          $name
+     * @param ReflectionType $returnType
+     * @param string         $name
      * @return bool
      */
-    private function returnTypeShouldBeQualified(\ReflectionType $returnType, string $name): bool
+    private function returnTypeShouldBeQualified(ReflectionType $returnType, string $name): bool
     {
         if (in_array($name, self::RESERVED_UNQUALIFIED_RETURN_TYPES, true)) {
             return false;
@@ -185,11 +190,11 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionMethod $method
+     * @param ReflectionMethod $method
      * @return array
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    private function packParams(\ReflectionMethod $method): array
+    private function packParams(ReflectionMethod $method): array
     {
         $params = [];
         foreach ($method->getParameters() as $parameter) {
@@ -219,10 +224,10 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionParameter $parameter
+     * @param ReflectionParameter $parameter
      * @return string|null
      */
-    private function defineParamReturnType(\ReflectionParameter $parameter): ?string
+    private function defineParamReturnType(ReflectionParameter $parameter): ?string
     {
         if (!$parameter->hasType()) {
             return null;
@@ -242,7 +247,7 @@ final class Methods
     }
 
     /**
-     * @param \ReflectionClass[] $reflections
+     * @param ReflectionClass[] $reflections
      * @return Node\Stmt\ClassMethod[]
      */
     private function getExtendedMethodNodes(array $reflections): array

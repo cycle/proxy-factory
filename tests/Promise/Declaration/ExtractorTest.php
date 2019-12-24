@@ -18,13 +18,16 @@ use Cycle\ORM\Promise\Tests\Declaration\Fixtures\EntityWithConstructor;
 use Cycle\ORM\Promise\Tests\Fixtures\ChildEntity;
 use Cycle\ORM\Promise\Tests\Fixtures\ParentEntity;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionException;
 use Spiral\Core\Container;
+use Throwable;
 
 class ExtractorTest extends TestCase
 {
     /**
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testExtractProperties(): void
     {
@@ -38,8 +41,8 @@ class ExtractorTest extends TestCase
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testExtractParentMethods(): void
     {
@@ -53,9 +56,9 @@ class ExtractorTest extends TestCase
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Throwable
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws Throwable
+     * @throws Throwable
      */
     public function testExtractMethods(): void
     {
@@ -70,8 +73,8 @@ class ExtractorTest extends TestCase
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testSelfReturnTypes(): void
     {
@@ -87,18 +90,18 @@ class ExtractorTest extends TestCase
 
     /**
      * @param string $class
-     * @return \Cycle\ORM\Promise\Declaration\Structure
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @return Structure
+     * @throws ReflectionException
+     * @throws Throwable
      */
     private function getDeclaration(string $class): Structure
     {
-        return $this->extractor()->extract(new \ReflectionClass($class));
+        return $this->extractor()->extract(new ReflectionClass($class));
     }
 
     /**
-     * @return \Cycle\ORM\Promise\Declaration\Extractor
-     * @throws \Throwable
+     * @return Extractor
+     * @throws Throwable
      */
     private function extractor(): Extractor
     {

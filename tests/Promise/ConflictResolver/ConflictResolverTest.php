@@ -14,6 +14,7 @@ namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
 use Cycle\ORM\Promise\ConflictResolver;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
+use Throwable;
 
 class ConflictResolverTest extends TestCase
 {
@@ -23,7 +24,7 @@ class ConflictResolverTest extends TestCase
      * @param array $reserved
      * @param array $input
      * @param array $expected
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function testFind(array $reserved, array $input, array $expected): void
     {
@@ -51,8 +52,8 @@ class ConflictResolverTest extends TestCase
     }
 
     /**
-     * @return \Cycle\ORM\Promise\ConflictResolver
-     * @throws \Throwable
+     * @return ConflictResolver
+     * @throws Throwable
      */
     private function conflictResolver(): ConflictResolver
     {

@@ -12,6 +12,10 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Declaration;
 
 use PhpParser\Node\Stmt\ClassMethod;
+use ReflectionProperty;
+use SplObjectStorage;
+
+use function Cycle\ORM\Promise\phpVersionBetween;
 
 final class Structure
 {
@@ -24,7 +28,7 @@ final class Structure
     /** @var bool */
     public $hasClone;
 
-    /** @var \SplObjectStorage */
+    /** @var SplObjectStorage */
     private $properties;
 
     /**
@@ -35,15 +39,15 @@ final class Structure
     }
 
     /**
-     * @param array             $constants
-     * @param \SplObjectStorage $properties
-     * @param bool              $hasClone
-     * @param ClassMethod       ...$methods
+     * @param array            $constants
+     * @param SplObjectStorage $properties
+     * @param bool             $hasClone
+     * @param ClassMethod      ...$methods
      * @return Structure
      */
     public static function create(
         array $constants,
-        \SplObjectStorage $properties,
+        SplObjectStorage $properties,
         bool $hasClone,
         ClassMethod ...$methods
     ): Structure {
@@ -57,14 +61,15 @@ final class Structure
     }
 
     /**
+     * A list of properties to be unset due to they are initialized (have a default value).
      * @return string[]
      */
     public function toBeUnsetProperties(): array
     {
         $names = [];
-        /** @var \ReflectionProperty $property */
+        /** @var ReflectionProperty $property */
         foreach ($this->properties as $property) {
-            if ($this->properties[$property] === true && $property->isPublic()) {
+            if ($this->doesDefaultMatter($property) && $property->isPublic()) {
                 $names[] = $property->getName();
             }
         }
@@ -73,12 +78,13 @@ final class Structure
     }
 
     /**
+     * A list of public properties. Any access to them be proxied.
      * @return string[]
      */
     public function publicProperties(): array
     {
         $names = [];
-        /** @var \ReflectionProperty $property */
+        /** @var ReflectionProperty $property */
         foreach ($this->properties as $property) {
             if ($property->isPublic()) {
                 $names[] = $property->getName();
@@ -94,7 +100,7 @@ final class Structure
     public function properties(): array
     {
         $names = [];
-        /** @var \ReflectionProperty $property */
+        /** @var ReflectionProperty $property */
         foreach ($this->properties as $property) {
             $names[] = $property->getName();
         }
@@ -113,5 +119,16 @@ final class Structure
         }
 
         return $names;
+    }
+
+    /**
+     * Since php7.4.1 the behaviour changed as it was before php7.4.0. All properties should be unset.
+     * @see https://github.com/php/php-src/pull/4974
+     * @param ReflectionProperty $property
+     * @return bool
+     */
+    private function doesDefaultMatter(ReflectionProperty $property): bool
+    {
+        return !phpVersionBetween('7.4.0', '7.4.1') || $this->properties[$property] === true;
     }
 }

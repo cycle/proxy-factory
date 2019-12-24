@@ -11,12 +11,14 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise;
 
+use ReflectionClass;
+
 interface MaterializerInterface
 {
     /**
-     * @param string           $code
-     * @param string           $shortClassName
-     * @param \ReflectionClass $reflection
+     * @param string          $code
+     * @param string          $shortClassName
+     * @param ReflectionClass $reflection
      */
-    public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void;
+    public function materialize(string $code, string $shortClassName, ReflectionClass $reflection): void;
 }

@@ -12,16 +12,17 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Declaration\Declaration;
 
 use Cycle\ORM\Promise\Declaration\DeclarationInterface;
+use ReflectionClass;
 
 final class ReflectionDeclaration implements DeclarationInterface
 {
-    /** @var \ReflectionClass */
+    /** @var ReflectionClass */
     private $reflection;
 
     /**
-     * @param \ReflectionClass $class
+     * @param ReflectionClass $class
      */
-    public function __construct(\ReflectionClass $class)
+    public function __construct(ReflectionClass $class)
     {
         $this->reflection = $class;
     }

@@ -5,14 +5,18 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter\Methods;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\Tests\ProxyPrinter\BaseProxyPrinterTest;
+use ReflectionClass;
+use ReflectionException;
+use Throwable;
 
 class MethodArgsTest extends BaseProxyPrinterTest
 {
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testHasArgType(): void
     {
@@ -22,9 +26,9 @@ class MethodArgsTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testArgDefaults(): void
     {
@@ -35,9 +39,9 @@ class MethodArgsTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testVariadicArg(): void
     {
@@ -47,9 +51,9 @@ class MethodArgsTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testReferencedArg(): void
     {
@@ -62,13 +66,13 @@ class MethodArgsTest extends BaseProxyPrinterTest
      * @param string $classname
      * @param string $as
      * @return string
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     private function makeOutput(string $classname, string $as): string
     {
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
