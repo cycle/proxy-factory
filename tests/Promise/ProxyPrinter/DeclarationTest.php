@@ -12,23 +12,27 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\PromiseInterface;
+use ReflectionClass;
+use ReflectionException;
+use Throwable;
 
 use function Cycle\ORM\Promise\shortName;
 
 class DeclarationTest extends BaseProxyPrinterTest
 {
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testDeclaration(): void
     {
         $classname = Fixtures\Entity::class;
         $as = 'EntityProxy' . __LINE__;
 
-        $r = new \ReflectionClass($classname);
+        $r = new ReflectionClass($classname);
         $parent = Declarations::createParentFromReflection($r);
         $class = Declarations::createClassFromName($as, $parent);
         $output = $this->make($r, $class, $parent);
@@ -59,13 +63,13 @@ class DeclarationTest extends BaseProxyPrinterTest
      * @param string $classname
      * @param string $as
      *
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testTraits(string $classname, string $as): void
     {
-        $r = new \ReflectionClass($classname);
+        $r = new ReflectionClass($classname);
         $parent = Declarations::createParentFromReflection($r);
         $class = Declarations::createClassFromName($as, $parent);
         $this->assertStringNotContainsString(' use ', $this->make($r, $class, $parent));
@@ -83,7 +87,7 @@ class DeclarationTest extends BaseProxyPrinterTest
      * @param string $className
      * @param string $proxyFullName
      * @return object
-     * @throws \Throwable
+     * @throws Throwable
      */
     private function makeProxyObject(string $className, string $proxyFullName)
     {

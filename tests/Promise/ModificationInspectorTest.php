@@ -13,17 +13,22 @@ namespace Cycle\ORM\Promise\Tests;
 
 use Cycle\ORM\Promise\Materizalizer\ModificationInspector;
 use Cycle\ORM\Promise\Tests\Fixtures\ModificationInspector\Inspected;
+use DateTime;
+use Exception;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionException;
 use Spiral\Core\Container;
+use Throwable;
 
 class ModificationInspectorTest extends TestCase
 {
 
     /**
-     * @throws \ReflectionException
-     * @throws \Exception
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Exception
+     * @throws Throwable
      */
     public function testDate(): void
     {
@@ -32,14 +37,14 @@ class ModificationInspectorTest extends TestCase
 
         foreach ($files as $file) {
             if (is_file($file)) {
-                $date = new \DateTime('@' . filemtime($file));
+                $date = new DateTime('@' . filemtime($file));
                 if ($date > $lastDate) {
                     $lastDate = $date;
                 }
             }
         }
 
-        $this->assertEquals($lastDate, $this->inspector()->getLastModifiedDate(new \ReflectionClass(Inspected::class)));
+        $this->assertEquals($lastDate, $this->inspector()->getLastModifiedDate(new ReflectionClass(Inspected::class)));
     }
 
     private function filesDirectory(): string
@@ -48,8 +53,8 @@ class ModificationInspectorTest extends TestCase
     }
 
     /**
-     * @return \Cycle\ORM\Promise\Materizalizer\ModificationInspector
-     * @throws \Throwable
+     * @return ModificationInspector
+     * @throws Throwable
      */
     private function inspector(): ModificationInspector
     {

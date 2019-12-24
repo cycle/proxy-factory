@@ -17,7 +17,7 @@ use PhpParser\NodeVisitorAbstract;
 use function Cycle\ORM\Promise\inject;
 
 /**
- * Add "unset properties" property
+ * Add const with properties list
  */
 final class AddPropertiesConst extends NodeVisitorAbstract
 {
@@ -63,13 +63,11 @@ final class AddPropertiesConst extends NodeVisitorAbstract
             $array[] = new Node\Expr\ArrayItem(new Node\Scalar\String_($value));
         }
 
-        $const = new Node\Stmt\ClassConst([
+        return new Node\Stmt\ClassConst([
             new Node\Const_(
                 $this->name,
                 new Node\Expr\Array_($array, ['kind' => Node\Expr\Array_::KIND_SHORT])
             )
         ], Node\Stmt\Class_::MODIFIER_PRIVATE);
-
-        return $const;
     }
 }

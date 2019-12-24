@@ -11,15 +11,19 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration\Extractor;
 
+use ReflectionClass;
+use ReflectionProperty;
+use SplObjectStorage;
+
 final class Properties
 {
     /**
-     * @param \ReflectionClass $reflection
-     * @return \SplObjectStorage
+     * @param ReflectionClass $reflection
+     * @return SplObjectStorage
      */
-    public function getProperties(\ReflectionClass $reflection): \SplObjectStorage
+    public function getProperties(ReflectionClass $reflection): SplObjectStorage
     {
-        $properties = new \SplObjectStorage();
+        $properties = new SplObjectStorage();
         $defaults = $reflection->getDefaultProperties();
 
         foreach ($reflection->getProperties() as $property) {
@@ -34,10 +38,10 @@ final class Properties
     }
 
     /**
-     * @param \ReflectionProperty $property
+     * @param ReflectionProperty $property
      * @return bool
      */
-    private function isIgnoredProperty(\ReflectionProperty $property): bool
+    private function isIgnoredProperty(ReflectionProperty $property): bool
     {
         return $property->isPrivate() || $property->isStatic();
     }

@@ -152,7 +152,7 @@ final class AddProxiedMethods extends NodeVisitorAbstract
     private function packMethodArgs(Node\Stmt\ClassMethod $method): array
     {
         $args = [];
-        /** @var \PhpParser\Node\Param $param */
+        /** @var Node\Param $param */
         foreach ($method->getParams() as $param) {
             $args[] = (new Param($param->var->name))->getNode();
         }

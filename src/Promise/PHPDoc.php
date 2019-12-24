@@ -47,6 +47,6 @@ final class PHPDoc
      */
     private static function makeComment($comment): Doc
     {
-        return new Doc(is_array($comment) ? join("\n", $comment) : $comment);
+        return new Doc(is_array($comment) ? implode("\n", $comment) : $comment);
     }
 }

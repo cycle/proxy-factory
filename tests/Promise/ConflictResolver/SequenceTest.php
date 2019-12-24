@@ -14,6 +14,7 @@ namespace Cycle\ORM\Promise\Tests\Declaration\ConflictResolver;
 use Cycle\ORM\Promise\ConflictResolver\Sequences;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\Container;
+use Throwable;
 
 class SequenceTest extends TestCase
 {
@@ -23,7 +24,7 @@ class SequenceTest extends TestCase
      * @param array $sequence
      * @param int   $pos
      * @param int   $expected
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function testFind(array $sequence, int $pos, int $expected): void
     {
@@ -50,8 +51,8 @@ class SequenceTest extends TestCase
     }
 
     /**
-     * @return \Cycle\ORM\Promise\ConflictResolver\Sequences
-     * @throws \Throwable
+     * @return Sequences
+     * @throws Throwable
      */
     private function sequences(): Sequences
     {

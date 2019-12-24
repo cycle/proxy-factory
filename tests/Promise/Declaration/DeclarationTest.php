@@ -13,18 +13,20 @@ namespace Cycle\ORM\Promise\Tests\Declaration;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Tests\Declaration\Fixtures\HasNamespaceExample;
+use Example;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class DeclarationTest extends TestCase
 {
     /**
      * @dataProvider nameProvider
      *
-     * @param \ReflectionClass $reflection
-     * @param string           $name
-     * @param string           $expected
+     * @param ReflectionClass $reflection
+     * @param string          $name
+     * @param string          $expected
      */
-    public function testShortName(\ReflectionClass $reflection, string $name, string $expected): void
+    public function testShortName(ReflectionClass $reflection, string $name, string $expected): void
     {
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($name, $parent);
@@ -34,7 +36,7 @@ class DeclarationTest extends TestCase
 
     public function nameProvider(): array
     {
-        $r = new \ReflectionClass(\Example::class);
+        $r = new ReflectionClass(Example::class);
 
         return [
             [$r, 'ExampleProxy\\', 'ExampleProxy'],
@@ -47,11 +49,11 @@ class DeclarationTest extends TestCase
     /**
      * @dataProvider namespaceProvider
      *
-     * @param \ReflectionClass $reflection
-     * @param string           $name
-     * @param string|null      $expected
+     * @param ReflectionClass $reflection
+     * @param string          $name
+     * @param string|null     $expected
      */
-    public function testNamespace(\ReflectionClass $reflection, string $name, ?string $expected): void
+    public function testNamespace(ReflectionClass $reflection, string $name, ?string $expected): void
     {
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($name, $parent);
@@ -61,8 +63,8 @@ class DeclarationTest extends TestCase
 
     public function namespaceProvider(): array
     {
-        $r1 = new \ReflectionClass(\Example::class);
-        $r2 = new \ReflectionClass(HasNamespaceExample::class);
+        $r1 = new ReflectionClass(Example::class);
+        $r2 = new ReflectionClass(HasNamespaceExample::class);
 
         return [
             [$r1, 'ExampleProxy\\', null],
@@ -79,11 +81,11 @@ class DeclarationTest extends TestCase
     /**
      * @dataProvider fullNameProvider
      *
-     * @param \ReflectionClass $reflection
-     * @param string           $name
-     * @param string|null      $expected
+     * @param ReflectionClass $reflection
+     * @param string          $name
+     * @param string|null     $expected
      */
-    public function testFullName(\ReflectionClass $reflection, string $name, ?string $expected): void
+    public function testFullName(ReflectionClass $reflection, string $name, ?string $expected): void
     {
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($name, $parent);
@@ -93,8 +95,8 @@ class DeclarationTest extends TestCase
 
     public function fullNameProvider(): array
     {
-        $r1 = new \ReflectionClass(\Example::class);
-        $r2 = new \ReflectionClass(HasNamespaceExample::class);
+        $r1 = new ReflectionClass(Example::class);
+        $r2 = new ReflectionClass(HasNamespaceExample::class);
 
         return [
             [$r1, 'ExampleProxy', '\ExampleProxy'],

@@ -11,13 +11,15 @@ declare(strict_types=1);
 
 namespace Cycle\ORM\Promise\Declaration;
 
+use ReflectionClass;
+
 final class Declarations
 {
     /**
-     * @param \ReflectionClass $parent
+     * @param ReflectionClass $parent
      * @return DeclarationInterface
      */
-    public static function createParentFromReflection(\ReflectionClass $parent): DeclarationInterface
+    public static function createParentFromReflection(ReflectionClass $parent): DeclarationInterface
     {
         return new Declaration\ReflectionDeclaration($parent);
     }

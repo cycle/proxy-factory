@@ -18,7 +18,10 @@ use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\PromiseFactoryInterface;
 use Cycle\ORM\Schema;
+use Doctrine\Instantiator\Exception\ExceptionInterface;
 use Doctrine\Instantiator\Instantiator;
+use ReflectionClass;
+use ReflectionException;
 use Spiral\Core\Container\SingletonInterface;
 
 final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
@@ -69,8 +72,8 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
      * @param array        $scope
      * @return PromiseInterface
      * @throws ProxyFactoryException
-     * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
-     * @throws \ReflectionException
+     * @throws ExceptionInterface
+     * @throws ReflectionException
      */
     public function promise(ORMInterface $orm, string $role, array $scope): PromiseInterface
     {
@@ -80,8 +83,8 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
         }
 
         try {
-            $reflection = new \ReflectionClass($class);
-        } catch (\ReflectionException $e) {
+            $reflection = new ReflectionClass($class);
+        } catch (ReflectionException $e) {
             throw ProxyFactoryException::wrap($e);
         }
 
@@ -106,17 +109,17 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
     }
 
     /**
-     * @param \ReflectionClass $reflection
-     * @param string           $className
-     * @param ORMInterface     $orm
-     * @param string           $role
-     * @param array            $scope
+     * @param ReflectionClass $reflection
+     * @param string          $className
+     * @param ORMInterface    $orm
+     * @param string          $role
+     * @param array           $scope
      * @return PromiseInterface
-     * @throws \Doctrine\Instantiator\Exception\ExceptionInterface
-     * @throws \ReflectionException
+     * @throws ExceptionInterface
+     * @throws ReflectionException
      */
     private function instantiate(
-        \ReflectionClass $reflection,
+        ReflectionClass $reflection,
         string $className,
         ORMInterface $orm,
         string $role,

@@ -12,20 +12,24 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Tests\ProxyPrinter;
 
 use Cycle\ORM\Promise\Declaration\Declarations;
+use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\Printer;
+use ReflectionClass;
+use ReflectionException;
+use Throwable;
 
 class ConstantsTest extends BaseProxyPrinterTest
 {
     /**
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testConstValues(): void
     {
         $classname = Fixtures\EntityWithProperties::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -45,15 +49,15 @@ class ConstantsTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testWithoutConflicts(): void
     {
         $classname = Fixtures\EntityWithoutConstConflicts::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -70,22 +74,22 @@ class ConstantsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $reflection = new \ReflectionClass($as);
+        $reflection = new ReflectionClass($as);
         $this->assertArrayHasKey('PUBLIC_CONST', $reflection->getConstants());
         $this->assertArrayHasKey('PROTECTED_CONST', $reflection->getConstants());
         $this->assertArrayHasKey(Printer::PUBLIC_PROPERTIES_CONST, $reflection->getConstants());
     }
 
     /**
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \ReflectionException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws ReflectionException
+     * @throws Throwable
      */
     public function testWithConflicts(): void
     {
         $classname = Fixtures\EntityWithConstConflicts::class;
         $as = self::NS . __CLASS__ . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -103,7 +107,7 @@ class ConstantsTest extends BaseProxyPrinterTest
 
         eval($output);
 
-        $reflection = new \ReflectionClass($as);
+        $reflection = new ReflectionClass($as);
         $this->assertArrayHasKey('PUBLIC_CONST', $reflection->getConstants());
         $this->assertArrayHasKey('PROTECTED_CONST', $reflection->getConstants());
         $this->assertArrayHasKey(Printer::PUBLIC_PROPERTIES_CONST, $reflection->getConstants());

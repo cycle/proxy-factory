@@ -14,6 +14,8 @@ namespace Cycle\ORM\Promise\Declaration;
 use Cycle\ORM\Promise\Declaration\Extractor\Constants;
 use Cycle\ORM\Promise\Declaration\Extractor\Methods;
 use Cycle\ORM\Promise\Declaration\Extractor\Properties;
+use ReflectionClass;
+use ReflectionException;
 
 final class Extractor
 {
@@ -42,11 +44,11 @@ final class Extractor
     }
 
     /**
-     * @param \ReflectionClass $reflection
+     * @param ReflectionClass $reflection
      * @return Structure
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
-    public function extract(\ReflectionClass $reflection): Structure
+    public function extract(ReflectionClass $reflection): Structure
     {
         return Structure::create(
             $this->constants->getConstants($reflection),
@@ -57,10 +59,10 @@ final class Extractor
     }
 
     /**
-     * @param \ReflectionClass $reflection
+     * @param ReflectionClass $reflection
      * @return bool
      */
-    private function hasCloneMethod(\ReflectionClass $reflection): bool
+    private function hasCloneMethod(ReflectionClass $reflection): bool
     {
         if (!$reflection->hasMethod('__clone')) {
             return false;
@@ -68,7 +70,7 @@ final class Extractor
 
         try {
             $cloneMethod = $reflection->getMethod('__clone');
-        } catch (\ReflectionException $exception) {
+        } catch (ReflectionException $exception) {
             return false;
         }
 

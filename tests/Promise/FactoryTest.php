@@ -17,18 +17,22 @@ use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\MaterializerInterface;
 use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\Promise\Materizalizer\FileMaterializer;
+use Cycle\ORM\Promise\PromiseInterface;
 use Cycle\ORM\Promise\ProxyFactory;
+use Cycle\ORM\Promise\Resolver;
 use Cycle\ORM\Promise\Tests\Fixtures\SchematicEntity;
 use Cycle\ORM\Transaction;
 use Cycle\Schema;
+use PDO;
 use Spiral\Core\Container;
 use Spiral\Database\Driver\SQLite\SQLiteDriver;
+use Throwable;
 
 class FactoryTest extends BaseTest
 {
     public const DRIVER = 'sqlite';
 
-    /** @var \Spiral\Core\Container */
+    /** @var Container */
     private $container;
 
     public function setUp(): void
@@ -40,7 +44,7 @@ class FactoryTest extends BaseTest
             'sqlite'    => [
                 'driver' => SQLiteDriver::class,
                 'check'  => static function () {
-                    return !in_array('sqlite', \PDO::getAvailableDrivers(), true);
+                    return !in_array('sqlite', PDO::getAvailableDrivers(), true);
                 },
                 'conn'   => 'sqlite::memory:',
                 'user'   => 'sqlite',
@@ -67,8 +71,8 @@ class FactoryTest extends BaseTest
      * @param string $materializer
      * @param array  $params
      *
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testPromise(string $materializer, array $params): void
     {
@@ -84,7 +88,7 @@ class FactoryTest extends BaseTest
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
-        /** @var SchematicEntity|\Cycle\ORM\Promise\Resolver $promise */
+        /** @var SchematicEntity|Resolver $promise */
         $promise = $this->factory()->promise($orm, $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
@@ -118,7 +122,7 @@ class FactoryTest extends BaseTest
      * @param array  $params
      *
      * @throws ProxyFactoryException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function testNullScope(string $materializer, array $params): void
     {
@@ -134,7 +138,7 @@ class FactoryTest extends BaseTest
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
-        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
+        /** @var SchematicEntity|PromiseInterface $promise */
         $promise = $this->factory()->promise($orm, $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
@@ -150,7 +154,7 @@ class FactoryTest extends BaseTest
      * @param array  $params
      *
      * @throws ProxyFactoryException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function testUnknownScope(string $materializer, array $params): void
     {
@@ -166,7 +170,7 @@ class FactoryTest extends BaseTest
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
-        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
+        /** @var SchematicEntity|PromiseInterface $promise */
         $promise = $this->factory()->promise($orm, $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
@@ -182,7 +186,7 @@ class FactoryTest extends BaseTest
      * @param array  $params
      *
      * @throws ProxyFactoryException
-     * @throws \Throwable
+     * @throws Throwable
      */
     public function testUnknownProperty(string $materializer, array $params): void
     {
@@ -198,7 +202,7 @@ class FactoryTest extends BaseTest
 
         $this->bindMaterializer($this->container->make($materializer, $params));
 
-        /** @var SchematicEntity|\Cycle\ORM\Promise\PromiseInterface $promise */
+        /** @var SchematicEntity|PromiseInterface $promise */
         $promise = $this->factory()->promise($orm, $role, $scope);
 
         $this->assertInstanceOf($role, $promise);
@@ -236,8 +240,8 @@ class FactoryTest extends BaseTest
     }
 
     /**
-     * @return \Cycle\ORM\Promise\ProxyFactory
-     * @throws \Throwable
+     * @return ProxyFactory
+     * @throws Throwable
      */
     private function factory(): ProxyFactory
     {

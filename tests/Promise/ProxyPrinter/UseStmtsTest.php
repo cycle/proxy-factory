@@ -16,6 +16,9 @@ use Cycle\ORM\Promise\Declaration\Declarations;
 use Cycle\ORM\Promise\Exception\ProxyFactoryException;
 use Cycle\ORM\Promise\PromiseInterface;
 use Cycle\ORM\Promise\Resolver;
+use ReflectionClass;
+use ReflectionException;
+use Throwable;
 
 class UseStmtsTest extends BaseProxyPrinterTest
 {
@@ -27,15 +30,15 @@ class UseStmtsTest extends BaseProxyPrinterTest
     ];
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testSameNamespace(): void
     {
         $classname = Fixtures\Entity::class;
         $as = 'EntityProxy' . str_replace('\\', '', __CLASS__) . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -53,15 +56,15 @@ class UseStmtsTest extends BaseProxyPrinterTest
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Cycle\ORM\Promise\Exception\ProxyFactoryException
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      */
     public function testDistinctNamespace(): void
     {
         $classname = Fixtures\Entity::class;
         $as = "\EntityProxy" . str_replace('\\', '', __CLASS__) . __LINE__;
-        $reflection = new \ReflectionClass($classname);
+        $reflection = new ReflectionClass($classname);
 
         $parent = Declarations::createParentFromReflection($reflection);
         $class = Declarations::createClassFromName($as, $parent);
@@ -98,11 +101,11 @@ class UseStmtsTest extends BaseProxyPrinterTest
      * @param string $class
      * @param array  $types
      * @return array
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     private function fetchExternalDependencies(string $class, array $types = []): array
     {
-        $reflection = new \ReflectionClass($class);
+        $reflection = new ReflectionClass($class);
 
         foreach ($reflection->getConstructor()->getParameters() as $parameter) {
             if (!$parameter->hasType() || $parameter->getType()->isBuiltin()) {

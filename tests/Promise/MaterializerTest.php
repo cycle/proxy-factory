@@ -14,8 +14,12 @@ namespace Cycle\ORM\Promise\Tests;
 use Cycle\ORM\Promise\Materizalizer\EvalMaterializer;
 use Cycle\ORM\Promise\Materizalizer\FileMaterializer;
 use Cycle\ORM\Promise\Tests\Fixtures\Entity;
+use Exception;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use ReflectionException;
 use Spiral\Core\Container;
+use Throwable;
 
 class MaterializerTest extends TestCase
 {
@@ -37,14 +41,14 @@ class MaterializerTest extends TestCase
      * @param string $className
      * @param string $code
      *
-     * @throws \ReflectionException
+     * @throws ReflectionException
      */
     public function testEvalMaterialize(string $className, string $code): void
     {
         $this->assertFalse(class_exists($className));
 
         $materializer = new EvalMaterializer();
-        $materializer->materialize($code, $className, new \ReflectionClass(Entity::class));
+        $materializer->materialize($code, $className, new ReflectionClass(Entity::class));
 
         $this->assertTrue(class_exists($className));
     }
@@ -64,9 +68,9 @@ class MaterializerTest extends TestCase
      * @param string $className
      * @param string $code
      *
-     * @throws \ReflectionException
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws ReflectionException
+     * @throws Exception
+     * @throws Throwable
      */
     public function testFileMaterializer(string $className, string $code): void
     {
@@ -76,7 +80,7 @@ class MaterializerTest extends TestCase
         $container = new Container();
         /** @var FileMaterializer $materializer */
         $materializer = $container->make(FileMaterializer::class, ['directory' => $this->filesDirectory()]);
-        $materializer->materialize($code, $className, new \ReflectionClass(Entity::class));
+        $materializer->materialize($code, $className, new ReflectionClass(Entity::class));
 
         $this->assertTrue(class_exists($fullClassName));
     }

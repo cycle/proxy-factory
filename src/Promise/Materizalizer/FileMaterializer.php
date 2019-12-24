@@ -12,6 +12,8 @@ declare(strict_types=1);
 namespace Cycle\ORM\Promise\Materizalizer;
 
 use Cycle\ORM\Promise\MaterializerInterface;
+use Exception;
+use ReflectionClass;
 use Spiral\Core\Container\SingletonInterface;
 
 use function Cycle\ORM\Promise\trimPHPOpenTag;
@@ -39,9 +41,9 @@ final class FileMaterializer implements MaterializerInterface, SingletonInterfac
 
     /**
      * {@inheritdoc}
-     * @throws \Exception
+     * @throws Exception
      */
-    public function materialize(string $code, string $shortClassName, \ReflectionClass $reflection): void
+    public function materialize(string $code, string $shortClassName, ReflectionClass $reflection): void
     {
         $modifiedDate = $this->inspector->getLastModifiedDate($reflection);
         $filename = $this->makeFilename($shortClassName);
