@@ -16,7 +16,6 @@ namespace Cycle\ORM\Promise\Tests\Fixtures;
  */
 class SchematicEntity
 {
-
     /**
      * @column(type=string)
      * @var string
