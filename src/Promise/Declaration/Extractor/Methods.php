@@ -145,48 +145,9 @@ final class Methods
             return null;
         }
 
-        $returnType = $method->getReturnType();
+        $name = $this->defineType($method, $method->getReturnType());
 
-        if ($returnType === null) {
-            return null;
-        }
-
-        $name = $returnType->getName();
-        $name = $this->replacedSelfReturnTypeName($method, $name);
-
-        if ($this->returnTypeShouldBeQualified($returnType, $name)) {
-            $name = '\\' . $name;
-        }
-
-        if ($returnType->allowsNull()) {
-            $name = '?' . $name;
-        }
-
-        return new Node\Identifier($name);
-    }
-
-    /**
-     * @param ReflectionMethod $method
-     * @param string           $name
-     * @return string
-     */
-    private function replacedSelfReturnTypeName(ReflectionMethod $method, string $name): string
-    {
-        return $name === 'self' ? $method->class : $name;
-    }
-
-    /**
-     * @param ReflectionType $returnType
-     * @param string         $name
-     * @return bool
-     */
-    private function returnTypeShouldBeQualified(ReflectionType $returnType, string $name): bool
-    {
-        if (in_array($name, self::RESERVED_UNQUALIFIED_RETURN_TYPES, true)) {
-            return false;
-        }
-
-        return !$returnType->isBuiltin();
+        return $name !== null ? new Node\Identifier($name) : null;
     }
 
     /**
@@ -212,7 +173,7 @@ final class Methods
                 $param->makeByRef();
             }
 
-            $type = $this->defineParamReturnType($parameter);
+            $type = $this->defineParamType($parameter, $method);
             if ($type !== null) {
                 $param->setType($type);
             }
@@ -225,25 +186,65 @@ final class Methods
 
     /**
      * @param ReflectionParameter $parameter
+     * @param ReflectionMethod    $method
      * @return string|null
      */
-    private function defineParamReturnType(ReflectionParameter $parameter): ?string
+    private function defineParamType(ReflectionParameter $parameter, ReflectionMethod $method): ?string
     {
         if (!$parameter->hasType()) {
             return null;
         }
 
-        $typeReflection = $parameter->getType();
-        if ($typeReflection === null) {
+        return $this->defineType($method, $parameter->getType());
+    }
+
+    /**
+     * @param ReflectionMethod    $method
+     * @param ReflectionType|null $type
+     * @return string|null
+     */
+    private function defineType(ReflectionMethod $method, ?ReflectionType $type): ?string
+    {
+        if ($type === null) {
             return null;
         }
 
-        $type = $typeReflection->getName();
-        if ($typeReflection->allowsNull()) {
-            $type = "?$type";
+        $name = $type->getName();
+        $name = $this->replacedSelfTypeName($method, $name);
+
+        if ($this->typeShouldBeQualified($type, $name)) {
+            $name = '\\' . $name;
         }
 
-        return $type;
+        if ($type->allowsNull()) {
+            $name = "?$name";
+        }
+
+        return $name;
+    }
+
+    /**
+     * @param ReflectionMethod $method
+     * @param string           $name
+     * @return string
+     */
+    private function replacedSelfTypeName(ReflectionMethod $method, string $name): string
+    {
+        return $name === 'self' ? $method->class : $name;
+    }
+
+    /**
+     * @param ReflectionType $returnType
+     * @param string         $name
+     * @return bool
+     */
+    private function typeShouldBeQualified(ReflectionType $returnType, string $name): bool
+    {
+        if (in_array($name, self::RESERVED_UNQUALIFIED_RETURN_TYPES, true)) {
+            return false;
+        }
+
+        return !$returnType->isBuiltin();
     }
 
     /**
