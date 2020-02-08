@@ -13,7 +13,7 @@
   },
   "require-dev": {
     "ext-pdo": "*",
-    "phpunit/phpunit": "~7.0",
+    "phpunit/phpunit": "~8.0",
     "cycle/annotated": "^1.0",
     "spiral/code-style": "^1.0",
     "roave/security-advisories": "dev-master"
