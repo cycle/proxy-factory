@@ -284,7 +284,8 @@ final class Methods
                 $this->traverser->traverse(
                     $this->parser->parse(
                         file_get_contents($fileName)
-                    ), $methods
+                    ),
+                    $methods
                 );
 
                 self::$nodesByFileNameCache[$fileName] = $methods->getMethods();
@@ -293,7 +294,7 @@ final class Methods
         return self::$nodesByFileNameCache[$fileName];
     }
 
-    public static function resetNodesCache() : void
+    public static function resetNodesCache(): void
     {
         self::$nodesByFileNameCache = [];
     }
