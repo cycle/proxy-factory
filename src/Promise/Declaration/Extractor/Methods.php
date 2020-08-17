@@ -44,6 +44,8 @@ final class Methods
 
     private const RESERVED_UNQUALIFIED_RETURN_TYPES = ['self', 'static', 'object'];
 
+    private static $nodesByFileNameCache = [];
+
     /** @varTraverser */
     private $traverser;
 
@@ -255,20 +257,44 @@ final class Methods
     {
         $nodes = [];
         foreach ($reflections as $reflection) {
-            if (file_exists($reflection->getFileName())) {
-                $methods = new FetchMethods();
-                $this->traverser->traverse($this->parser->parse(
-                    file_get_contents($reflection->getFileName())
-                ), $methods);
+            if (!$fileName = $reflection->getFileName()) {
+                continue;
+            }
 
-                foreach ($methods->getMethods() as $name => $method) {
-                    if (!isset($nodes[$name])) {
-                        $nodes[$name] = $method;
-                    }
+            foreach ($this->getMethodsByFile($fileName) as $name => $method) {
+                if (!isset($nodes[$name])) {
+                    $nodes[$name] = $method;
                 }
             }
         }
 
         return $nodes;
+    }
+
+    /**
+     * @param  string $fileName
+     * @return array
+     */
+    private function getMethodsByFile(string $fileName): array
+    {
+        if (!array_key_exists($fileName, self::$nodesByFileNameCache)) {
+            self::$nodesByFileNameCache[$fileName] = [];
+            if (is_file($fileName)) {
+                $methods = new FetchMethods();
+                $this->traverser->traverse(
+                    $this->parser->parse(
+                        file_get_contents($fileName)
+                    ), $methods
+                );
+
+                self::$nodesByFileNameCache[$fileName] = $methods->getMethods();
+            }
+        }
+        return self::$nodesByFileNameCache[$fileName];
+    }
+
+    public static function resetNodesCache() : void
+    {
+        self::$nodesByFileNameCache = [];
     }
 }

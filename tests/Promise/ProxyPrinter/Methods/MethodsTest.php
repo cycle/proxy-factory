@@ -65,6 +65,37 @@ class MethodsTest extends BaseProxyPrinterTest
      * @throws ReflectionException
      * @throws ProxyFactoryException
      * @throws Throwable
+     */
+    public function testPromiseMethodsCache(): void
+    {
+        $classname = Fixtures\EntityWithMethods::class;
+        $as = self::NS . __CLASS__ . __LINE__;
+        $reflection = new ReflectionClass($classname);
+
+        $parent = Declarations::createParentFromReflection($reflection);
+        $class = Declarations::createClassFromName($as, $parent);
+
+        $outputFirst = $this->make($reflection, $class, $parent);
+        $fileName = $reflection->getFileName();
+        rename($fileName, $fileName . '_old');
+        $outputSecond = $this->make($reflection, $class, $parent);
+        rename($fileName . '_old', $fileName);
+        //get information from cache. Result same inspire that file was changed
+        $this->assertEquals($outputFirst, $outputSecond);
+
+        Extractor\Methods::resetNodesCache();
+        rename($fileName, $fileName . '_old');
+        Extractor\Methods::resetNodesCache();
+        $outputSecond = $this->make($reflection, $class, $parent);
+        rename($fileName . '_old', $fileName);
+        //get information when cache was cleared. Result not same because of file changing
+        $this->assertNotEquals($outputFirst, $outputSecond);
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws ProxyFactoryException
+     * @throws Throwable
      * @throws Throwable
      */
     public function testInheritedMethods(): void
