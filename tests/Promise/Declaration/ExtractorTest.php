@@ -89,6 +89,26 @@ class ExtractorTest extends TestCase
     }
 
     /**
+     * @throws ReflectionException
+     * @throws Throwable
+     */
+    public function testCachedStructures(): void
+    {
+        //New extractor each time
+        $this->assertNotSame(
+            $this->getDeclaration(self::class),
+            $this->getDeclaration(self::class)
+        );
+
+        //Same cached structure object
+        $extractor = $this->extractor();
+        $this->assertSame(
+            $extractor->extract(new ReflectionClass(self::class)),
+            $extractor->extract(new ReflectionClass(self::class))
+        );
+    }
+
+    /**
      * @param string $class
      * @return Structure
      * @throws ReflectionException
