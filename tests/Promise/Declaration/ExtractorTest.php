@@ -25,18 +25,6 @@ use Throwable;
 
 class ExtractorTest extends TestCase
 {
-    /** @var Extractor */
-    private $extractor;
-
-    /**
-     * @throws Throwable
-     */
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->extractor = $this->extractor();
-    }
-
     /**
      * @throws ReflectionException
      * @throws Throwable
@@ -108,7 +96,7 @@ class ExtractorTest extends TestCase
      */
     private function getDeclaration(string $class): Structure
     {
-        return $this->extractor->extract(new ReflectionClass($class));
+        return $this->extractor()->extract(new ReflectionClass($class));
     }
 
     /**
