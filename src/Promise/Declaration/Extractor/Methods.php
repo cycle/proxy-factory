@@ -50,6 +50,9 @@ final class Methods
     /** @var Parser */
     private $parser;
 
+    /** @var array */
+    private $extendedMethodsCache = [];
+
     /**
      * @param Traverser   $traverser
      * @param Parser|null $parser
@@ -255,20 +258,41 @@ final class Methods
     {
         $nodes = [];
         foreach ($reflections as $reflection) {
-            if (file_exists($reflection->getFileName())) {
-                $methods = new FetchMethods();
-                $this->traverser->traverse($this->parser->parse(
-                    file_get_contents($reflection->getFileName())
-                ), $methods);
+            $fileName = $reflection->getFileName();
+            if (!$fileName) {
+                continue;
+            }
 
-                foreach ($methods->getMethods() as $name => $method) {
-                    if (!isset($nodes[$name])) {
-                        $nodes[$name] = $method;
-                    }
+            if (!isset($this->extendedMethodsCache[$fileName])) {
+                $this->extendedMethodsCache[$fileName] = $this->fetchReflectionMethods($fileName);
+            }
+
+            foreach ($this->extendedMethodsCache[$fileName] as $name => $method) {
+                if (!isset($nodes[$name])) {
+                    $nodes[$name] = $method;
                 }
             }
         }
 
         return $nodes;
+    }
+
+    /**
+     * @param string $fileName
+     * @return array
+     */
+    private function fetchReflectionMethods(string $fileName): array
+    {
+        if (!is_file($fileName)) {
+            return [];
+        }
+
+        $methods = new FetchMethods();
+        $this->traverser->traverse(
+            $this->parser->parse(file_get_contents($fileName)),
+            $methods
+        );
+
+        return $methods->getMethods();
     }
 }

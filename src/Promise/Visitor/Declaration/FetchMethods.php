@@ -14,7 +14,7 @@ namespace Cycle\ORM\Promise\Visitor\Declaration;
 use PhpParser\Node;
 use PhpParser\NodeVisitorAbstract;
 
-class FetchMethods extends NodeVisitorAbstract
+final class FetchMethods extends NodeVisitorAbstract
 {
     /** @var Node\Stmt\ClassMethod[] */
     private $methods = [];

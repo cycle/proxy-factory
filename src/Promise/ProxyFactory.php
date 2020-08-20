@@ -41,23 +41,25 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
     /** @var Instantiator */
     private $instantiator;
 
-
     /** @var array */
     private $resolved = [];
+
+    /** @var array */
+    private $instantiateMethods = [];
 
     /**
      * @param Extractor                  $extractor
      * @param Printer                    $printer
-     * @param Instantiator               $instantiator
+     * @param Instantiator|null          $instantiator
      * @param MaterializerInterface|null $materializer
      * @param Names|null                 $names
      */
     public function __construct(
         Extractor $extractor,
         Printer $printer,
-        Instantiator $instantiator = null,
-        MaterializerInterface $materializer = null,
-        Names $names = null
+        ?Instantiator $instantiator = null,
+        ?MaterializerInterface $materializer = null,
+        ?Names $names = null
     ) {
         $this->extractor = $extractor;
         $this->printer = $printer;
@@ -125,11 +127,14 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
         string $role,
         array $scope
     ): PromiseInterface {
-        $structure = $this->extractor->extract($reflection);
+        if (!isset($this->instantiateMethods[$role])) {
+            $structure = $this->extractor->extract($reflection);
+            $this->instantiateMethods[$role] = $this->printer->initMethodName($structure);
+        }
 
         /** @var PromiseInterface $instance */
         $instance = $this->instantiator->instantiate($className);
-        $instance->{$this->printer->initMethodName($structure)}($orm, $role, $scope);
+        $instance->{$this->instantiateMethods[$role]}($orm, $role, $scope);
 
         return $instance;
     }

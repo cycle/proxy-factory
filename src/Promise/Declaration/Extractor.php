@@ -28,6 +28,9 @@ final class Extractor
     /** @var Extractor\Constants */
     private $constants;
 
+    /** @var array  */
+    private $reflectionStructureCache = [];
+
     /**
      * @param Constants  $constants
      * @param Properties $properties
@@ -50,12 +53,16 @@ final class Extractor
      */
     public function extract(ReflectionClass $reflection): Structure
     {
-        return Structure::create(
-            $this->constants->getConstants($reflection),
-            $this->properties->getProperties($reflection),
-            $this->hasCloneMethod($reflection),
-            ...$this->methods->getMethods($reflection)
-        );
+        if (!isset($this->reflectionStructureCache[$reflection->name])) {
+            $this->reflectionStructureCache[$reflection->name] = Structure::create(
+                $this->constants->getConstants($reflection),
+                $this->properties->getProperties($reflection),
+                $this->hasCloneMethod($reflection),
+                ...$this->methods->getMethods($reflection)
+            );
+        }
+
+        return $this->reflectionStructureCache[$reflection->name];
     }
 
     /**
