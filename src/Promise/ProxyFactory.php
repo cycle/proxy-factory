@@ -50,14 +50,14 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
     /**
      * @param Extractor                  $extractor
      * @param Printer                    $printer
-     * @param Instantiator|null          $instantiator
+     * @param Instantiator               $instantiator
      * @param MaterializerInterface|null $materializer
      * @param Names|null                 $names
      */
     public function __construct(
         Extractor $extractor,
         Printer $printer,
-        ?Instantiator $instantiator = null,
+        Instantiator $instantiator,
         ?MaterializerInterface $materializer = null,
         ?Names $names = null
     ) {
