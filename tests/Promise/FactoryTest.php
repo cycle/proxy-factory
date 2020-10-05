@@ -127,7 +127,7 @@ class FactoryTest extends BaseTest
     public function testNullScope(string $materializer, array $params): void
     {
         $this->expectException(ProxyFactoryException::class);
-        $this->expectExceptionMessageRegExp('/Method `\w+\(\)` not loaded for/');
+        $this->expectExceptionMessageMatches('/Method `\w+\(\)` not loaded for/');
 
         $role = SchematicEntity::class;
         $orm = $this->orm();
@@ -159,7 +159,7 @@ class FactoryTest extends BaseTest
     public function testUnknownScope(string $materializer, array $params): void
     {
         $this->expectException(ProxyFactoryException::class);
-        $this->expectExceptionMessageRegExp('/Method `\w+\(\)` not loaded for/');
+        $this->expectExceptionMessageMatches('/Method `\w+\(\)` not loaded for/');
 
         $role = SchematicEntity::class;
         $orm = $this->orm();
@@ -191,7 +191,7 @@ class FactoryTest extends BaseTest
     public function testUnknownProperty(string $materializer, array $params): void
     {
         $this->expectException(ProxyFactoryException::class);
-        $this->expectExceptionMessageRegExp('/Property `\w+` not loaded in `[_a-z]+\(\)` method for/');
+        $this->expectExceptionMessageMatches('/Property `\w+` not loaded in `[_a-z]+\(\)` method for/');
 
         $role = SchematicEntity::class;
         $orm = $this->orm();

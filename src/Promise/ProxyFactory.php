@@ -20,6 +20,7 @@ use Cycle\ORM\PromiseFactoryInterface;
 use Cycle\ORM\Schema;
 use Doctrine\Instantiator\Exception\ExceptionInterface;
 use Doctrine\Instantiator\Instantiator;
+use Doctrine\Instantiator\InstantiatorInterface;
 use ReflectionClass;
 use ReflectionException;
 use Spiral\Core\Container\SingletonInterface;
@@ -38,7 +39,7 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
     /** @var Names */
     private $names;
 
-    /** @var Instantiator */
+    /** @var InstantiatorInterface */
     private $instantiator;
 
     /** @var array */
@@ -50,20 +51,20 @@ final class ProxyFactory implements PromiseFactoryInterface, SingletonInterface
     /**
      * @param Extractor                  $extractor
      * @param Printer                    $printer
-     * @param Instantiator|null          $instantiator
+     * @param InstantiatorInterface|null $instantiator
      * @param MaterializerInterface|null $materializer
      * @param Names|null                 $names
      */
     public function __construct(
         Extractor $extractor,
         Printer $printer,
-        ?Instantiator $instantiator = null,
+        ?InstantiatorInterface $instantiator = null,
         ?MaterializerInterface $materializer = null,
         ?Names $names = null
     ) {
         $this->extractor = $extractor;
         $this->printer = $printer;
-        $this->instantiator = $instantiator;
+        $this->instantiator = $instantiator ?? new Instantiator();
         $this->materializer = $materializer ?? new EvalMaterializer();
         $this->names = $names ?? new Names();
     }
