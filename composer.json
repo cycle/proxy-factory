@@ -4,7 +4,7 @@
   "license": "MIT",
   "description": "Proxy Factory Interface implementation for cycle ORM",
   "require": {
-    "php": "^7.2",
+    "php": "^7.2 || ^8.0",
     "ext-mbstring": "*",
     "nikic/php-parser": "^4.2",
     "doctrine/instantiator": "^1.2",
