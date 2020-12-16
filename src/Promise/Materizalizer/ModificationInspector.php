@@ -54,11 +54,11 @@ final class ModificationInspector
      */
     private function getLatestParentsModifiedDate(ReflectionClass $reflection): DateTime
     {
-        $modifiedDate = new DateTime('@' . filemtime($reflection->getFileName()));
+        $modifiedDate = new DateTime('@' . $this->getDatetime($reflection));
 
         $parent = $reflection->getParentClass();
         while ($parent !== false) {
-            $parentsModifiedDate = new DateTime('@' . filemtime($parent->getFileName()));
+            $parentsModifiedDate = new DateTime('@' . $this->getDatetime($reflection));
 
             if ($parentsModifiedDate > $modifiedDate) {
                 $modifiedDate = $parentsModifiedDate;
@@ -68,5 +68,10 @@ final class ModificationInspector
         }
 
         return $modifiedDate;
+    }
+
+    private function getDatetime(ReflectionClass $reflection)
+    {
+        return $reflection->getFileName() ? filemtime($reflection->getFileName()) : time();
     }
 }
