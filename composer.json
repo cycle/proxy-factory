@@ -9,7 +9,7 @@
     "nikic/php-parser": "^4.2",
     "doctrine/instantiator": "^1.2",
     "cycle/orm": "^1.1",
-    "spiral/files": "^2.0"
+    "spiral/files": "^2.7"
   },
   "require-dev": {
     "ext-pdo": "*",
