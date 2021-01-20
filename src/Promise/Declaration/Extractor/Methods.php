@@ -230,7 +230,7 @@ final class Methods
     }
 
     /**
-     * @param ReflectionMethod $method
+     * @param ReflectionMethod    $method
      * @param ReflectionNamedType $type
      * @return string|null
      */
