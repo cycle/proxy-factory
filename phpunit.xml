@@ -16,8 +16,11 @@
         <testsuite name="Proxy Factory">
             <directory>./tests/Promise/</directory>
         </testsuite>
-        <testsuite name="Proxy Factory 74">
+        <testsuite name="Proxy Factory 7.4">
             <directory phpVersion="7.4.0-dev" phpVersionOperator="ge">./tests/php74/</directory>
+        </testsuite>
+        <testsuite name="Proxy Factory 8.0">
+            <directory phpVersion="8.0.0-dev" phpVersionOperator="ge">./tests/php80/</directory>
         </testsuite>
     </testsuites>
 
