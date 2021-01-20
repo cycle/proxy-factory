@@ -219,7 +219,7 @@ final class Methods
             $name = '\\' . $name;
         }
 
-        if ($type->allowsNull()) {
+        if ($name !== 'mixed' && $type->allowsNull()) {
             $name = "?$name";
         }
 
