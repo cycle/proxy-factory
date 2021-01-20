@@ -214,13 +214,11 @@ final class Methods
         }
 
         if ($type instanceof \ReflectionUnionType) {
-            $types = array_filter(
-                array_map(
-                    function (ReflectionNamedType $type) use ($method): ?string {
-                        return $this->defineSingularType($method, $type);
-                    },
-                    $type->getTypes()
-                )
+            $types = array_map(
+                function (ReflectionNamedType $type) use ($method): ?string {
+                    return $this->defineSingularType($method, $type);
+                },
+                $type->getTypes()
             );
 
             if ($types) {
