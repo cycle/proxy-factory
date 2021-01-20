@@ -13,7 +13,8 @@ namespace Cycle\ORM\Promise\Tests80\Fixtures;
 
 class EntityWithMixedArg
 {
-    public function method(mixed $arg): void
+    public function method(mixed $arg): mixed
     {
+        return $arg;
     }
 }
