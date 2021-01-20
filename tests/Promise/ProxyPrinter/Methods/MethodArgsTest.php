@@ -35,7 +35,10 @@ class MethodArgsTest extends BaseProxyPrinterTest
         $output = $this->makeOutput(Fixtures\ArgsFixture::class, self::NS . __CLASS__ . __LINE__);
 
         //Long syntax by default
-        $this->assertStringContainsString('defaultsSetter(string $a, $b = array(), int $c = 3, ?bool $d = null)', $output);
+        $this->assertStringContainsString(
+            'defaultsSetter(string $a, $b = array(), int $c = 3, ?bool $d = null)',
+            $output
+        );
     }
 
     /**
