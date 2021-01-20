@@ -231,15 +231,11 @@ final class Methods
 
     /**
      * @param ReflectionMethod $method
-     * @param ReflectionNamedType|null $type
+     * @param ReflectionNamedType $type
      * @return string|null
      */
-    private function defineSingularType(ReflectionMethod $method, ?ReflectionNamedType $type): ?string
+    private function defineSingularType(ReflectionMethod $method, ReflectionNamedType $type): ?string
     {
-        if ($type === null) {
-            return null;
-        }
-
         $name = $type->getName();
         $name = $this->replacedSelfTypeName($method, $name);
 
