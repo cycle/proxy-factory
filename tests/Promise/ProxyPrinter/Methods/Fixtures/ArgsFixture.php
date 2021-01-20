@@ -19,7 +19,7 @@ class ArgsFixture
     }
 
 
-    public function defaultsSetter(string $a, $b = [], int $c = 3, bool $d): void
+    public function defaultsSetter(string $a, $b = [], int $c = 3, ?bool $d = null): void
     {
     }
 

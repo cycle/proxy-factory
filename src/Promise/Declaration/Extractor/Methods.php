@@ -20,6 +20,7 @@ use PhpParser\ParserFactory;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 use ReflectionParameter;
 use ReflectionType;
 
@@ -208,10 +209,33 @@ final class Methods
      */
     private function defineType(ReflectionMethod $method, ?ReflectionType $type): ?string
     {
-        if ($type === null) {
-            return null;
+        if ($type instanceof ReflectionNamedType) {
+            return $this->defineSingularType($method, $type);
         }
 
+        if ($type instanceof \ReflectionUnionType) {
+            $types = array_map(
+                function (ReflectionNamedType $type) use ($method): ?string {
+                    return $this->defineSingularType($method, $type);
+                },
+                $type->getTypes()
+            );
+
+            if ($types) {
+                return implode('|', array_filter($types));
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @param ReflectionMethod    $method
+     * @param ReflectionNamedType $type
+     * @return string|null
+     */
+    private function defineSingularType(ReflectionMethod $method, ReflectionNamedType $type): ?string
+    {
         $name = $type->getName();
         $name = $this->replacedSelfTypeName($method, $name);
 
@@ -219,7 +243,7 @@ final class Methods
             $name = '\\' . $name;
         }
 
-        if ($type->allowsNull()) {
+        if ($name !== 'mixed' && $type->allowsNull()) {
             $name = "?$name";
         }
 
