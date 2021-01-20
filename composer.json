@@ -4,12 +4,12 @@
   "license": "MIT",
   "description": "Proxy Factory Interface implementation for cycle ORM",
   "require": {
-    "php": "^7.2 || ^8.0",
+    "php": ">=7.2",
     "ext-mbstring": "*",
     "nikic/php-parser": "^4.2",
     "doctrine/instantiator": "^1.2",
     "cycle/orm": "^1.1",
-    "spiral/files": "^2.0"
+    "spiral/files": "^2.7"
   },
   "require-dev": {
     "ext-pdo": "*",
